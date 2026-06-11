@@ -14,12 +14,12 @@ interface NavLink {
 export class ShellComponent {
   readonly navLinks: NavLink[] = [
     { path: '/dashboard', label: 'Dashboard' },
-    { path: '/productos', label: 'Productos' },
-    { path: '/ventas', label: 'Nueva Venta' },
-    { path: '/plataformas', label: 'Plataformas' },
-    { path: '/reportes', label: 'Reportes' },
-    { path: '/cierre', label: 'Cierre del Día' },
-    { path: '/proveedores', label: 'Proveedores' },
-    { path: '/usuarios', label: 'Usuarios' },
+    { path: '/products', label: 'Productos' },
+    { path: '/sales', label: 'Nueva Venta' },
+    { path: '/platforms', label: 'Plataformas' },
+    { path: '/reports', label: 'Reportes' },
+    { path: '/close', label: 'Cierre del Día' },
+    { path: '/suppliers', label: 'Proveedores' },
+    { path: '/users', label: 'Usuarios' },
   ];
 }

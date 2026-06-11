@@ -66,6 +66,7 @@ Mockups generated in Claude Design are saved locally in `~/vicfix-design-referen
 8. **All API calls go through services.** Components never inject `HttpClient` directly.
 9. **JWT lives in memory + httpOnly cookie.** Access token in memory (signal in AuthService), refresh token in httpOnly cookie set by backend. Never store JWT in localStorage.
 10. **Empty states are mandatory.** Every list view must show a meaningful empty state with a primary action. Never render a bare empty table.
+11. **English code, Spanish UI.** Route paths, folder names, and code identifiers are English (`/products`, `ProductsComponent`). UI text and nav labels are Spanish (Productos, Nueva Venta). URLs mirror REST resources: `/products` ↔ `/api/products`.
 
 ## Conventional commits
 
