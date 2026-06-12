@@ -1,0 +1,160 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="px-5 py-4 space-y-4">
+
+  <!-- Error banner -->
+  @if (errorMessage()) {
+    <div class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/>
+      </svg>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Two-column grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+    <!-- Nombre del producto -->
+    <div class="sm:col-span-2">
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">
+        Nombre del producto <span class="text-red-500">*</span>
+      </label>
+      <input formControlName="productName" type="text" placeholder="Ej: Cuaderno universitario"
+        class="w-full px-3 py-2 rounded-lg border text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]"
+        [class.border-red-400]="fieldError('productName')"
+        [class.bg-red-50]="fieldError('productName')"
+        [class.border-slate-200]="!fieldError('productName')"
+        [class.bg-white]="!fieldError('productName')" />
+      @if (fieldError('productName')) {
+        <p class="mt-1 text-xs text-red-600">El nombre es obligatorio.</p>
+      }
+    </div>
+
+    <!-- Categoría (ID) -->
+    <div>
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">
+        Categoría (ID) <span class="text-red-500">*</span>
+      </label>
+      <input formControlName="categoryId" type="number" placeholder="1"
+        class="w-full px-3 py-2 rounded-lg border text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]"
+        [class.border-red-400]="fieldError('categoryId')"
+        [class.bg-red-50]="fieldError('categoryId')"
+        [class.border-slate-200]="!fieldError('categoryId')"
+        [class.bg-white]="!fieldError('categoryId')" />
+      @if (fieldError('categoryId')) {
+        <p class="mt-1 text-xs text-red-600">La categoría es obligatoria.</p>
+      }
+    </div>
+
+    <!-- Marca -->
+    <div>
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">Marca</label>
+      <input formControlName="productBrand" type="text" placeholder="Ej: Norma"
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]" />
+    </div>
+
+    <!-- Stock -->
+    <div>
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">
+        Stock <span class="text-red-500">*</span>
+      </label>
+      <input formControlName="productStock" type="number" min="0"
+        class="w-full px-3 py-2 rounded-lg border text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]"
+        [class.border-red-400]="fieldError('productStock')"
+        [class.bg-red-50]="fieldError('productStock')"
+        [class.border-slate-200]="!fieldError('productStock')"
+        [class.bg-white]="!fieldError('productStock')" />
+      @if (fieldError('productStock')) {
+        <p class="mt-1 text-xs text-red-600">El stock no puede ser negativo.</p>
+      }
+    </div>
+
+    <!-- Unidad de medida -->
+    <div>
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">
+        Unidad de medida <span class="text-red-500">*</span>
+      </label>
+      <select formControlName="measureUnit"
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]">
+        @for (u of measureUnits; track u.value) {
+          <option [value]="u.value">{{ u.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Precio de venta -->
+    <div>
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">
+        Precio de venta <span class="text-red-500">*</span>
+      </label>
+      <input formControlName="salePrice" type="number" min="1" placeholder="0"
+        class="w-full px-3 py-2 rounded-lg border text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]"
+        [class.border-red-400]="fieldError('salePrice')"
+        [class.bg-red-50]="fieldError('salePrice')"
+        [class.border-slate-200]="!fieldError('salePrice')"
+        [class.bg-white]="!fieldError('salePrice')" />
+      @if (fieldError('salePrice')) {
+        <p class="mt-1 text-xs text-red-600">Ingresa un precio de venta válido.</p>
+      }
+    </div>
+
+    <!-- Precio de costo -->
+    <div>
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">
+        Precio de costo <span class="text-red-500">*</span>
+      </label>
+      <input formControlName="costPrice" type="number" min="1" placeholder="0"
+        class="w-full px-3 py-2 rounded-lg border text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]"
+        [class.border-red-400]="fieldError('costPrice')"
+        [class.bg-red-50]="fieldError('costPrice')"
+        [class.border-slate-200]="!fieldError('costPrice')"
+        [class.bg-white]="!fieldError('costPrice')" />
+      @if (fieldError('costPrice')) {
+        <p class="mt-1 text-xs text-red-600">Ingresa un precio de costo válido.</p>
+      }
+    </div>
+
+    <!-- Cantidad de reorden -->
+    <div>
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">Cantidad de reorden</label>
+      <input formControlName="reorderQuantity" type="number" min="0"
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]" />
+    </div>
+
+    <!-- Fecha de vencimiento -->
+    <div>
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">Fecha de vencimiento</label>
+      <input formControlName="expirationDate" type="date"
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]" />
+    </div>
+
+    <!-- Código de barras -->
+    <div class="sm:col-span-2">
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">Código de barras</label>
+      <input formControlName="barcode" type="text" placeholder="Ej: 7702001234567"
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]" />
+    </div>
+
+  </div>
+
+  <!-- Footer actions -->
+  <div class="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
+    <button type="button" (click)="cancelled.emit()"
+      class="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-[#64748B] hover:bg-slate-50 transition-colors">
+      Cancelar
+    </button>
+    <button type="submit"
+      [disabled]="submitting() || form.invalid"
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#059669] text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+      @if (submitting()) {
+        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+        </svg>
+        Guardando...
+      } @else {
+        {{ isEditMode ? 'Guardar cambios' : 'Crear producto' }}
+      }
+    </button>
+  </div>
+
+</form>

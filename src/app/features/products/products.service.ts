@@ -21,4 +21,16 @@ export class ProductsService {
   getProductById(id: number): Observable<Product> {
     return this.http.get<Product>(`${base}/${id}`);
   }
+
+  createProduct(dto: Partial<Product>): Observable<Product> {
+    return this.http.post<Product>(base, dto);
+  }
+
+  updateProduct(id: number, dto: Partial<Product>): Observable<Product> {
+    return this.http.put<Product>(`${base}/${id}`, dto);
+  }
+
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${base}/${id}`);
+  }
 }

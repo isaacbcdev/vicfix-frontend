@@ -12,11 +12,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProductsService } from './products.service';
 import { Product } from '@shared/models/product.model';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
+import { ModalComponent } from '@shared/ui/modal/modal.component';
+import { ProductFormComponent } from './product-form/product-form.component';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [FormsModule, CurrencyCopPipe],
+  imports: [FormsModule, CurrencyCopPipe, ModalComponent, ProductFormComponent],
   templateUrl: './products.html',
 })
 export class ProductsComponent implements OnInit {
@@ -30,6 +32,10 @@ export class ProductsComponent implements OnInit {
   query = signal('');
   loading = signal(false);
   error = signal<string | null>(null);
+
+  showModal = signal(false);
+  editingProduct = signal<Product | null>(null);
+  deletingId = signal<number | null>(null);
 
   totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
@@ -63,6 +69,39 @@ export class ProductsComponent implements OnInit {
         error: () => {
           this.error.set('No se pudo cargar la lista de productos. Intenta de nuevo.');
           this.loading.set(false);
+        },
+      });
+  }
+
+  openCreate(): void {
+    this.editingProduct.set(null);
+    this.showModal.set(true);
+  }
+
+  openEdit(product: Product): void {
+    this.editingProduct.set(product);
+    this.showModal.set(true);
+  }
+
+  onProductSaved(_product: Product): void {
+    this.showModal.set(false);
+    this.loadProducts();
+  }
+
+  deleteProduct(id: number): void {
+    this.deletingId.set(id);
+    this.error.set(null);
+    this.svc
+      .deleteProduct(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.deletingId.set(null);
+          this.loadProducts();
+        },
+        error: () => {
+          this.deletingId.set(null);
+          this.error.set('No se pudo eliminar el producto. Intenta de nuevo.');
         },
       });
   }

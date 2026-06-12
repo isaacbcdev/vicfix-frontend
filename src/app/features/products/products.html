@@ -3,8 +3,8 @@
   <!-- Header -->
   <div class="flex items-center justify-between">
     <h1 class="text-2xl font-semibold text-[#0F172A]">Productos</h1>
-    <button disabled
-      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#059669] text-white text-sm font-medium opacity-50 cursor-not-allowed">
+    <button (click)="openCreate()"
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#059669] text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
       </svg>
@@ -23,24 +23,24 @@
       placeholder="Buscar producto..."
       class="w-full pl-9 pr-8 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]" />
     @if (searchInput) {
-    <button (click)="clearSearch()"
-      class="absolute right-2 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#0F172A]">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
+      <button (click)="clearSearch()"
+        class="absolute right-2 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#0F172A]">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     }
   </div>
 
   <!-- Error -->
   @if (error()) {
-  <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
-    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="10" />
-      <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
-    </svg>
-    {{ error() }}
-  </div>
+    <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+        <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
+      </svg>
+      {{ error() }}
+    </div>
   }
 
   <!-- Table card -->
@@ -55,79 +55,98 @@
             <th class="text-right px-4 py-3 font-medium text-[#64748B]">Precio venta</th>
             <th class="text-left px-4 py-3 font-medium text-[#64748B]">Unidad</th>
             <th class="text-left px-4 py-3 font-medium text-[#64748B]">Estado</th>
+            <th class="px-4 py-3"></th>
           </tr>
         </thead>
         <tbody>
 
           <!-- Loading skeletons -->
           @if (loading()) {
-          @for (_ of [1,2,3,4,5,6,7,8]; track $index) {
-          <tr class="border-b border-slate-50 animate-pulse">
-            <td class="px-4 py-3">
-              <div class="h-4 bg-slate-100 rounded w-40"></div>
-              <div class="h-3 bg-slate-100 rounded w-24 mt-1"></div>
-            </td>
-            <td class="px-4 py-3">
-              <div class="h-4 bg-slate-100 rounded w-28"></div>
-            </td>
-            <td class="px-4 py-3 text-right">
-              <div class="h-4 bg-slate-100 rounded w-8 ml-auto"></div>
-            </td>
-            <td class="px-4 py-3 text-right">
-              <div class="h-4 bg-slate-100 rounded w-20 ml-auto"></div>
-            </td>
-            <td class="px-4 py-3">
-              <div class="h-4 bg-slate-100 rounded w-14"></div>
-            </td>
-            <td class="px-4 py-3">
-              <div class="h-5 bg-slate-100 rounded-full w-20"></div>
-            </td>
-          </tr>
-          }
+            @for (_ of [1,2,3,4,5,6,7,8]; track $index) {
+              <tr class="border-b border-slate-50 animate-pulse">
+                <td class="px-4 py-3">
+                  <div class="h-4 bg-slate-100 rounded w-40"></div>
+                  <div class="h-3 bg-slate-100 rounded w-24 mt-1"></div>
+                </td>
+                <td class="px-4 py-3"><div class="h-4 bg-slate-100 rounded w-28"></div></td>
+                <td class="px-4 py-3 text-right"><div class="h-4 bg-slate-100 rounded w-8 ml-auto"></div></td>
+                <td class="px-4 py-3 text-right"><div class="h-4 bg-slate-100 rounded w-20 ml-auto"></div></td>
+                <td class="px-4 py-3"><div class="h-4 bg-slate-100 rounded w-14"></div></td>
+                <td class="px-4 py-3"><div class="h-5 bg-slate-100 rounded-full w-20"></div></td>
+                <td class="px-4 py-3"><div class="h-5 bg-slate-100 rounded w-16 ml-auto"></div></td>
+              </tr>
+            }
           }
 
           <!-- Data rows -->
           @if (!loading()) {
-          @for (p of products(); track p.productId) {
-          <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-            <td class="px-4 py-3">
-              <span class="font-medium text-[#0F172A]">{{ p.productName }}</span>
-              @if (p.productBrand) {
-              <div class="text-xs text-[#64748B]">{{ p.productBrand }}</div>
-              }
-            </td>
-            <td class="px-4 py-3 text-text-secondary">{{ p.categoryName ?? '—' }}</td>
-            <td class="px-4 py-3 text-right font-medium text-[#0F172A]">{{ p.productStock }}</td>
-            <td class="px-4 py-3 text-right font-medium text-[#0F172A]">{{ p.salePrice | currencyCop }}</td>
-            <td class="px-4 py-3 text-[#64748B]">{{ p.measureUnitDisplay ?? p.measureUnit }}</td>
-            <td class="px-4 py-3">
-              <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ statusClass(p.status) }}">
-                {{ p.statusDisplay ?? p.status }}
-              </span>
-            </td>
-          </tr>
-          }
+            @for (p of products(); track p.productId) {
+              <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                <td class="px-4 py-3">
+                  <span class="font-medium text-[#0F172A]">{{ p.productName }}</span>
+                  @if (p.productBrand) {
+                    <div class="text-xs text-[#64748B]">{{ p.productBrand }}</div>
+                  }
+                </td>
+                <td class="px-4 py-3 text-[#64748B]">{{ p.categoryName ?? '—' }}</td>
+                <td class="px-4 py-3 text-right font-medium text-[#0F172A]">{{ p.productStock }}</td>
+                <td class="px-4 py-3 text-right font-medium text-[#0F172A]">{{ p.salePrice | currencyCop }}</td>
+                <td class="px-4 py-3 text-[#64748B]">{{ p.measureUnitDisplay ?? p.measureUnit }}</td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ statusClass(p.status) }}">
+                    {{ p.statusDisplay ?? p.status }}
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center justify-end gap-1">
+                    <button (click)="openEdit(p)"
+                      class="p-1.5 rounded-lg text-[#64748B] hover:text-[#059669] hover:bg-emerald-50 transition-colors"
+                      title="Editar">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                      </svg>
+                    </button>
+                    <button (click)="deleteProduct(p.productId)"
+                      [disabled]="deletingId() === p.productId"
+                      class="p-1.5 rounded-lg text-[#64748B] hover:text-red-600 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      title="Eliminar">
+                      @if (deletingId() === p.productId) {
+                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                        </svg>
+                      } @else {
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                        </svg>
+                      }
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
 
-          <!-- Empty state -->
-          @empty {
-          <tr>
-            <td colspan="6" class="px-4 py-16 text-center">
-              <div class="flex flex-col items-center gap-3">
-                <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5"
-                  viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-                </svg>
-                <p class="text-[#64748B] text-sm">No hay productos registrados aún.</p>
-                <button disabled
-                  class="mt-1 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#059669] text-white text-sm font-medium opacity-50 cursor-not-allowed">
-                  Agregar primer producto
-                </button>
-              </div>
-            </td>
-          </tr>
-          }
+            <!-- Empty state -->
+            @empty {
+              <tr>
+                <td colspan="7" class="px-4 py-16 text-center">
+                  <div class="flex flex-col items-center gap-3">
+                    <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5"
+                      viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                    </svg>
+                    <p class="text-[#64748B] text-sm">No hay productos registrados aún.</p>
+                    <button (click)="openCreate()"
+                      class="mt-1 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#059669] text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
+                      Agregar primer producto
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
           }
 
         </tbody>
@@ -136,21 +155,32 @@
 
     <!-- Pagination -->
     @if (!loading() && totalElements() > 0) {
-    <div class="flex items-center justify-between px-4 py-3 border-t border-slate-100 text-sm text-[#64748B]">
-      <span>{{ totalElements() }} producto{{ totalElements() === 1 ? '' : 's' }}</span>
-      <div class="flex items-center gap-3">
-        <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 0"
-          class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-          Anterior
-        </button>
-        <span>Página {{ currentPage() + 1 }} de {{ totalPages() }}</span>
-        <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() + 1 >= totalPages()"
-          class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-          Siguiente
-        </button>
+      <div class="flex items-center justify-between px-4 py-3 border-t border-slate-100 text-sm text-[#64748B]">
+        <span>{{ totalElements() }} producto{{ totalElements() === 1 ? '' : 's' }}</span>
+        <div class="flex items-center gap-3">
+          <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 0"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+            Anterior
+          </button>
+          <span>Página {{ currentPage() + 1 }} de {{ totalPages() }}</span>
+          <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() + 1 >= totalPages()"
+            class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+            Siguiente
+          </button>
+        </div>
       </div>
-    </div>
     }
   </div>
 
 </div>
+
+<!-- Create / Edit modal -->
+<app-modal
+  [title]="editingProduct() ? 'Editar producto' : 'Agregar producto'"
+  [isOpen]="showModal()"
+  (closed)="showModal.set(false)">
+  <app-product-form
+    [product]="editingProduct()"
+    (saved)="onProductSaved($event)"
+    (cancelled)="showModal.set(false)" />
+</app-modal>
