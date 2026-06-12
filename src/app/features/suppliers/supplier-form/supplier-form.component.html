@@ -1,0 +1,81 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="px-5 py-4 space-y-4">
+
+  @if (errorMessage()) {
+    <div class="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/>
+      </svg>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  <div class="space-y-3">
+
+    <!-- Nombre -->
+    <div>
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">
+        Nombre <span class="text-red-500">*</span>
+      </label>
+      <input formControlName="name" type="text" placeholder="Ej: Distribuidora Nacional"
+        class="w-full px-3 py-2 rounded-lg border text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]"
+        [class.border-red-400]="fieldError('name')"
+        [class.bg-red-50]="fieldError('name')"
+        [class.border-slate-200]="!fieldError('name')"
+        [class.bg-white]="!fieldError('name')" />
+      @if (fieldError('name')) {
+        <p class="mt-1 text-xs text-red-600">El nombre es obligatorio.</p>
+      }
+    </div>
+
+    <!-- NIT -->
+    <div>
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">NIT</label>
+      <input formControlName="nit" type="text" placeholder="Ej: 900123456-7"
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]" />
+    </div>
+
+    <!-- Tipo de negocio -->
+    <div>
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">Tipo de negocio</label>
+      <input formControlName="businessType" type="text" placeholder="Ej: Mayorista"
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]" />
+    </div>
+
+    <!-- Sitio web -->
+    <div>
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">Sitio web</label>
+      <input formControlName="website" type="url" placeholder="https://proveedor.com"
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]" />
+    </div>
+
+    <!-- Descripción -->
+    <div>
+      <label class="block text-sm font-medium text-[#0F172A] mb-1">Descripción</label>
+      <textarea formControlName="description" rows="3" placeholder="Descripción del proveedor..."
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669] resize-none"></textarea>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
+    <button type="button" (click)="cancelled.emit()"
+      class="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-[#64748B] hover:bg-slate-50 transition-colors">
+      Cancelar
+    </button>
+    <button type="submit"
+      [disabled]="submitting() || form.invalid"
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#059669] text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+      @if (submitting()) {
+        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+        </svg>
+        Guardando...
+      } @else {
+        {{ isEditMode ? 'Guardar cambios' : 'Crear proveedor' }}
+      }
+    </button>
+  </div>
+
+</form>
