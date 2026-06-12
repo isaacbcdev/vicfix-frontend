@@ -1,8 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
 import { environment } from '@environments/environment';
-import { LoginResponse, User } from './auth.models';
+import { LoginResponse, LoginResult, User } from './auth.models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -22,7 +22,7 @@ export class AuthService {
     this._currentUser.set(null);
   }
 
-  login(username: string, password: string): Observable<boolean> {
+  login(username: string, password: string): Observable<LoginResult> {
     return this.http
       .post<LoginResponse>(`${this.base}/login`, { username, password }, { withCredentials: true })
       .pipe(
@@ -30,10 +30,11 @@ export class AuthService {
           this._accessToken.set(res.accessToken);
           return this.loadCurrentUser();
         }),
-        map(() => true),
-        catchError(() => {
+        map((): LoginResult => ({ ok: true })),
+        catchError((err: HttpErrorResponse) => {
           this.clearAuth();
-          return of(false);
+          const reason = err.status === 423 ? 'locked' : 'credentials';
+          return of<LoginResult>({ ok: false, reason });
         })
       );
   }

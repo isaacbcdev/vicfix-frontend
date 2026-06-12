@@ -10,3 +10,7 @@ export interface User {
   email?: string;
   roles?: string[];
 }
+
+export type LoginResult =
+  | { ok: true }
+  | { ok: false; reason: 'credentials' | 'locked' };
