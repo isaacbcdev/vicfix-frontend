@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { ProductsService } from '../products.service';
@@ -16,7 +16,7 @@ interface ErrorResponse {
   imports: [ReactiveFormsModule],
   templateUrl: './product-form.component.html',
 })
-export class ProductFormComponent implements OnInit {
+export class ProductFormComponent {
   product = input<Product | null>(null);
   saved = output<Product>();
   cancelled = output<void>();
@@ -47,22 +47,26 @@ export class ProductFormComponent implements OnInit {
     { value: 'PACK', label: 'Paquete' },
   ];
 
-  ngOnInit(): void {
-    const p = this.product();
-    if (p) {
-      this.form.patchValue({
-        productName: p.productName,
-        categoryId: p.categoryId,
-        productBrand: p.productBrand ?? '',
-        productStock: p.productStock,
-        salePrice: p.salePrice,
-        costPrice: p.costPrice ?? null,
-        measureUnit: p.measureUnit,
-        reorderQuantity: p.reorderQuantity,
-        expirationDate: p.expirationDate ?? '',
-        barcode: p.barcode ?? '',
-      });
-    }
+  constructor() {
+    effect(() => {
+      const p = this.product();
+      if (p) {
+        this.form.patchValue({
+          productName: p.productName,
+          categoryId: p.categoryId,
+          productBrand: p.productBrand ?? '',
+          productStock: p.productStock,
+          salePrice: p.salePrice,
+          costPrice: p.costPrice ?? 0,
+          measureUnit: p.measureUnit,
+          reorderQuantity: p.reorderQuantity,
+          expirationDate: p.expirationDate ?? '',
+          barcode: p.barcode ?? '',
+        });
+      } else {
+        this.form.reset();
+      }
+    });
   }
 
   get isEditMode(): boolean {
