@@ -1,15 +1,17 @@
 import { Routes } from '@angular/router';
 import { ShellComponent } from '@shared/layout/shell/shell';
+import { authGuard, guestGuard } from '@shared/auth/auth.guard';
 
 export const routes: Routes = [
   {
     path: 'login',
+    canActivate: [guestGuard],
     loadComponent: () => import('@features/login/login').then(m => m.LoginComponent),
   },
   {
     path: '',
     component: ShellComponent,
-    // canActivate: [AuthGuard] — add here when AuthService/JWT is ready
+    canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
