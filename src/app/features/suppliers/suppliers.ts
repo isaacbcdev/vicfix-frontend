@@ -28,6 +28,7 @@ export class SuppliersComponent implements OnInit {
   showModal = signal(false);
   editingSupplier = signal<Supplier | null>(null);
   deactivatingId = signal<number | null>(null);
+  restoringId = signal<number | null>(null);
 
   totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
@@ -100,6 +101,24 @@ export class SuppliersComponent implements OnInit {
         error: () => {
           this.deactivatingId.set(null);
           this.error.set('No se pudo desactivar el proveedor. Intenta de nuevo.');
+        },
+      });
+  }
+
+  onRestore(id: number): void {
+    this.restoringId.set(id);
+    this.error.set(null);
+    this.svc
+      .restoreSupplier(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.restoringId.set(null);
+          this.loadSuppliers();
+        },
+        error: () => {
+          this.restoringId.set(null);
+          this.error.set('No se pudo restaurar el proveedor. Intenta de nuevo.');
         },
       });
   }

@@ -4,9 +4,9 @@
   <div class="flex items-center justify-between">
     <h1 class="text-2xl font-semibold text-[#0F172A]">Proveedores</h1>
     <button (click)="openCreate()"
-      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#059669] text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
       </svg>
       Agregar proveedor
     </button>
@@ -15,20 +15,21 @@
   <!-- Search + status filter -->
   <div class="flex flex-col sm:flex-row gap-3">
     <div class="relative flex-1 max-w-sm">
-      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748B]" fill="none" stroke="currentColor"
-        stroke-width="2" viewBox="0 0 24 24">
-        <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/>
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary" fill="none"
+        stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8" />
+        <path stroke-linecap="round" d="m21 21-4.35-4.35" />
       </svg>
       <input type="text" [value]="searchInput" (input)="onSearchChange($any($event.target).value)"
         placeholder="Buscar proveedor..."
-        class="w-full pl-9 pr-8 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#059669]/40 focus:border-[#059669]" />
+        class="w-full pl-9 pr-8 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent" />
       @if (searchInput) {
-        <button (click)="clearSearch()"
-          class="absolute right-2 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#0F172A]">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
+      <button (click)="clearSearch()"
+        class="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-[#0F172A]">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
       }
     </div>
 
@@ -36,21 +37,17 @@
     <div class="flex gap-2">
       <button type="button" (click)="setStatusFilter('ACTIVE')"
         class="px-4 py-2 rounded-lg border text-sm font-medium transition-colors"
-        [class.bg-[#059669]]="statusFilter() === 'ACTIVE'"
-        [class.text-white]="statusFilter() === 'ACTIVE'"
-        [class.border-[#059669]]="statusFilter() === 'ACTIVE'"
-        [class.bg-white]="statusFilter() !== 'ACTIVE'"
-        [class.text-[#64748B]]="statusFilter() !== 'ACTIVE'"
+        [class.bg-accent]="statusFilter() === 'ACTIVE'" [class.text-white]="statusFilter() === 'ACTIVE'"
+        [class.border-accent]="statusFilter() === 'ACTIVE'" [class.bg-white]="statusFilter() !== 'ACTIVE'"
+        [class.text-text-secondary]="statusFilter() !== 'ACTIVE'"
         [class.border-slate-200]="statusFilter() !== 'ACTIVE'">
         Activos
       </button>
       <button type="button" (click)="setStatusFilter('INACTIVE')"
         class="px-4 py-2 rounded-lg border text-sm font-medium transition-colors"
-        [class.bg-[#059669]]="statusFilter() === 'INACTIVE'"
-        [class.text-white]="statusFilter() === 'INACTIVE'"
-        [class.border-[#059669]]="statusFilter() === 'INACTIVE'"
-        [class.bg-white]="statusFilter() !== 'INACTIVE'"
-        [class.text-[#64748B]]="statusFilter() !== 'INACTIVE'"
+        [class.bg-accent]="statusFilter() === 'INACTIVE'" [class.text-white]="statusFilter() === 'INACTIVE'"
+        [class.border-accent]="statusFilter() === 'INACTIVE'" [class.bg-white]="statusFilter() !== 'INACTIVE'"
+        [class.text-text-secondary]="statusFilter() !== 'INACTIVE'"
         [class.border-slate-200]="statusFilter() !== 'INACTIVE'">
         Inactivos
       </button>
@@ -59,12 +56,13 @@
 
   <!-- Error -->
   @if (error()) {
-    <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
-      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/>
-      </svg>
-      {{ error() }}
-    </div>
+  <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
+    </svg>
+    {{ error() }}
+  </div>
   }
 
   <!-- Table card -->
@@ -73,11 +71,11 @@
       <table class="w-full text-sm">
         <thead>
           <tr class="border-b border-slate-100 bg-slate-50">
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">Nombre</th>
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">NIT</th>
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">Tipo de negocio</th>
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">Sitio web</th>
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">Estado</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Nombre</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">NIT</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Tipo de negocio</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Sitio web</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Estado</th>
             <th class="px-4 py-3"></th>
           </tr>
         </thead>
@@ -85,100 +83,125 @@
 
           <!-- Loading skeletons -->
           @if (loading()) {
-            @for (_ of [1,2,3,4,5,6]; track $index) {
-              <tr class="border-b border-slate-50 animate-pulse">
-                <td class="px-4 py-3"><div class="h-4 bg-slate-100 rounded w-40"></div></td>
-                <td class="px-4 py-3"><div class="h-4 bg-slate-100 rounded w-28"></div></td>
-                <td class="px-4 py-3"><div class="h-4 bg-slate-100 rounded w-24"></div></td>
-                <td class="px-4 py-3"><div class="h-4 bg-slate-100 rounded w-32"></div></td>
-                <td class="px-4 py-3"><div class="h-5 bg-slate-100 rounded-full w-16"></div></td>
-                <td class="px-4 py-3"><div class="h-5 bg-slate-100 rounded w-16 ml-auto"></div></td>
-              </tr>
-            }
+          @for (_ of [1,2,3,4,5,6]; track $index) {
+          <tr class="border-b border-slate-50 animate-pulse">
+            <td class="px-4 py-3">
+              <div class="h-4 bg-slate-100 rounded w-40"></div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="h-4 bg-slate-100 rounded w-28"></div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="h-4 bg-slate-100 rounded w-24"></div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="h-4 bg-slate-100 rounded w-32"></div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="h-5 bg-slate-100 rounded-full w-16"></div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="h-5 bg-slate-100 rounded w-16 ml-auto"></div>
+            </td>
+          </tr>
+          }
           }
 
           <!-- Data rows -->
           @if (!loading()) {
-            @for (s of suppliers(); track s.supplierId) {
-              <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                <td class="px-4 py-3 font-medium text-[#0F172A]">{{ s.name }}</td>
-                <td class="px-4 py-3 text-[#64748B]">{{ s.nit ?? '—' }}</td>
-                <td class="px-4 py-3 text-[#64748B]">{{ s.businessType ?? '—' }}</td>
-                <td class="px-4 py-3">
-                  @if (s.website) {
-                    <a [href]="s.website" target="_blank" rel="noopener noreferrer"
-                      class="text-[#059669] hover:underline truncate max-w-[160px] block">
-                      {{ s.website }}
-                    </a>
+          @for (s of suppliers(); track s.supplierId) {
+          <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-3 font-medium text-[#0F172A]">{{ s.name }}</td>
+            <td class="px-4 py-3 text-text-secondary">{{ s.nit ?? '—' }}</td>
+            <td class="px-4 py-3 text-text-secondary">{{ s.businessType ?? '—' }}</td>
+            <td class="px-4 py-3">
+              @if (s.website) {
+              <a [href]="s.website" target="_blank" rel="noopener noreferrer"
+                class="text-accent hover:underline truncate max-w-[160px] block">
+                {{ s.website }}
+              </a>
+              } @else {
+              <span class="text-text-secondary">—</span>
+              }
+            </td>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                [class.bg-emerald-100]="s.status === 'ACTIVE'" [class.text-emerald-700]="s.status === 'ACTIVE'"
+                [class.bg-slate-100]="s.status === 'INACTIVE'" [class.text-slate-500]="s.status === 'INACTIVE'">
+                {{ s.statusDisplay ?? s.status }}
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex items-center justify-end gap-1">
+                <button (click)="openEdit(s)"
+                  class="p-1.5 rounded-lg text-text-secondary hover:text-accent hover:bg-emerald-50 transition-colors"
+                  title="Editar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                  </svg>
+                </button>
+                @if (s.status === 'ACTIVE') {
+                <button (click)="onDeactivate(s.supplierId)" [disabled]="deactivatingId() === s.supplierId"
+                  class="p-1.5 rounded-lg text-text-secondary hover:text-amber-600 hover:bg-amber-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  title="Desactivar">
+                  @if (deactivatingId() === s.supplierId) {
+                  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
                   } @else {
-                    <span class="text-[#64748B]">—</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                  </svg>
                   }
-                </td>
-                <td class="px-4 py-3">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                    [class.bg-emerald-100]="s.status === 'ACTIVE'"
-                    [class.text-emerald-700]="s.status === 'ACTIVE'"
-                    [class.bg-slate-100]="s.status === 'INACTIVE'"
-                    [class.text-slate-500]="s.status === 'INACTIVE'">
-                    {{ s.statusDisplay ?? s.status }}
-                  </span>
-                </td>
-                <td class="px-4 py-3">
-                  <div class="flex items-center justify-end gap-1">
-                    <button (click)="openEdit(s)"
-                      class="p-1.5 rounded-lg text-[#64748B] hover:text-[#059669] hover:bg-emerald-50 transition-colors"
-                      title="Editar">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/>
-                      </svg>
-                    </button>
-                    @if (s.status === 'ACTIVE') {
-                      <button (click)="onDeactivate(s.supplierId)"
-                        [disabled]="deactivatingId() === s.supplierId"
-                        class="p-1.5 rounded-lg text-[#64748B] hover:text-amber-600 hover:bg-amber-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                        title="Desactivar">
-                        @if (deactivatingId() === s.supplierId) {
-                          <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-                          </svg>
-                        } @else {
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
-                          </svg>
-                        }
-                      </button>
-                    }
-                  </div>
-                </td>
-              </tr>
-            }
+                </button>
+                } @else {
+                <button (click)="onRestore(s.supplierId)" [disabled]="restoringId() === s.supplierId"
+                  class="p-1.5 rounded-lg text-text-secondary hover:text-emerald-600 hover:bg-emerald-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  title="Restaurar">
+                  @if (restoringId() === s.supplierId) {
+                  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  } @else {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                  }
+                </button>
+                }
+              </div>
+            </td>
+          </tr>
+          }
 
-            <!-- Empty state -->
-            @empty {
-              <tr>
-                <td colspan="6" class="px-4 py-16 text-center">
-                  <div class="flex flex-col items-center gap-3">
-                    <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5"
-                      viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016 2.993 2.993 0 002.25-1.016 3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 2.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/>
-                    </svg>
-                    <p class="text-[#64748B] text-sm">
-                      No hay proveedores {{ statusFilter() === 'ACTIVE' ? 'activos' : 'inactivos' }} registrados.
-                    </p>
-                    @if (statusFilter() === 'ACTIVE') {
-                      <button (click)="openCreate()"
-                        class="mt-1 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#059669] text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
-                        Agregar primer proveedor
-                      </button>
-                    }
-                  </div>
-                </td>
-              </tr>
-            }
+          <!-- Empty state -->
+          @empty {
+          <tr>
+            <td colspan="6" class="px-4 py-16 text-center">
+              <div class="flex flex-col items-center gap-3">
+                <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016 2.993 2.993 0 002.25-1.016 3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 2.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
+                </svg>
+                <p class="text-text-secondary text-sm">
+                  No hay proveedores {{ statusFilter() === 'ACTIVE' ? 'activos' : 'inactivos' }} registrados.
+                </p>
+                @if (statusFilter() === 'ACTIVE') {
+                <button (click)="openCreate()"
+                  class="mt-1 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
+                  Agregar primer proveedor
+                </button>
+                }
+              </div>
+            </td>
+          </tr>
+          }
           }
 
         </tbody>
@@ -187,32 +210,27 @@
 
     <!-- Pagination -->
     @if (!loading() && totalElements() > 0) {
-      <div class="flex items-center justify-between px-4 py-3 border-t border-slate-100 text-sm text-[#64748B]">
-        <span>{{ totalElements() }} proveedor{{ totalElements() === 1 ? '' : 'es' }}</span>
-        <div class="flex items-center gap-3">
-          <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 0"
-            class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-            Anterior
-          </button>
-          <span>Página {{ currentPage() + 1 }} de {{ totalPages() }}</span>
-          <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() + 1 >= totalPages()"
-            class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-            Siguiente
-          </button>
-        </div>
+    <div class="flex items-center justify-between px-4 py-3 border-t border-slate-100 text-sm text-text-secondary">
+      <span>{{ totalElements() }} proveedor{{ totalElements() === 1 ? '' : 'es' }}</span>
+      <div class="flex items-center gap-3">
+        <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 0"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+          Anterior
+        </button>
+        <span>Página {{ currentPage() + 1 }} de {{ totalPages() }}</span>
+        <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() + 1 >= totalPages()"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+          Siguiente
+        </button>
       </div>
+    </div>
     }
   </div>
 
 </div>
 
 <!-- Create / Edit modal -->
-<app-modal
-  [title]="editingSupplier() ? 'Editar proveedor' : 'Agregar proveedor'"
-  [isOpen]="showModal()"
+<app-modal [title]="editingSupplier() ? 'Editar proveedor' : 'Agregar proveedor'" [isOpen]="showModal()"
   (closed)="showModal.set(false)">
-  <app-supplier-form
-    [supplier]="editingSupplier()"
-    (saved)="onSaved()"
-    (cancelled)="showModal.set(false)" />
+  <app-supplier-form [supplier]="editingSupplier()" (saved)="onSaved()" (cancelled)="showModal.set(false)" />
 </app-modal>

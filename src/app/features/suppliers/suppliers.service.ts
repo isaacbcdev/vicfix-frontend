@@ -40,4 +40,8 @@ export class SuppliersService {
   deactivateSupplier(id: number): Observable<void> {
     return this.http.patch<void>(`${base}/${id}/deactivate`, {});
   }
+
+  restoreSupplier(id: number): Observable<void> {
+    return this.http.patch<void>(`${base}/${id}/restore`, {});
+  }
 }
