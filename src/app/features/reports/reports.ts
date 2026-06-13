@@ -25,7 +25,6 @@ function today(): string {
 
 @Component({
   selector: 'app-reports',
-  standalone: true,
   imports: [CurrencyCopPipe, DecimalPipe],
   templateUrl: './reports.html',
 })

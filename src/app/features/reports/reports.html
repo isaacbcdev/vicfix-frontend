@@ -2,21 +2,21 @@
 
   <!-- Header -->
   <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-semibold text-[#0F172A]">Reportes</h1>
+    <h1 class="text-2xl font-semibold text-text-primary">Reportes</h1>
   </div>
 
   <!-- Date range (hidden on stock tab) -->
   @if (activeTab() !== 'stock') {
   <div class="flex flex-wrap items-end gap-4">
     <div>
-      <label class="block text-xs font-medium text-[#64748B] mb-1">Desde</label>
+      <label class="block text-xs font-medium text-text-secondary mb-1">Desde</label>
       <input type="date" [value]="startDate()" (change)="onDateChange('start', $any($event.target).value)"
-        class="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent" />
+        class="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent" />
     </div>
     <div>
-      <label class="block text-xs font-medium text-[#64748B] mb-1">Hasta</label>
+      <label class="block text-xs font-medium text-text-secondary mb-1">Hasta</label>
       <input type="date" [value]="endDate()" (change)="onDateChange('end', $any($event.target).value)"
-        class="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent" />
+        class="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent" />
     </div>
   </div>
   }
@@ -25,19 +25,17 @@
   <div class="border-b border-slate-200">
     <nav class="flex gap-0 -mb-px overflow-x-auto">
       @for (tab of [
-        {id: 'sales', label: 'Ventas por Producto'},
-        {id: 'financial', label: 'Estado de Resultados'},
-        {id: 'stock', label: 'Inventario'},
-        {id: 'categories', label: 'Balance Categorías'},
-        {id: 'cashflow', label: 'Flujo de Caja'}
+      {id: 'sales', label: 'Ventas por Producto'},
+      {id: 'financial', label: 'Estado de Resultados'},
+      {id: 'stock', label: 'Inventario'},
+      {id: 'categories', label: 'Balance Categorías'},
+      {id: 'cashflow', label: 'Flujo de Caja'}
       ]; track tab.id) {
       <button type="button" (click)="setActiveTab($any(tab.id))"
         class="px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors"
-        [class.border-accent]="activeTab() === tab.id"
-        [class.text-accent]="activeTab() === tab.id"
-        [class.border-transparent]="activeTab() !== tab.id"
-        [class.text-text-secondary]="activeTab() !== tab.id"
-        [class.hover:text-[#0F172A]]="activeTab() !== tab.id">
+        [class.border-accent]="activeTab() === tab.id" [class.text-accent]="activeTab() === tab.id"
+        [class.border-transparent]="activeTab() !== tab.id" [class.text-text-secondary]="activeTab() !== tab.id"
+        [class.hover:text-text-primary]="activeTab() !== tab.id">
         {{ tab.label }}
       </button>
       }
@@ -71,16 +69,16 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
     <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-xs font-medium text-[#64748B] uppercase tracking-wide">Total vendido</p>
-      <p class="mt-1 text-2xl font-semibold text-[#0F172A]">{{ data.totalProductsSold | number }}</p>
+      <p class="text-xs font-medium text-text-secondary uppercase tracking-wide">Total vendido</p>
+      <p class="mt-1 text-2xl font-semibold text-text-primary">{{ data.totalProductsSold | number }}</p>
     </div>
     <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-xs font-medium text-[#64748B] uppercase tracking-wide">Ingresos totales</p>
-      <p class="mt-1 text-2xl font-semibold text-[#0F172A]">{{ data.totalRevenue | currencyCop }}</p>
+      <p class="text-xs font-medium text-text-secondary uppercase tracking-wide">Ingresos totales</p>
+      <p class="mt-1 text-2xl font-semibold text-text-primary">{{ data.totalRevenue | currencyCop }}</p>
     </div>
     <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-xs font-medium text-[#64748B] uppercase tracking-wide">Ganancia total</p>
-      <p class="mt-1 text-2xl font-semibold text-[#059669]">{{ data.totalProfit | currencyCop }}</p>
+      <p class="text-xs font-medium text-text-secondary uppercase tracking-wide">Ganancia total</p>
+      <p class="mt-1 text-2xl font-semibold text-accent">{{ data.totalProfit | currencyCop }}</p>
     </div>
   </div>
 
@@ -89,27 +87,27 @@
       <table class="w-full text-sm">
         <thead>
           <tr class="border-b border-slate-100 bg-slate-50">
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">Producto</th>
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">Categoría</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Cantidad</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Ingresos</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Costo</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Ganancia</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Producto</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Categoría</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Cantidad</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Ingresos</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Costo</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Ganancia</th>
           </tr>
         </thead>
         <tbody>
           @for (row of data.rows; track row.productName) {
           <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-            <td class="px-4 py-3 font-medium text-[#0F172A]">{{ row.productName }}</td>
-            <td class="px-4 py-3 text-[#64748B]">{{ row.category }}</td>
-            <td class="px-4 py-3 text-right text-[#0F172A]">{{ row.quantitySold | number }}</td>
-            <td class="px-4 py-3 text-right text-[#0F172A]">{{ row.totalRevenue | currencyCop }}</td>
-            <td class="px-4 py-3 text-right text-[#0F172A]">{{ row.totalCost | currencyCop }}</td>
-            <td class="px-4 py-3 text-right font-medium text-[#059669]">{{ row.profit | currencyCop }}</td>
+            <td class="px-4 py-3 font-medium text-text-primary">{{ row.productName }}</td>
+            <td class="px-4 py-3 text-text-secondary">{{ row.category }}</td>
+            <td class="px-4 py-3 text-right text-text-primary">{{ row.quantitySold | number }}</td>
+            <td class="px-4 py-3 text-right text-text-primary">{{ row.totalRevenue | currencyCop }}</td>
+            <td class="px-4 py-3 text-right text-text-primary">{{ row.totalCost | currencyCop }}</td>
+            <td class="px-4 py-3 text-right font-medium text-accent">{{ row.profit | currencyCop }}</td>
           </tr>
           } @empty {
           <tr>
-            <td colspan="6" class="px-4 py-12 text-center text-[#64748B] text-sm">
+            <td colspan="6" class="px-4 py-12 text-center text-text-secondary text-sm">
               No hay datos de ventas para el período seleccionado.
             </td>
           </tr>
@@ -120,7 +118,7 @@
   </div>
 
   } @else if (!loading()) {
-  <div class="flex items-center justify-center py-24 text-[#64748B] text-sm">Sin datos.</div>
+  <div class="flex items-center justify-center py-24 text-text-secondary text-sm">Sin datos.</div>
   }
   }
 
@@ -129,28 +127,27 @@
   @if (financialData(); as data) {
 
   <div class="bg-white rounded-xl border border-slate-200 p-6 max-w-lg">
-    <h2 class="text-base font-semibold text-[#0F172A] mb-5">Estado de Resultados</h2>
+    <h2 class="text-base font-semibold text-text-primary mb-5">Estado de Resultados</h2>
     <div class="space-y-3">
       <div class="flex items-center justify-between">
-        <span class="text-sm text-[#64748B]">Ingresos totales</span>
-        <span class="text-base font-semibold text-[#059669]">{{ data.totalIncome | currencyCop }}</span>
+        <span class="text-sm text-text-secondary">Ingresos totales</span>
+        <span class="text-base font-semibold text-accent">{{ data.totalIncome | currencyCop }}</span>
       </div>
       <div class="flex items-center justify-between">
-        <span class="text-sm text-[#64748B]">Costo de ventas</span>
-        <span class="text-sm text-[#0F172A]">- {{ data.totalCost | currencyCop }}</span>
+        <span class="text-sm text-text-secondary">Costo de ventas</span>
+        <span class="text-sm text-text-primary">- {{ data.totalCost | currencyCop }}</span>
       </div>
       <div class="flex items-center justify-between border-t border-slate-100 pt-3">
-        <span class="text-sm font-medium text-[#0F172A]">Ganancia bruta</span>
-        <span class="text-sm font-semibold text-[#0F172A]">{{ data.grossProfit | currencyCop }}</span>
+        <span class="text-sm font-medium text-text-primary">Ganancia bruta</span>
+        <span class="text-sm font-semibold text-text-primary">{{ data.grossProfit | currencyCop }}</span>
       </div>
       <div class="flex items-center justify-between">
-        <span class="text-sm text-[#64748B]">Gastos</span>
-        <span class="text-sm text-[#0F172A]">- {{ data.totalExpenses | currencyCop }}</span>
+        <span class="text-sm text-text-secondary">Gastos</span>
+        <span class="text-sm text-text-primary">- {{ data.totalExpenses | currencyCop }}</span>
       </div>
       <div class="flex items-center justify-between border-t-2 border-slate-200 pt-3">
-        <span class="text-sm font-semibold text-[#0F172A]">Ganancia neta</span>
-        <span class="text-lg font-bold"
-          [class.text-[#059669]]="data.netProfit >= 0"
+        <span class="text-sm font-semibold text-text-primary">Ganancia neta</span>
+        <span class="text-lg font-bold" [class.text-accent]="data.netProfit >= 0"
           [class.text-[#DC2626]]="data.netProfit < 0">
           {{ data.netProfit | currencyCop }}
         </span>
@@ -159,7 +156,7 @@
   </div>
 
   } @else if (!loading()) {
-  <div class="flex items-center justify-center py-24 text-[#64748B] text-sm">Sin datos.</div>
+  <div class="flex items-center justify-center py-24 text-text-secondary text-sm">Sin datos.</div>
   }
   }
 
@@ -169,39 +166,39 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
     <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-xs font-medium text-[#64748B] uppercase tracking-wide">Total productos</p>
-      <p class="mt-1 text-2xl font-semibold text-[#0F172A]">{{ data.totalProducts | number }}</p>
+      <p class="text-xs font-medium text-text-secondary uppercase tracking-wide">Total productos</p>
+      <p class="mt-1 text-2xl font-semibold text-text-primary">{{ data.totalProducts | number }}</p>
     </div>
     <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-xs font-medium text-[#64748B] uppercase tracking-wide">Valor del inventario</p>
-      <p class="mt-1 text-2xl font-semibold text-[#0F172A]">{{ data.totalInventoryValue | currencyCop }}</p>
+      <p class="text-xs font-medium text-text-secondary uppercase tracking-wide">Valor del inventario</p>
+      <p class="mt-1 text-2xl font-semibold text-text-primary">{{ data.totalInventoryValue | currencyCop }}</p>
     </div>
     <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-xs font-medium text-[#64748B] uppercase tracking-wide">Costo promedio unitario</p>
-      <p class="mt-1 text-2xl font-semibold text-[#0F172A]">{{ data.averageUnitCost | currencyCop }}</p>
+      <p class="text-xs font-medium text-text-secondary uppercase tracking-wide">Costo promedio unitario</p>
+      <p class="mt-1 text-2xl font-semibold text-text-primary">{{ data.averageUnitCost | currencyCop }}</p>
     </div>
   </div>
 
   <!-- Category breakdown -->
   <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
     <div class="px-4 py-3 border-b border-slate-100 bg-slate-50">
-      <h2 class="text-sm font-semibold text-[#0F172A]">Por categoría</h2>
+      <h2 class="text-sm font-semibold text-text-primary">Por categoría</h2>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
           <tr class="border-b border-slate-100">
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">Categoría</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Stock total</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Valor total</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Categoría</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Stock total</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Valor total</th>
           </tr>
         </thead>
         <tbody>
           @for (entry of categoryEntries(data.groupedRows); track entry[0]) {
           <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-            <td class="px-4 py-3 font-medium text-[#0F172A]">{{ entry[0] }}</td>
-            <td class="px-4 py-3 text-right text-[#0F172A]">{{ entry[1].stockSum | number }}</td>
-            <td class="px-4 py-3 text-right text-[#0F172A]">{{ entry[1].valueSum | currencyCop }}</td>
+            <td class="px-4 py-3 font-medium text-text-primary">{{ entry[0] }}</td>
+            <td class="px-4 py-3 text-right text-text-primary">{{ entry[1].stockSum | number }}</td>
+            <td class="px-4 py-3 text-right text-text-primary">{{ entry[1].valueSum | currencyCop }}</td>
           </tr>
           }
         </tbody>
@@ -212,31 +209,31 @@
   <!-- Full product list -->
   <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
     <div class="px-4 py-3 border-b border-slate-100 bg-slate-50">
-      <h2 class="text-sm font-semibold text-[#0F172A]">Todos los productos</h2>
+      <h2 class="text-sm font-semibold text-text-primary">Todos los productos</h2>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
           <tr class="border-b border-slate-100">
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">Producto</th>
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">Categoría</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Stock</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Costo unit.</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Valor total</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Producto</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Categoría</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Stock</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Costo unit.</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Valor total</th>
           </tr>
         </thead>
         <tbody>
           @for (row of data.rows; track row.productName) {
           <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-            <td class="px-4 py-3 font-medium text-[#0F172A]">{{ row.productName }}</td>
-            <td class="px-4 py-3 text-[#64748B]">{{ row.category }}</td>
-            <td class="px-4 py-3 text-right text-[#0F172A]">{{ row.stock | number }}</td>
-            <td class="px-4 py-3 text-right text-[#0F172A]">{{ row.unitCost | currencyCop }}</td>
-            <td class="px-4 py-3 text-right font-medium text-[#0F172A]">{{ row.totalValue | currencyCop }}</td>
+            <td class="px-4 py-3 font-medium text-text-primary">{{ row.productName }}</td>
+            <td class="px-4 py-3 text-text-secondary">{{ row.category }}</td>
+            <td class="px-4 py-3 text-right text-text-primary">{{ row.stock | number }}</td>
+            <td class="px-4 py-3 text-right text-text-primary">{{ row.unitCost | currencyCop }}</td>
+            <td class="px-4 py-3 text-right font-medium text-text-primary">{{ row.totalValue | currencyCop }}</td>
           </tr>
           } @empty {
           <tr>
-            <td colspan="5" class="px-4 py-12 text-center text-[#64748B] text-sm">
+            <td colspan="5" class="px-4 py-12 text-center text-text-secondary text-sm">
               No hay productos en el inventario.
             </td>
           </tr>
@@ -247,7 +244,7 @@
   </div>
 
   } @else if (!loading()) {
-  <div class="flex items-center justify-center py-24 text-[#64748B] text-sm">Sin datos.</div>
+  <div class="flex items-center justify-center py-24 text-text-secondary text-sm">Sin datos.</div>
   }
   }
 
@@ -257,16 +254,16 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
     <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-xs font-medium text-[#64748B] uppercase tracking-wide">Ventas totales</p>
-      <p class="mt-1 text-2xl font-semibold text-[#0F172A]">{{ data.totalSales | currencyCop }}</p>
+      <p class="text-xs font-medium text-text-secondary uppercase tracking-wide">Ventas totales</p>
+      <p class="mt-1 text-2xl font-semibold text-text-primary">{{ data.totalSales | currencyCop }}</p>
     </div>
     <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-xs font-medium text-[#64748B] uppercase tracking-wide">Costo total</p>
-      <p class="mt-1 text-2xl font-semibold text-[#0F172A]">{{ data.totalCost | currencyCop }}</p>
+      <p class="text-xs font-medium text-text-secondary uppercase tracking-wide">Costo total</p>
+      <p class="mt-1 text-2xl font-semibold text-text-primary">{{ data.totalCost | currencyCop }}</p>
     </div>
     <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-xs font-medium text-[#64748B] uppercase tracking-wide">Ganancia total</p>
-      <p class="mt-1 text-2xl font-semibold text-[#059669]">{{ data.totalProfit | currencyCop }}</p>
+      <p class="text-xs font-medium text-text-secondary uppercase tracking-wide">Ganancia total</p>
+      <p class="mt-1 text-2xl font-semibold text-accent">{{ data.totalProfit | currencyCop }}</p>
     </div>
   </div>
 
@@ -275,27 +272,27 @@
       <table class="w-full text-sm">
         <thead>
           <tr class="border-b border-slate-100 bg-slate-50">
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">Categoría</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Ventas</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Costo</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Ganancia</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Margen</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Categoría</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Ventas</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Costo</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Ganancia</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Margen</th>
           </tr>
         </thead>
         <tbody>
           @for (row of data.rows; track row.categoryName) {
           <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-            <td class="px-4 py-3 font-medium text-[#0F172A]">{{ row.categoryName }}</td>
-            <td class="px-4 py-3 text-right text-[#0F172A]">{{ row.totalSales | currencyCop }}</td>
-            <td class="px-4 py-3 text-right text-[#0F172A]">{{ row.totalCost | currencyCop }}</td>
-            <td class="px-4 py-3 text-right font-medium text-[#059669]">{{ row.totalProfit | currencyCop }}</td>
-            <td class="px-4 py-3 text-right text-[#64748B]">
+            <td class="px-4 py-3 font-medium text-text-primary">{{ row.categoryName }}</td>
+            <td class="px-4 py-3 text-right text-text-primary">{{ row.totalSales | currencyCop }}</td>
+            <td class="px-4 py-3 text-right text-text-primary">{{ row.totalCost | currencyCop }}</td>
+            <td class="px-4 py-3 text-right font-medium text-accent">{{ row.totalProfit | currencyCop }}</td>
+            <td class="px-4 py-3 text-right text-text-secondary">
               {{ profitMargin(row.totalProfit, row.totalSales) | number:'1.1-1' }}%
             </td>
           </tr>
           } @empty {
           <tr>
-            <td colspan="5" class="px-4 py-12 text-center text-[#64748B] text-sm">
+            <td colspan="5" class="px-4 py-12 text-center text-text-secondary text-sm">
               No hay datos para el período seleccionado.
             </td>
           </tr>
@@ -306,7 +303,7 @@
   </div>
 
   } @else if (!loading()) {
-  <div class="flex items-center justify-center py-24 text-[#64748B] text-sm">Sin datos.</div>
+  <div class="flex items-center justify-center py-24 text-text-secondary text-sm">Sin datos.</div>
   }
   }
 
@@ -316,17 +313,16 @@
 
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
     <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-xs font-medium text-[#64748B] uppercase tracking-wide">Ingresos</p>
-      <p class="mt-1 text-2xl font-semibold text-[#059669]">{{ data.totalIncome | currencyCop }}</p>
+      <p class="text-xs font-medium text-text-secondary uppercase tracking-wide">Ingresos</p>
+      <p class="mt-1 text-2xl font-semibold text-accent">{{ data.totalIncome | currencyCop }}</p>
     </div>
     <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-xs font-medium text-[#64748B] uppercase tracking-wide">Egresos</p>
+      <p class="text-xs font-medium text-text-secondary uppercase tracking-wide">Egresos</p>
       <p class="mt-1 text-2xl font-semibold text-[#DC2626]">{{ data.totalExpenses | currencyCop }}</p>
     </div>
     <div class="bg-white rounded-xl border border-slate-200 p-5">
-      <p class="text-xs font-medium text-[#64748B] uppercase tracking-wide">Flujo neto</p>
-      <p class="mt-1 text-2xl font-semibold"
-        [class.text-[#059669]]="data.netCashFlow >= 0"
+      <p class="text-xs font-medium text-text-secondary uppercase tracking-wide">Flujo neto</p>
+      <p class="mt-1 text-2xl font-semibold" [class.text-accent]="data.netCashFlow >= 0"
         [class.text-[#DC2626]]="data.netCashFlow < 0">
         {{ data.netCashFlow | currencyCop }}
       </p>
@@ -338,27 +334,28 @@
       <table class="w-full text-sm">
         <thead>
           <tr class="border-b border-slate-100 bg-slate-50">
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">Fecha</th>
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">Descripción</th>
-            <th class="text-left px-4 py-3 font-medium text-[#64748B]">Tipo</th>
-            <th class="text-right px-4 py-3 font-medium text-[#64748B]">Monto</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Fecha</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Descripción</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Tipo</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Monto</th>
           </tr>
         </thead>
         <tbody>
           @for (row of data.rows; track $index) {
           <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-            <td class="px-4 py-3 text-[#64748B] whitespace-nowrap">{{ row.date }}</td>
-            <td class="px-4 py-3 text-[#0F172A]">{{ row.description }}</td>
+            <td class="px-4 py-3 text-text-secondary whitespace-nowrap">{{ row.date }}</td>
+            <td class="px-4 py-3 text-text-primary">{{ row.description }}</td>
             <td class="px-4 py-3">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ cashFlowTypeBadgeClass(row.type) }}">
+              <span
+                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ cashFlowTypeBadgeClass(row.type) }}">
                 {{ row.type }}
               </span>
             </td>
-            <td class="px-4 py-3 text-right font-medium text-[#0F172A]">{{ row.amount | currencyCop }}</td>
+            <td class="px-4 py-3 text-right font-medium text-text-primary">{{ row.amount | currencyCop }}</td>
           </tr>
           } @empty {
           <tr>
-            <td colspan="4" class="px-4 py-12 text-center text-[#64748B] text-sm">
+            <td colspan="4" class="px-4 py-12 text-center text-text-secondary text-sm">
               No hay movimientos para el período seleccionado.
             </td>
           </tr>
@@ -369,7 +366,7 @@
   </div>
 
   } @else if (!loading()) {
-  <div class="flex items-center justify-center py-24 text-[#64748B] text-sm">Sin datos.</div>
+  <div class="flex items-center justify-center py-24 text-text-secondary text-sm">Sin datos.</div>
   }
   }
 
