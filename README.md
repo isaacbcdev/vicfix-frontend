@@ -4,11 +4,11 @@ Angular 21 frontend for VicFix, a management system for a family-owned business 
 
 ## Live demo
 
-[Link will be added after deployment]
+`https://www.vicfix.shop`
 
 ## Backend
 
-Spring Boot 3.4.4 REST API deployed at https://app.vicfix.shop
+Spring Boot 3.4.4 REST API deployed at `https://app.vicfix.shop`
 
 ## Tech stack
 
@@ -39,7 +39,8 @@ Spring Boot 3.4.4 REST API deployed at https://app.vicfix.shop
 
 ## Project structure
 
-```
+``` markdown
+
 src/app/
   auth/
     login/           — Login component
@@ -79,7 +80,7 @@ Backend must be running locally on port 8081, or update `src/environments/enviro
 Connect this repo to Vercel with these settings:
 
 | Setting | Value |
-|---|---|
+| --- | --- |
 | Framework preset | Other |
 | Build command | `npm run build` |
 | Output directory | `dist/vicfix-frontend/browser` |
