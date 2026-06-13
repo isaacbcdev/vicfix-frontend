@@ -21,9 +21,9 @@
     <header class="h-16 bg-surface border-b border-slate-200 flex-none flex items-center justify-between px-6">
       <span class="text-text-primary font-semibold text-sm">VicFix</span>
       <div class="flex items-center gap-3">
-        <span class="text-sm text-[#64748B]">{{ authService.user()?.username }}</span>
+        <span class="text-sm text-text-secondary">{{ authService.user()?.username }}</span>
         <button (click)="logout()" [disabled]="loggingOut()"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-[#64748B] hover:text-[#DC2626] hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-text-secondary hover:text-[#DC2626] hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
           @if (loggingOut()) {
           <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />

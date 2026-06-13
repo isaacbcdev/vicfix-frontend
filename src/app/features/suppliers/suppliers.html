@@ -2,7 +2,7 @@
 
   <!-- Header -->
   <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-semibold text-[#0F172A]">Proveedores</h1>
+    <h1 class="text-2xl font-semibold text-text-primary">Proveedores</h1>
     <button (click)="openCreate()"
       class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -22,10 +22,10 @@
       </svg>
       <input type="text" [value]="searchInput" (input)="onSearchChange($any($event.target).value)"
         placeholder="Buscar proveedor..."
-        class="w-full pl-9 pr-8 py-2 rounded-lg border border-slate-200 bg-white text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent" />
+        class="w-full pl-9 pr-8 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent" />
       @if (searchInput) {
       <button (click)="clearSearch()"
-        class="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-[#0F172A]">
+        class="absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -57,7 +57,7 @@
   <!-- Error -->
   @if (error()) {
   <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
-    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="10" />
       <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
     </svg>
@@ -111,7 +111,7 @@
           @if (!loading()) {
           @for (s of suppliers(); track s.supplierId) {
           <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
-            <td class="px-4 py-3 font-medium text-[#0F172A]">{{ s.name }}</td>
+            <td class="px-4 py-3 font-medium text-text-primary">{{ s.name }}</td>
             <td class="px-4 py-3 text-text-secondary">{{ s.nit ?? '—' }}</td>
             <td class="px-4 py-3 text-text-secondary">{{ s.businessType ?? '—' }}</td>
             <td class="px-4 py-3">
