@@ -1,59 +1,88 @@
-# VicfixFrontend
+# VicFix Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.7.
+Angular 21 frontend for VicFix, a management system for a family-owned business in Sabanalarga, Atlántico, Colombia. Replaces a Thymeleaf MVC app with a modern SPA.
 
-## Development server
+## Live demo
 
-To start a local development server, run:
+[Link will be added after deployment]
 
-```bash
-ng serve
+## Backend
+
+Spring Boot 3.4.4 REST API deployed at https://app.vicfix.shop
+
+## Tech stack
+
+- Angular 21 — standalone components, signals, zoneless change detection
+- Tailwind CSS
+- TypeScript strict mode
+- JWT authentication — access token in memory, refresh token in httpOnly cookie with rotation and reuse detection
+- Reactive forms
+- RxJS — Observables for HTTP, signals for component state, rxResource for reactive data fetching
+
+## Features built
+
+- **Login** — JWT auth with session restore on reload
+- **Productos** — paginated list with search, full CRUD via modal form
+- **Nueva Venta** — POS screen with cart, real-time totals, payment method selection
+- **Proveedores** — supplier management with active/inactive filter and restore action
+- **Usuarios** — user management with RBAC role assignment and status toggle
+- **Reportes** — five report tabs: ventas por producto, financiero, inventario, categorías, flujo de caja
+
+## Architecture decisions worth noting
+
+- **Signals over NgRx** — no global state library; signals + services are sufficient for this app's scale
+- **Zoneless** — Angular 21 zoneless change detection enabled
+- **JWT in memory** — access token never written to localStorage; refresh token in httpOnly cookie only
+- **RBAC** — permissions flow through roles, not directly to users
+- **Lazy loading** — every feature route is lazy-loaded
+- **rxResource** — used for reactive search (Nueva Venta product search re-fetches automatically when query signal changes)
+
+## Project structure
+
+```
+src/app/
+  auth/
+    login/           — Login component
+    auth-api.ts      — AuthService (token in memory, session restore)
+    auth.guard.ts    — authGuard + guestGuard
+    auth.interceptor.ts — JWT bearer token injection
+    auth.models.ts   — LoginResponse, User, LoginResult types
+  shared/
+    layout/shell/    — Shell component (sidebar + header + router-outlet)
+    pipes/           — CurrencyCopPipe (Colombian peso: $251.000)
+    ui/modal/        — Reusable ModalComponent
+    models/          — Shared domain models (Product, Page)
+  features/
+    products/        — Product list + CRUD modal
+    sales/           — Nueva Venta POS
+    suppliers/       — Supplier management
+    users/           — User management with roles
+    reports/         — Five report tabs wired to backend
+    dashboard/       — Placeholder (pending V10 platform migration)
+    platforms/       — Placeholder (pending V10 platform migration)
+    close/           — Placeholder (Cierre del Día, pending V10)
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Getting started
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Prerequisites: Node 22, Angular CLI 21
 
 ```bash
-ng generate component component-name
+npm install
+ng serve --port 4200
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Backend must be running locally on port 8081, or update `src/environments/environment.ts` to point at the production API.
 
-```bash
-ng generate --help
-```
+## Deploying to Vercel
 
-## Building
+Connect this repo to Vercel with these settings:
 
-To build the project run:
+| Setting | Value |
+|---|---|
+| Framework preset | Other |
+| Build command | `npm run build` |
+| Output directory | `dist/vicfix-frontend/browser` |
+| Install command | `npm install` |
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+`vercel.json` handles SPA routing — no HashLocationStrategy needed.
