@@ -29,6 +29,7 @@ export class ProductFormComponent {
 
   form = this.fb.group({
     productName: ['', Validators.required],
+    productDescription: [''],
     categoryId: [null as number | null, Validators.required],
     productBrand: [''],
     productStock: [0, [Validators.required, Validators.min(0)]],
@@ -53,6 +54,7 @@ export class ProductFormComponent {
       if (p) {
         this.form.patchValue({
           productName: p.productName,
+          productDescription: p.productDescription ?? '',
           categoryId: p.categoryId,
           productBrand: p.productBrand ?? '',
           productStock: p.productStock,
@@ -88,6 +90,7 @@ export class ProductFormComponent {
     const raw = this.form.getRawValue();
     const dto: Partial<Product> = {
       productName: raw.productName ?? undefined,
+      productDescription: raw.productDescription || null,
       categoryId: raw.categoryId ?? undefined,
       productBrand: raw.productBrand || null,
       productStock: raw.productStock ?? 0,
