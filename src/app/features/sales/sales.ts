@@ -3,10 +3,10 @@ import { FormsModule } from '@angular/forms';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { AuthService } from '@auth/auth-api';
-import { ProductsService } from '@features/products/products.service';
+import { ProductsService } from '@features/products/products-api';
 import { Product } from '@shared/models/product.model';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
-import { SalesService } from './sales.service';
+import { SalesService } from './sales-api';
 import { CartItem } from './sales.models';
 
 @Component({
@@ -37,9 +37,7 @@ export class SalesComponent {
 
   searchResults = rxResource({
     params: () =>
-      this.searchQuery().length >= 2
-        ? { query: this.searchQuery(), page: 0, size: 10 }
-        : undefined,
+      this.searchQuery().length >= 2 ? { query: this.searchQuery(), page: 0, size: 10 } : undefined,
     stream: ({ params }) =>
       this.productsService.getProducts(params.page, params.size, params.query),
   });
@@ -53,9 +51,7 @@ export class SalesComponent {
       const existing = items.find((i) => i.productId === product.productId);
       if (existing) {
         return items.map((i) =>
-          i.productId === product.productId
-            ? { ...i, quantity: Math.min(999, i.quantity + 1) }
-            : i,
+          i.productId === product.productId ? { ...i, quantity: Math.min(999, i.quantity + 1) } : i,
         );
       }
       return [
@@ -129,9 +125,7 @@ export class SalesComponent {
         },
         error: (err) => {
           const msg = err?.error?.message as string | undefined;
-          this.submitError.set(
-            msg ?? 'No se pudo registrar la venta. Intenta de nuevo.',
-          );
+          this.submitError.set(msg ?? 'No se pudo registrar la venta. Intenta de nuevo.');
         },
       });
   }

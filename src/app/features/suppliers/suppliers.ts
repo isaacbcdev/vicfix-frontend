@@ -3,9 +3,9 @@ import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalComponent } from '@shared/ui/modal/modal.component';
-import { SuppliersService } from './suppliers.service';
+import { SuppliersService } from './suppliers-api';
 import { Supplier } from './suppliers.models';
-import { SupplierFormComponent } from './supplier-form/supplier-form.component';
+import { SupplierFormComponent } from './supplier-form/supplier-form';
 
 @Component({
   selector: 'app-suppliers',

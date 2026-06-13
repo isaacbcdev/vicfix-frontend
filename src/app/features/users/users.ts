@@ -4,13 +4,12 @@ import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalComponent } from '@shared/ui/modal/modal.component';
 import { AuthService } from '../../auth/auth-api';
-import { UsersService } from './users.service';
+import { UsersService } from './users-api';
 import { UserModel } from './users.models';
-import { UserFormComponent } from './user-form/user-form.component';
+import { UserFormComponent } from './user-form/user-form';
 
 @Component({
   selector: 'app-users',
-  standalone: true,
   imports: [FormsModule, ModalComponent, UserFormComponent],
   templateUrl: './users.html',
 })

@@ -1,19 +1,12 @@
-import {
-  Component,
-  inject,
-  signal,
-  computed,
-  DestroyRef,
-  OnInit,
-} from '@angular/core';
+import { Component, inject, signal, computed, DestroyRef, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ProductsService } from './products.service';
+import { ProductsService } from './products-api';
 import { Product } from '@shared/models/product.model';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { ModalComponent } from '@shared/ui/modal/modal.component';
-import { ProductFormComponent } from './product-form/product-form.component';
+import { ProductFormComponent } from './product-form/product-form';
 
 @Component({
   selector: 'app-products',
