@@ -1,11 +1,16 @@
-import { inject, ApplicationConfig, provideBrowserGlobalErrorListeners, provideAppInitializer } from '@angular/core';
+import {
+  inject,
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+  provideAppInitializer,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { catchError, firstValueFrom, of, switchMap } from 'rxjs';
 
 import { routes } from './app.routes';
-import { jwtInterceptor } from '@shared/auth/auth.interceptor';
-import { AuthService } from '@shared/auth/auth.service';
+import { jwtInterceptor } from './auth/auth.interceptor';
+import { AuthService } from './auth/auth-api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,9 +23,9 @@ export const appConfig: ApplicationConfig = {
       // Failure (no cookie, backend down) is caught — app boots unauthenticated.
       return firstValueFrom(
         auth.refresh().pipe(
-          switchMap(token => (token ? auth.loadCurrentUser() : of(null))),
-          catchError(() => of(null))
-        )
+          switchMap((token) => (token ? auth.loadCurrentUser() : of(null))),
+          catchError(() => of(null)),
+        ),
       );
     }),
   ],

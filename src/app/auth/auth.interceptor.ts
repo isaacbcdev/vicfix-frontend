@@ -1,14 +1,13 @@
 import { inject } from '@angular/core';
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '@environments/environment';
-import { AuthService } from './auth.service';
+import { AuthService } from './auth-api';
 
-export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
-  const auth = inject(AuthService);
+export function jwtInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) {
   const router = inject(Router);
-  const token = auth.accessToken();
+  const token = inject(AuthService).token();
 
   // Pass third-party requests through untouched
   if (!req.url.startsWith(environment.apiUrl)) {
@@ -17,8 +16,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
   // All requests to our API: attach credentials cookie + bearer token when present
   const apiReq = req.clone({
-    withCredentials: true,
-    ...(token ? { setHeaders: { Authorization: `Bearer ${token}` } } : {}),
+    headers: req.headers.append('Authorization', `Bearer ${token}`),
   });
 
   return next(apiReq).pipe(
@@ -27,11 +25,9 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
       // Only redirect on 401 from protected API resources.
       const isAuthEndpoint = req.url.includes('/api/v1/auth/');
       if (err.status === 401 && !isAuthEndpoint) {
-        // TODO: silent refresh + request queue — implement in a later commit
-        auth.clearAuth();
         router.navigate(['/login']);
       }
       return throwError(() => err);
-    })
+    }),
   );
-};
+}
