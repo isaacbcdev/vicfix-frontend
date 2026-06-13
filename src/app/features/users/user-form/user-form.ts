@@ -1,8 +1,15 @@
 import { Component, effect, inject, input, output, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { finalize } from 'rxjs';
-import { UsersService } from '../users.service';
-import { RolesService } from '../roles.service';
+import { UsersService } from '../users-api';
+import { RolesService } from '../roles-api';
 import { Role, UserModel } from '../users.models';
 
 interface ErrorResponse {
@@ -22,7 +29,7 @@ function atLeastOneRole(): ValidatorFn {
   selector: 'app-user-form',
   standalone: true,
   imports: [ReactiveFormsModule],
-  templateUrl: './user-form.component.html',
+  templateUrl: './user-form.html',
 })
 export class UserFormComponent {
   user = input<UserModel | null>(null);

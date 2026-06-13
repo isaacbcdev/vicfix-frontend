@@ -1,7 +1,7 @@
 import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
-import { ProductsService } from '../products.service';
+import { ProductsService } from '../products-api';
 import { Product } from '@shared/models/product.model';
 
 interface ErrorResponse {
@@ -14,7 +14,7 @@ interface ErrorResponse {
   selector: 'app-product-form',
   standalone: true,
   imports: [ReactiveFormsModule],
-  templateUrl: './product-form.component.html',
+  templateUrl: './product-form.html',
 })
 export class ProductFormComponent {
   product = input<Product | null>(null);
@@ -100,20 +100,16 @@ export class ProductFormComponent {
     };
 
     const p = this.product();
-    const request$ = p
-      ? this.svc.updateProduct(p.productId, dto)
-      : this.svc.createProduct(dto);
+    const request$ = p ? this.svc.updateProduct(p.productId, dto) : this.svc.createProduct(dto);
 
-    request$
-      .pipe(finalize(() => this.submitting.set(false)))
-      .subscribe({
-        next: (result) => this.saved.emit(result),
-        error: (err) => {
-          const body = err?.error as Partial<ErrorResponse> | null;
-          this.errorMessage.set(
-            body?.message ?? 'Ocurrió un error al guardar el producto. Intenta de nuevo.',
-          );
-        },
-      });
+    request$.pipe(finalize(() => this.submitting.set(false))).subscribe({
+      next: (result) => this.saved.emit(result),
+      error: (err) => {
+        const body = err?.error as Partial<ErrorResponse> | null;
+        this.errorMessage.set(
+          body?.message ?? 'Ocurrió un error al guardar el producto. Intenta de nuevo.',
+        );
+      },
+    });
   }
 }

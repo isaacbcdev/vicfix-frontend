@@ -1,7 +1,7 @@
 import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
-import { SuppliersService } from '../suppliers.service';
+import { SuppliersService } from '../suppliers-api';
 import { Supplier } from '../suppliers.models';
 
 interface ErrorResponse {
@@ -14,7 +14,7 @@ interface ErrorResponse {
   selector: 'app-supplier-form',
   standalone: true,
   imports: [ReactiveFormsModule],
-  templateUrl: './supplier-form.component.html',
+  templateUrl: './supplier-form.html',
 })
 export class SupplierFormComponent {
   supplier = input<Supplier | null>(null);
@@ -78,20 +78,16 @@ export class SupplierFormComponent {
     };
 
     const s = this.supplier();
-    const request$ = s
-      ? this.svc.updateSupplier(s.supplierId, req)
-      : this.svc.createSupplier(req);
+    const request$ = s ? this.svc.updateSupplier(s.supplierId, req) : this.svc.createSupplier(req);
 
-    request$
-      .pipe(finalize(() => this.submitting.set(false)))
-      .subscribe({
-        next: () => this.saved.emit(),
-        error: (err) => {
-          const body = err?.error as Partial<ErrorResponse> | null;
-          this.errorMessage.set(
-            body?.message ?? 'Ocurrió un error al guardar el proveedor. Intenta de nuevo.',
-          );
-        },
-      });
+    request$.pipe(finalize(() => this.submitting.set(false))).subscribe({
+      next: () => this.saved.emit(),
+      error: (err) => {
+        const body = err?.error as Partial<ErrorResponse> | null;
+        this.errorMessage.set(
+          body?.message ?? 'Ocurrió un error al guardar el proveedor. Intenta de nuevo.',
+        );
+      },
+    });
   }
 }
