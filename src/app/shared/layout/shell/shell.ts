@@ -5,6 +5,7 @@ import { AuthService } from '../../../auth/auth-api';
 interface NavLink {
   path: string;
   label: string;
+  exact?: boolean;
 }
 
 @Component({
@@ -26,7 +27,8 @@ export class ShellComponent {
   readonly navLinks: NavLink[] = [
     { path: '/dashboard', label: 'Dashboard' },
     { path: '/products', label: 'Productos' },
-    { path: '/sales', label: 'Nueva Venta' },
+    { path: '/sales', label: 'Nueva Venta', exact: true },
+    { path: '/sales/history', label: 'Historial' },
     { path: '/platforms', label: 'Plataformas' },
     { path: '/reports', label: 'Reportes' },
     { path: '/close', label: 'Cierre del Día' },

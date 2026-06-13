@@ -7,7 +7,7 @@
     <nav class="flex-1 px-3 py-4 overflow-y-auto space-y-1">
       @for (link of navLinks; track link.path) {
       <a [routerLink]="link.path" routerLinkActive="text-accent bg-white/10 font-medium"
-        [routerLinkActiveOptions]="{ exact: false }"
+        [routerLinkActiveOptions]="{ exact: link.exact ?? false }"
         class="flex items-center px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-sm">
         {{ link.label }}
       </a>

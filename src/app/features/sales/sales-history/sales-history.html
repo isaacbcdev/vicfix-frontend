@@ -1,0 +1,185 @@
+<div class="space-y-6">
+
+  <!-- Page header -->
+  <div>
+    <h1 class="text-xl font-semibold text-text-primary">Historial de Ventas</h1>
+    <p class="mt-1 text-sm text-text-secondary">Consulta, confirma y cancela ventas registradas.</p>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="bg-surface rounded-xl border border-slate-200 p-4 space-y-3">
+    <!-- Date range -->
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="flex items-center gap-2">
+        <label class="text-sm text-text-secondary whitespace-nowrap">Desde</label>
+        <input type="date" [value]="startDate()" (change)="onDateChange('start', $any($event.target).value)"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent" />
+      </div>
+      <div class="flex items-center gap-2">
+        <label class="text-sm text-text-secondary whitespace-nowrap">Hasta</label>
+        <input type="date" [value]="endDate()" (change)="onDateChange('end', $any($event.target).value)"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent" />
+      </div>
+    </div>
+
+    <!-- Status filter -->
+    <div class="flex flex-wrap gap-2">
+      @for (opt of [
+        { value: '', label: 'Todos' },
+        { value: 'PENDING', label: 'Pendiente' },
+        { value: 'COMPLETED', label: 'Completada' },
+        { value: 'CANCELED', label: 'Cancelada' }
+      ]; track opt.value) {
+      <button (click)="setStatusFilter(opt.value)"
+        class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+        [class.bg-accent]="statusFilter() === opt.value"
+        [class.text-white]="statusFilter() === opt.value"
+        [class.bg-white]="statusFilter() !== opt.value"
+        [class.text-text-secondary]="statusFilter() !== opt.value"
+        [class.border]="statusFilter() !== opt.value"
+        [class.border-slate-200]="statusFilter() !== opt.value">
+        {{ opt.label }}
+      </button>
+      }
+    </div>
+  </div>
+
+  <!-- Action error banner -->
+  @if (actionError()) {
+  <div class="flex items-center justify-between gap-2 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+    <div class="flex items-center gap-2">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" /><path stroke-linecap="round" d="M12 8v4m0 4h.01" />
+      </svg>
+      {{ actionError() }}
+    </div>
+    <button (click)="actionError.set(null)" class="shrink-0 hover:text-red-900 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  }
+
+  <!-- Main card -->
+  <div class="bg-surface rounded-xl border border-slate-200 overflow-hidden">
+
+    <!-- Error state -->
+    @if (error()) {
+    <div class="flex items-center gap-2 m-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" /><path stroke-linecap="round" d="M12 8v4m0 4h.01" />
+      </svg>
+      {{ error() }}
+    </div>
+    }
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-200 bg-slate-50">
+            <th class="px-4 py-3 text-left font-medium text-text-secondary">Fecha</th>
+            <th class="px-4 py-3 text-left font-medium text-text-secondary">Cajero</th>
+            <th class="px-4 py-3 text-left font-medium text-text-secondary">Método de pago</th>
+            <th class="px-4 py-3 text-right font-medium text-text-secondary">Total</th>
+            <th class="px-4 py-3 text-right font-medium text-text-secondary">Descuento</th>
+            <th class="px-4 py-3 text-left font-medium text-text-secondary">Estado</th>
+            <th class="px-4 py-3 text-left font-medium text-text-secondary">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+          @for (i of [1,2,3,4,5]; track i) {
+          <tr class="border-b border-slate-100">
+            <td class="px-4 py-3"><div class="h-4 w-32 bg-slate-200 rounded animate-pulse"></div></td>
+            <td class="px-4 py-3"><div class="h-4 w-24 bg-slate-200 rounded animate-pulse"></div></td>
+            <td class="px-4 py-3"><div class="h-4 w-20 bg-slate-200 rounded animate-pulse"></div></td>
+            <td class="px-4 py-3"><div class="h-4 w-20 bg-slate-200 rounded animate-pulse ml-auto"></div></td>
+            <td class="px-4 py-3"><div class="h-4 w-16 bg-slate-200 rounded animate-pulse ml-auto"></div></td>
+            <td class="px-4 py-3"><div class="h-5 w-20 bg-slate-200 rounded-full animate-pulse"></div></td>
+            <td class="px-4 py-3"><div class="h-7 w-28 bg-slate-200 rounded animate-pulse"></div></td>
+          </tr>
+          }
+          } @else {
+          @for (sale of sales(); track sale.saleId) {
+          <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-3 text-text-primary whitespace-nowrap">
+              {{ sale.saleDate | date:'dd/MM/yyyy HH:mm' }}
+            </td>
+            <td class="px-4 py-3 text-text-primary">{{ sale.userName }}</td>
+            <td class="px-4 py-3 text-text-secondary">{{ sale.paymentMethodDisplay }}</td>
+            <td class="px-4 py-3 text-right text-text-primary font-medium">
+              {{ sale.total | currencyCop }}
+            </td>
+            <td class="px-4 py-3 text-right text-text-secondary">
+              {{ sale.discount | currencyCop }}
+            </td>
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                [class]="statusBadgeClass(sale.status)">
+                {{ sale.statusDisplay }}
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              @if (sale.status === 'PENDING') {
+              <div class="flex items-center gap-2">
+                <button (click)="onConfirm(sale.saleId)" [disabled]="confirmingId() === sale.saleId || cancelingId() === sale.saleId"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent text-white text-xs font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                  @if (confirmingId() === sale.saleId) {
+                  <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  }
+                  Confirmar
+                </button>
+                <button (click)="onCancel(sale.saleId)" [disabled]="confirmingId() === sale.saleId || cancelingId() === sale.saleId"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-300 text-red-600 text-xs font-medium hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                  @if (cancelingId() === sale.saleId) {
+                  <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  }
+                  Cancelar
+                </button>
+              </div>
+              }
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="7" class="px-4 py-12 text-center">
+              <p class="text-text-secondary text-sm">No hay ventas en el período seleccionado.</p>
+              <p class="text-text-secondary text-xs mt-1">Cambia el rango de fechas o el filtro de estado.</p>
+            </td>
+          </tr>
+          }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (!loading() && totalElements() > 0) {
+    <div class="flex items-center justify-between px-4 py-3 border-t border-slate-200">
+      <span class="text-sm text-text-secondary">
+        {{ totalElements() }} {{ totalElements() === 1 ? 'venta' : 'ventas' }}
+      </span>
+      <div class="flex items-center gap-2">
+        <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 0"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-text-secondary hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+          Anterior
+        </button>
+        <span class="text-sm text-text-secondary">{{ currentPage() + 1 }} / {{ totalPages() }}</span>
+        <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() >= totalPages() - 1"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 text-sm text-text-secondary hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+          Siguiente
+        </button>
+      </div>
+    </div>
+    }
+
+  </div>
+</div>

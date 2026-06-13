@@ -28,6 +28,13 @@ export const routes: Routes = [
         loadComponent: () => import('@features/sales/sales').then((m) => m.SalesComponent),
       },
       {
+        path: 'sales/history',
+        loadComponent: () =>
+          import('@features/sales/sales-history/sales-history').then(
+            (m) => m.SalesHistoryComponent,
+          ),
+      },
+      {
         path: 'platforms',
         loadComponent: () =>
           import('@features/platforms/platforms').then((m) => m.PlatformsComponent),
