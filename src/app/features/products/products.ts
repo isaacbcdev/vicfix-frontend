@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProductsService } from './products-api';
+import { AuthService } from '@auth/auth-api';
 import { Product } from '@shared/models/product.model';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { ModalComponent } from '@shared/ui/modal/modal.component';
@@ -17,6 +18,7 @@ import { ProductFormComponent } from './product-form/product-form';
 export class ProductsComponent implements OnInit {
   private svc = inject(ProductsService);
   private destroyRef = inject(DestroyRef);
+  protected auth = inject(AuthService);
 
   products = signal<Product[]>([]);
   totalElements = signal(0);

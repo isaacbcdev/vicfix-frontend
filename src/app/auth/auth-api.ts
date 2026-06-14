@@ -17,8 +17,16 @@ export class AuthService {
   token = computed(this._token);
   user = computed<User | null>(() => this._user());
   isAuthenticated = computed(() => this._token() !== null);
-  isAdmin = computed(() => this._user()?.roles!.includes('ROLE_ADMIN') ?? false);
-  isRoot = computed(() => this._user()?.roles!.includes('ROLE_ROOT') ?? false);
+  isAdmin = computed(() => this._user()?.roles?.includes('ROLE_ADMIN') ?? false);
+  isRoot = computed(() => this._user()?.roles?.includes('ROLE_ROOT') ?? false);
+
+  hasRole(role: string): boolean {
+    return this._user()?.roles?.includes(role) ?? false;
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    return roles.some((r) => this.hasRole(r));
+  }
 
   clearAuth(): void {
     this._token.set(null);

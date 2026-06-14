@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard } from '@auth/auth.guard';
+import { authGuard, guestGuard, roleGuard } from '@auth/auth.guard';
 import { ShellComponent } from '@shared/layout/shell/shell';
 
 export const routes: Routes = [
@@ -36,6 +36,7 @@ export const routes: Routes = [
       },
       {
         path: 'platforms',
+        canActivate: [roleGuard(['ROLE_ADMIN', 'ROLE_ROOT'])],
         loadComponent: () =>
           import('@features/platforms/platforms').then((m) => m.PlatformsComponent),
       },
@@ -45,15 +46,18 @@ export const routes: Routes = [
       },
       {
         path: 'close',
+        canActivate: [roleGuard(['ROLE_ADMIN', 'ROLE_ROOT'])],
         loadComponent: () => import('@features/close/close').then((m) => m.CloseComponent),
       },
       {
         path: 'suppliers',
+        canActivate: [roleGuard(['ROLE_ADMIN', 'ROLE_ROOT'])],
         loadComponent: () =>
           import('@features/suppliers/suppliers').then((m) => m.SuppliersComponent),
       },
       {
         path: 'users',
+        canActivate: [roleGuard(['ROLE_ROOT'])],
         loadComponent: () => import('@features/users/users').then((m) => m.UsersComponent),
       },
     ],

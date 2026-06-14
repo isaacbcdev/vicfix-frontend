@@ -13,3 +13,11 @@ export const guestGuard: CanActivateFn = () => {
   const router = inject(Router);
   return auth.isAuthenticated() ? router.createUrlTree(['/dashboard']) : true;
 };
+
+export function roleGuard(allowedRoles: string[]): CanActivateFn {
+  return () => {
+    const auth = inject(AuthService);
+    const router = inject(Router);
+    return auth.hasAnyRole(allowedRoles) ? true : router.createUrlTree(['/dashboard']);
+  };
+}
