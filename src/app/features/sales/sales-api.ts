@@ -36,4 +36,8 @@ export class SalesService {
   cancelSale(id: number): Observable<void> {
     return this.http.post<void>(`${base}/${id}/cancel`, {});
   }
+
+  deleteSale(id: number): Observable<void> {
+    return this.http.delete<void>(`${base}/${id}`);
+  }
 }

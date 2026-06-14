@@ -34,6 +34,7 @@ export class SalesHistoryComponent implements OnInit {
   actionError = signal<string | null>(null);
   confirmingId = signal<number | null>(null);
   cancelingId = signal<number | null>(null);
+  deletingId = signal<number | null>(null);
 
   totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
@@ -101,6 +102,7 @@ export class SalesHistoryComponent implements OnInit {
   }
 
   onCancel(id: number): void {
+    if (!confirm('¿Cancelar esta venta? Se restaurará el stock.')) return;
     this.cancelingId.set(id);
     this.actionError.set(null);
     this.svc
@@ -111,6 +113,22 @@ export class SalesHistoryComponent implements OnInit {
         error: (err) => {
           const msg = err?.error?.message as string | undefined;
           this.actionError.set(msg ?? 'No se pudo cancelar la venta. Intenta de nuevo.');
+        },
+      });
+  }
+
+  onDelete(id: number): void {
+    if (!confirm('¿Eliminar esta venta?')) return;
+    this.deletingId.set(id);
+    this.actionError.set(null);
+    this.svc
+      .deleteSale(id)
+      .pipe(finalize(() => this.deletingId.set(null)))
+      .subscribe({
+        next: () => this.loadSales(),
+        error: (err) => {
+          const msg = err?.error?.message as string | undefined;
+          this.actionError.set(msg ?? 'No se pudo eliminar la venta. Intenta de nuevo.');
         },
       });
   }

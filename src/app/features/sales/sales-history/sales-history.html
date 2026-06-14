@@ -124,7 +124,8 @@
             <td class="px-4 py-3">
               @if (sale.status === 'PENDING') {
               <div class="flex items-center gap-2">
-                <button (click)="onConfirm(sale.saleId)" [disabled]="confirmingId() === sale.saleId || cancelingId() === sale.saleId"
+                <button (click)="onConfirm(sale.saleId)"
+                  [disabled]="confirmingId() === sale.saleId || deletingId() === sale.saleId"
                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent text-white text-xs font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                   @if (confirmingId() === sale.saleId) {
                   <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -134,17 +135,42 @@
                   }
                   Confirmar
                 </button>
-                <button (click)="onCancel(sale.saleId)" [disabled]="confirmingId() === sale.saleId || cancelingId() === sale.saleId"
+                <button (click)="onDelete(sale.saleId)"
+                  [disabled]="confirmingId() === sale.saleId || deletingId() === sale.saleId"
                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-300 text-red-600 text-xs font-medium hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-                  @if (cancelingId() === sale.saleId) {
+                  @if (deletingId() === sale.saleId) {
                   <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                   </svg>
                   }
-                  Cancelar
+                  Eliminar
                 </button>
               </div>
+              } @else if (sale.status === 'COMPLETED') {
+              <button (click)="onCancel(sale.saleId)"
+                [disabled]="cancelingId() === sale.saleId"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-300 text-red-600 text-xs font-medium hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                @if (cancelingId() === sale.saleId) {
+                <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+                }
+                Cancelar
+              </button>
+              } @else if (sale.status === 'CANCELED') {
+              <button (click)="onDelete(sale.saleId)"
+                [disabled]="deletingId() === sale.saleId"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-300 text-red-600 text-xs font-medium hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                @if (deletingId() === sale.saleId) {
+                <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+                }
+                Eliminar
+              </button>
               }
             </td>
           </tr>
