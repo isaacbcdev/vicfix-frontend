@@ -12,7 +12,6 @@ interface ErrorResponse {
 
 @Component({
   selector: 'app-supplier-form',
-  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './supplier-form.html',
 })

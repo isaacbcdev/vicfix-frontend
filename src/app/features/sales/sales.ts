@@ -11,7 +11,6 @@ import { CartItem } from './sales.models';
 
 @Component({
   selector: 'app-sales',
-  standalone: true,
   imports: [FormsModule, CurrencyCopPipe],
   templateUrl: './sales.html',
 })

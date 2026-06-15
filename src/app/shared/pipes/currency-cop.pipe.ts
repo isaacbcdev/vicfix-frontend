@@ -6,11 +6,15 @@ const formatter = new Intl.NumberFormat('es-CO', {
   maximumFractionDigits: 0,
 });
 
-@Pipe({ name: 'currencyCop', standalone: true })
+@Pipe({ name: 'currencyCop' })
 export class CurrencyCopPipe implements PipeTransform {
   transform(value: number | null | undefined): string {
     if (value == null) return '';
     // es-CO produces "$25.000" already; strip any trailing " COP" artifact
-    return formatter.format(value).replace(/\s*COP\s*/g, '').replace(/\$\s+/, '$').trim();
+    return formatter
+      .format(value)
+      .replace(/\s*COP\s*/g, '')
+      .replace(/\$\s+/, '$')
+      .trim();
   }
 }

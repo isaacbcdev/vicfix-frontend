@@ -3,22 +3,21 @@ import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProductsService } from './products-api';
-import { CategoriesService } from './categories.service';
+import { CategoriesService } from './categories-api';
 import { AuthService } from '@auth/auth-api';
 import { Category, Product } from '@shared/models/product.model';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
-import { ModalComponent } from '@shared/ui/modal/modal.component';
+import { ModalComponent } from '@shared/ui/modal/modal';
 import { ProductFormComponent } from './product-form/product-form';
 
 const CATEGORY_DISPLAY_NAMES: Record<string, string> = {
   'SERVICIOS DIGITALES E IMPRESIONES': 'Servicios Digitales',
-  'MISCELANEA': 'Miscelánea',
-  'POLITOS': 'Politos',
+  MISCELANEA: 'Miscelánea',
+  POLITOS: 'Politos',
 };
 
 @Component({
   selector: 'app-products',
-  standalone: true,
   imports: [FormsModule, CurrencyCopPipe, ModalComponent, ProductFormComponent],
   templateUrl: './products.html',
 })
@@ -64,7 +63,7 @@ export class ProductsComponent implements OnInit {
   readonly statusOptions = [
     { value: null, label: 'Todos' },
     { value: 'ACTIVE', label: 'Activo' },
-    { value: 'LOW_STOCK', label: 'Stock bajo' },   // sentinel — handled specially in setStatus()
+    { value: 'LOW_STOCK', label: 'Stock bajo' }, // sentinel — handled specially in setStatus()
     { value: 'OUT_OF_STOCK', label: 'Agotado' },
   ];
 
@@ -144,16 +143,18 @@ export class ProductsComponent implements OnInit {
   }
 
   isStatusActive(value: string | null): boolean {
-  if (value === 'LOW_STOCK') return this.lowStock();
-  if (value === null || value === '') {
-    return !this.lowStock() && this.selectedStatus() === null;
+    if (value === 'LOW_STOCK') return this.lowStock();
+    if (value === null || value === '') {
+      return !this.lowStock() && this.selectedStatus() === null;
+    }
+    return this.selectedStatus() === value;
   }
-  return this.selectedStatus() === value;
-}
 
   displayCategoryName(name: string): string {
-    return CATEGORY_DISPLAY_NAMES[name.toUpperCase()] ??
-      name.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+    return (
+      CATEGORY_DISPLAY_NAMES[name.toUpperCase()] ??
+      name.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    );
   }
 
   openCreate(): void {

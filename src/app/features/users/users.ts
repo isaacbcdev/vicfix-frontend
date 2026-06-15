@@ -2,7 +2,7 @@ import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angula
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ModalComponent } from '@shared/ui/modal/modal.component';
+import { ModalComponent } from '@shared/ui/modal/modal';
 import { AuthService } from '../../auth/auth-api';
 import { UsersService } from './users-api';
 import { UserModel } from './users.models';

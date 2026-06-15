@@ -27,7 +27,6 @@ function atLeastOneRole(): ValidatorFn {
 
 @Component({
   selector: 'app-user-form',
-  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './user-form.html',
 })
