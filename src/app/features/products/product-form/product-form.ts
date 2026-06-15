@@ -2,7 +2,8 @@ import { Component, effect, inject, input, output, signal } from '@angular/core'
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { ProductsService } from '../products-api';
-import { Product } from '@shared/models/product.model';
+import { Category, Product } from '@shared/models/product.model';
+import { CategoriesService } from '../categories-api';
 
 interface ErrorResponse {
   status: number;
@@ -22,6 +23,9 @@ export class ProductFormComponent {
 
   private fb = inject(FormBuilder);
   private svc = inject(ProductsService);
+  private categoriesService = inject(CategoriesService);
+
+  categories = signal<Category[]>([]);
 
   submitting = signal(false);
   errorMessage = signal<string | null>(null);
@@ -68,6 +72,8 @@ export class ProductFormComponent {
         this.form.reset();
       }
     });
+
+    this.categoriesService.getCategories().subscribe((cats) => this.categories.set(cats));
   }
 
   get isEditMode(): boolean {
