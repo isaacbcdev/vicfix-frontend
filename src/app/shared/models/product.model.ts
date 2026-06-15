@@ -1,3 +1,10 @@
+export interface Category {
+  categoryId: number;
+  categoryName: string;
+  categoryCode: string;
+  isActive: boolean;
+}
+
 export interface Product {
   productId: number;
   categoryId: number | null;

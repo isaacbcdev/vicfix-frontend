@@ -3,11 +3,18 @@ import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProductsService } from './products-api';
+import { CategoriesService } from './categories.service';
 import { AuthService } from '@auth/auth-api';
-import { Product } from '@shared/models/product.model';
+import { Category, Product } from '@shared/models/product.model';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { ModalComponent } from '@shared/ui/modal/modal.component';
 import { ProductFormComponent } from './product-form/product-form';
+
+const CATEGORY_DISPLAY_NAMES: Record<string, string> = {
+  'SERVICIOS DIGITALES E IMPRESIONES': 'Servicios Digitales',
+  'MISCELANEA': 'Miscelánea',
+  'POLITOS': 'Politos',
+};
 
 @Component({
   selector: 'app-products',
@@ -17,6 +24,7 @@ import { ProductFormComponent } from './product-form/product-form';
 })
 export class ProductsComponent implements OnInit {
   private svc = inject(ProductsService);
+  private categoriesSvc = inject(CategoriesService);
   private destroyRef = inject(DestroyRef);
   protected auth = inject(AuthService);
 
@@ -28,11 +36,35 @@ export class ProductsComponent implements OnInit {
   loading = signal(false);
   error = signal<string | null>(null);
 
+  selectedCategoryId = signal<number | null>(null);
+  selectedStatus = signal<string | null>(null);
+  categories = signal<Category[]>([]);
+  categoriesLoading = signal(false);
+
   showModal = signal(false);
   editingProduct = signal<Product | null>(null);
   deletingId = signal<number | null>(null);
 
   totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+
+  productCountLabel = computed(() => {
+    const count = this.totalElements();
+    const filtered =
+      this.selectedCategoryId() !== null ||
+      this.selectedStatus() !== null ||
+      this.query() !== '';
+    const suffix = count === 1 ? '' : 's';
+    return filtered
+      ? `${count} producto${suffix}`
+      : `${count} producto${suffix} registrado${suffix}`;
+  });
+
+  readonly statusOptions = [
+    { value: null, label: 'Todos' },
+    { value: 'ACTIVE', label: 'Activo' },
+    { value: 'LOW_STOCK', label: 'Stock bajo' },
+    { value: 'OUT_OF_STOCK', label: 'Agotado' },
+  ];
 
   private search$ = new Subject<string>();
   searchInput = '';
@@ -46,14 +78,35 @@ export class ProductsComponent implements OnInit {
         this.loadProducts();
       });
 
+    this.loadCategories();
     this.loadProducts();
+  }
+
+  loadCategories(): void {
+    this.categoriesLoading.set(true);
+    this.categoriesSvc
+      .getCategories()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (cats) => {
+          this.categories.set(cats);
+          this.categoriesLoading.set(false);
+        },
+        error: () => this.categoriesLoading.set(false),
+      });
   }
 
   loadProducts(): void {
     this.loading.set(true);
     this.error.set(null);
     this.svc
-      .getProducts(this.currentPage(), this.pageSize(), this.query())
+      .getProducts(
+        this.currentPage(),
+        this.pageSize(),
+        this.query(),
+        this.selectedCategoryId(),
+        this.selectedStatus(),
+      )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (page) => {
@@ -66,6 +119,23 @@ export class ProductsComponent implements OnInit {
           this.loading.set(false);
         },
       });
+  }
+
+  setCategory(id: number | null): void {
+    this.selectedCategoryId.set(id);
+    this.currentPage.set(0);
+    this.loadProducts();
+  }
+
+  setStatus(status: string | null): void {
+    this.selectedStatus.set(status);
+    this.currentPage.set(0);
+    this.loadProducts();
+  }
+
+  displayCategoryName(name: string): string {
+    return CATEGORY_DISPLAY_NAMES[name.toUpperCase()] ??
+      name.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
   }
 
   openCreate(): void {

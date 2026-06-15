@@ -10,11 +10,16 @@ const base = `${environment.apiUrl}/api/v1/products`;
 export class ProductsService {
   private http = inject(HttpClient);
 
-  getProducts(page: number, size: number, query: string): Observable<Page<Product>> {
-    const params = new HttpParams()
-      .set('page', page)
-      .set('size', size)
-      .set('query', query);
+  getProducts(
+    page: number,
+    size: number,
+    query: string,
+    categoryId?: number | null,
+    status?: string | null,
+  ): Observable<Page<Product>> {
+    let params = new HttpParams().set('page', page).set('size', size).set('query', query);
+    if (categoryId != null) params = params.set('categoryId', categoryId);
+    if (status != null) params = params.set('status', status);
     return this.http.get<Page<Product>>(base, { params });
   }
 
