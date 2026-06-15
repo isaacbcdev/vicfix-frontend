@@ -2,7 +2,7 @@ import { Component, input, output } from '@angular/core';
 
 @Component({
   selector: 'app-modal',
-  templateUrl: './modal.component.html',
+  templateUrl: './modal.html',
 })
 export class ModalComponent {
   title = input<string>('');
