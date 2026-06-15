@@ -38,6 +38,7 @@ export class ProductsComponent implements OnInit {
 
   selectedCategoryId = signal<number | null>(null);
   selectedStatus = signal<string | null>(null);
+  lowStock = signal(false);
   categories = signal<Category[]>([]);
   categoriesLoading = signal(false);
 
@@ -52,6 +53,7 @@ export class ProductsComponent implements OnInit {
     const filtered =
       this.selectedCategoryId() !== null ||
       this.selectedStatus() !== null ||
+      this.lowStock() ||
       this.query() !== '';
     const suffix = count === 1 ? '' : 's';
     return filtered
@@ -62,7 +64,7 @@ export class ProductsComponent implements OnInit {
   readonly statusOptions = [
     { value: null, label: 'Todos' },
     { value: 'ACTIVE', label: 'Activo' },
-    { value: 'LOW_STOCK', label: 'Stock bajo' },
+    { value: 'LOW_STOCK', label: 'Stock bajo' },   // sentinel — handled specially in setStatus()
     { value: 'OUT_OF_STOCK', label: 'Agotado' },
   ];
 
@@ -106,6 +108,7 @@ export class ProductsComponent implements OnInit {
         this.query(),
         this.selectedCategoryId(),
         this.selectedStatus(),
+        this.lowStock(),
       )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -123,12 +126,19 @@ export class ProductsComponent implements OnInit {
 
   setCategory(id: number | null): void {
     this.selectedCategoryId.set(id);
+    this.lowStock.set(false);
     this.currentPage.set(0);
     this.loadProducts();
   }
 
   setStatus(status: string | null): void {
-    this.selectedStatus.set(status);
+    if (status === 'LOW_STOCK') {
+      this.selectedStatus.set(null);
+      this.lowStock.set(true);
+    } else {
+      this.selectedStatus.set(status);
+      this.lowStock.set(false);
+    }
     this.currentPage.set(0);
     this.loadProducts();
   }

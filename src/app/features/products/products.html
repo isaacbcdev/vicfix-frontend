@@ -63,7 +63,7 @@
   <div class="flex items-center gap-2 flex-wrap">
     @for (s of statusOptions; track s.value) {
     <button (click)="setStatus(s.value)"
-      [class]="selectedStatus() === s.value
+      [class]="(s.value === 'LOW_STOCK' ? lowStock() : selectedStatus() === s.value)
         ? 'px-3 py-1.5 rounded-lg text-sm font-medium bg-accent text-white transition-colors'
         : 'px-3 py-1.5 rounded-lg text-sm font-medium bg-white border border-slate-200 text-text-secondary hover:bg-slate-50 transition-colors'">
       {{ s.label }}
