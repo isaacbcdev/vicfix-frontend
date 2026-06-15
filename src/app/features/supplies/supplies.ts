@@ -1,4 +1,13 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+
+function firstDayOfCurrentMonth(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+}
+
+function today(): string {
+  return new Date().toISOString().slice(0, 10);
+}
 import { DatePipe, AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
@@ -26,6 +35,8 @@ export class SuppliesComponent implements OnInit {
   pageSize = signal(20);
   query = signal('');
   statusFilter = signal('');
+  startDate = signal(firstDayOfCurrentMonth());
+  endDate = signal(today());
   loading = signal(false);
   error = signal<string | null>(null);
   actionError = signal<string | null>(null);
@@ -55,7 +66,14 @@ export class SuppliesComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
     this.svc
-      .getSupplies(this.currentPage(), this.pageSize(), this.query(), this.statusFilter())
+      .getSupplies(
+        this.currentPage(),
+        this.pageSize(),
+        this.query(),
+        this.statusFilter(),
+        this.startDate() || undefined,
+        this.endDate() || undefined,
+      )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (page) => {
@@ -79,6 +97,13 @@ export class SuppliesComponent implements OnInit {
   onSearchChange(value: string): void {
     this.searchInput = value;
     this.search$.next(value);
+  }
+
+  onDateChange(field: 'start' | 'end', value: string): void {
+    if (field === 'start') this.startDate.set(value);
+    else this.endDate.set(value);
+    this.currentPage.set(0);
+    this.loadSupplies();
   }
 
   clearSearch(): void {

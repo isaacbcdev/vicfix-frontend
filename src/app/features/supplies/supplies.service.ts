@@ -11,12 +11,21 @@ const base = `${environment.apiUrl}/api/v1/supplies`;
 export class SuppliesService {
   private http = inject(HttpClient);
 
-  getSupplies(page: number, size: number, query = '', status = ''): Observable<Page<Supply>> {
-    const params = new HttpParams()
+  getSupplies(
+    page: number,
+    size: number,
+    query = '',
+    status = '',
+    startDate?: string,
+    endDate?: string,
+  ): Observable<Page<Supply>> {
+    let params = new HttpParams()
       .set('page', page)
       .set('size', size)
       .set('query', query)
       .set('status', status);
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
     return this.http.get<Page<Supply>>(base, { params });
   }
 
