@@ -143,6 +143,14 @@ export class ProductsComponent implements OnInit {
     this.loadProducts();
   }
 
+  isStatusActive(value: string | null): boolean {
+  if (value === 'LOW_STOCK') return this.lowStock();
+  if (value === null || value === '') {
+    return !this.lowStock() && this.selectedStatus() === null;
+  }
+  return this.selectedStatus() === value;
+}
+
   displayCategoryName(name: string): string {
     return CATEGORY_DISPLAY_NAMES[name.toUpperCase()] ??
       name.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
