@@ -25,6 +25,12 @@ function nowDatetimeLocal(): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+function isoToDatetimeLocal(iso: string): string {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 const EXTRA_CHARGE_CODES = ['PTM', 'PUNTORED', 'REFACIL'];
 
 @Component({
@@ -49,10 +55,16 @@ export class PlatformDetailComponent implements OnInit {
   endDate = signal(today());
   loading = signal(false);
   error = signal<string | null>(null);
+  actionError = signal<string | null>(null);
 
   showTxModal = signal(false);
   submittingTx = signal(false);
   txError = signal<string | null>(null);
+
+  editingTransaction = signal<PlatformTransaction | null>(null);
+  showEditTxModal = signal(false);
+
+  deletingTxId = signal<string | null>(null);
 
   showBalanceModal = signal(false);
   submittingBalance = signal(false);
@@ -73,8 +85,6 @@ export class PlatformDetailComponent implements OnInit {
     operation: ['', Validators.required],
     movementType: ['EXIT' as 'ENTRY' | 'EXIT', Validators.required],
     amount: [null as number | null, [Validators.required, Validators.min(1)]],
-    balanceBefore: [null as number | null],
-    balanceAfter: [null as number | null],
     commission: [0 as number | null],
     extraCharge: [null as number | null],
     phoneNumber: [''],
@@ -151,8 +161,6 @@ export class PlatformDetailComponent implements OnInit {
       operation: '',
       movementType: 'EXIT',
       amount: null,
-      balanceBefore: null,
-      balanceAfter: null,
       commission: 0,
       extraCharge: null,
       phoneNumber: '',
@@ -177,14 +185,13 @@ export class PlatformDetailComponent implements OnInit {
 
     const req = {
       platformId: id,
-      transactionDate: raw.transactionDate!,
+      transactionDate: new Date(raw.transactionDate!).toISOString(),
       operation: raw.operation!,
       movementType: raw.movementType!,
       amount: Number(raw.amount),
-      ...(raw.balanceBefore != null && { balanceBefore: Number(raw.balanceBefore) }),
-      ...(raw.balanceAfter != null && { balanceAfter: Number(raw.balanceAfter) }),
       ...(raw.commission != null && { commission: Number(raw.commission) }),
-      ...(this.showExtraCharge() && raw.extraCharge != null && { extraCharge: Number(raw.extraCharge) }),
+      ...(this.showExtraCharge() &&
+        raw.extraCharge != null && { extraCharge: Number(raw.extraCharge) }),
       ...(raw.phoneNumber && { phoneNumber: raw.phoneNumber }),
       ...(raw.notes && { notes: raw.notes }),
     };
@@ -202,6 +209,90 @@ export class PlatformDetailComponent implements OnInit {
         error: (err) => {
           const msg = err?.error?.message as string | undefined;
           this.txError.set(msg ?? 'No se pudo registrar la transacción. Intenta de nuevo.');
+        },
+      });
+  }
+
+  openEditTxModal(tx: PlatformTransaction): void {
+    this.editingTransaction.set(tx);
+    this.txError.set(null);
+    this.txForm.reset({
+      transactionDate: isoToDatetimeLocal(tx.transactionDate),
+      operation: tx.operation,
+      movementType: tx.movementType,
+      amount: tx.amount,
+      commission: tx.commission,
+      extraCharge: tx.extraCharge,
+      phoneNumber: tx.phoneNumber ?? '',
+      notes: tx.notes ?? '',
+    });
+    this.showEditTxModal.set(true);
+  }
+
+  submitEditTx(): void {
+    this.txForm.markAllAsTouched();
+    if (this.txForm.invalid || this.submittingTx()) return;
+    const tx = this.editingTransaction();
+    if (!tx) return;
+    const id = this.platformId();
+
+    this.submittingTx.set(true);
+    this.txError.set(null);
+    const raw = this.txForm.getRawValue();
+
+    const req = {
+      platformId: id,
+      transactionDate: new Date(raw.transactionDate!).toISOString(),
+      operation: raw.operation!,
+      movementType: raw.movementType!,
+      amount: Number(raw.amount),
+      ...(raw.commission != null && { commission: Number(raw.commission) }),
+      ...(this.showExtraCharge() &&
+        raw.extraCharge != null && { extraCharge: Number(raw.extraCharge) }),
+      ...(raw.phoneNumber && { phoneNumber: raw.phoneNumber }),
+      ...(raw.notes && { notes: raw.notes }),
+    };
+
+    this.svc
+      .updateTransaction(tx.id, req)
+      .pipe(finalize(() => this.submittingTx.set(false)))
+      .subscribe({
+        next: () => {
+          this.showEditTxModal.set(false);
+          this.editingTransaction.set(null);
+          this.loadTransactions();
+          this.loadPlatform(id);
+        },
+        error: (err) => {
+          const msg = err?.error?.message as string | undefined;
+          this.txError.set(msg ?? 'No se pudo actualizar la transacción. Intenta de nuevo.');
+        },
+      });
+  }
+
+  onDeleteTransaction(txId: string): void {
+    if (
+      !window.confirm(
+        '¿Eliminar esta transacción? El saldo de la plataforma no se ajustará automáticamente.',
+      )
+    )
+      return;
+
+    this.deletingTxId.set(txId);
+    this.actionError.set(null);
+    const platformId = this.platformId();
+
+    this.svc
+      .deleteTransaction(txId)
+      .pipe(finalize(() => this.deletingTxId.set(null)))
+      .subscribe({
+        next: () => {
+          this.loadTransactions();
+          this.loadPlatform(platformId);
+        },
+        error: (err) => {
+          const msg = err?.error?.message as string | undefined;
+          this.actionError.set(msg ?? 'No se pudo eliminar la transacción. Intenta de nuevo.');
         },
       });
   }

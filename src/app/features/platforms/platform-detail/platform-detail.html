@@ -49,7 +49,7 @@
   </div>
   }
 
-  <!-- Transactions section -->
+  <!-- Transactions section header -->
   <div class="flex items-center justify-between flex-wrap gap-3">
     <h2 class="text-lg font-semibold text-text-primary">Transacciones</h2>
     @if (auth.hasAnyRole(['ROLE_ADMIN', 'ROLE_ROOT'])) {
@@ -88,6 +88,22 @@
   </div>
   }
 
+  <!-- Action error (delete) -->
+  @if (actionError()) {
+  <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
+    </svg>
+    {{ actionError() }}
+    <button (click)="actionError.set(null)" class="ml-auto shrink-0 hover:text-red-900 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  }
+
   <!-- Transactions table -->
   <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
     <div class="overflow-x-auto">
@@ -105,6 +121,7 @@
             <th class="text-right px-4 py-3 font-medium text-text-secondary whitespace-nowrap">Cargo extra</th>
             }
             <th class="text-left px-4 py-3 font-medium text-text-secondary">Teléfono</th>
+            <th class="px-4 py-3"></th>
           </tr>
         </thead>
         <tbody>
@@ -124,6 +141,7 @@
             <td class="px-4 py-3"><div class="h-4 bg-slate-100 rounded w-16 ml-auto"></div></td>
             }
             <td class="px-4 py-3"><div class="h-4 bg-slate-100 rounded w-24"></div></td>
+            <td class="px-4 py-3"><div class="h-4 bg-slate-100 rounded w-16 ml-auto"></div></td>
           </tr>
           }
           }
@@ -161,13 +179,40 @@
             </td>
             }
             <td class="px-4 py-3 text-text-secondary">{{ tx.phoneNumber ?? '—' }}</td>
+            <td class="px-4 py-3">
+              @if (auth.hasAnyRole(['ROLE_ADMIN', 'ROLE_ROOT'])) {
+              <div class="flex items-center justify-end gap-1">
+                <button (click)="openEditTxModal(tx)" title="Editar"
+                  class="p-1.5 rounded-lg border border-slate-200 text-text-secondary hover:text-accent hover:border-accent hover:bg-emerald-50 transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+                  </svg>
+                </button>
+                <button (click)="onDeleteTransaction(tx.id)" [disabled]="deletingTxId() === tx.id" title="Eliminar"
+                  class="p-1.5 rounded-lg border border-slate-200 text-text-secondary hover:text-error hover:border-red-300 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  @if (deletingTxId() === tx.id) {
+                  <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  } @else {
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                  </svg>
+                  }
+                </button>
+              </div>
+              }
+            </td>
           </tr>
           }
 
           <!-- Empty state -->
           @empty {
           <tr>
-            <td [attr.colspan]="showExtraCharge() ? 9 : 8" class="px-4 py-16 text-center">
+            <td [attr.colspan]="showExtraCharge() ? 10 : 9" class="px-4 py-16 text-center">
               <div class="flex flex-col items-center gap-3">
                 <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5"
                   viewBox="0 0 24 24">
@@ -212,7 +257,7 @@
 
 </div>
 
-<!-- Transaction modal -->
+<!-- Create transaction modal -->
 <app-modal [title]="txModalTitle()" [isOpen]="showTxModal()" (closed)="showTxModal.set(false)">
   <form [formGroup]="txForm" (ngSubmit)="submitTx()" class="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
 
@@ -226,7 +271,6 @@
     </div>
     }
 
-    <!-- Fecha y hora -->
     <div>
       <label class="block text-sm font-medium text-text-primary mb-1.5">
         Fecha y hora <span class="text-error">*</span>
@@ -240,7 +284,6 @@
       }
     </div>
 
-    <!-- Operación -->
     <div>
       <label class="block text-sm font-medium text-text-primary mb-1.5">
         Operación <span class="text-error">*</span>
@@ -254,7 +297,6 @@
       }
     </div>
 
-    <!-- Tipo de movimiento -->
     <div>
       <label class="block text-sm font-medium text-text-primary mb-2">
         Tipo de movimiento <span class="text-error">*</span>
@@ -279,7 +321,6 @@
       </div>
     </div>
 
-    <!-- Monto -->
     <div>
       <label class="block text-sm font-medium text-text-primary mb-1.5">
         Monto <span class="text-error">*</span>
@@ -293,21 +334,6 @@
       }
     </div>
 
-    <!-- Saldo anterior / siguiente -->
-    <div class="grid grid-cols-2 gap-3">
-      <div>
-        <label class="block text-sm font-medium text-text-primary mb-1.5">Saldo anterior</label>
-        <input type="number" formControlName="balanceBefore" min="0"
-          class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-text-primary mb-1.5">Saldo siguiente</label>
-        <input type="number" formControlName="balanceAfter" min="0"
-          class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors" />
-      </div>
-    </div>
-
-    <!-- Comisión / Cargo extra -->
     <div class="grid gap-3" [class.grid-cols-2]="showExtraCharge()">
       <div>
         <label class="block text-sm font-medium text-text-primary mb-1.5">Comisión</label>
@@ -323,14 +349,12 @@
       }
     </div>
 
-    <!-- Teléfono -->
     <div>
       <label class="block text-sm font-medium text-text-primary mb-1.5">Teléfono</label>
       <input type="text" formControlName="phoneNumber" placeholder="Número opcional"
         class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors" />
     </div>
 
-    <!-- Notas -->
     <div>
       <label class="block text-sm font-medium text-text-primary mb-1.5">Notas</label>
       <textarea formControlName="notes" rows="2" placeholder="Observaciones opcionales..."
@@ -352,6 +376,149 @@
         </svg>
         }
         Registrar transacción
+      </button>
+    </div>
+
+  </form>
+</app-modal>
+
+<!-- Edit transaction modal -->
+<app-modal title="Editar transacción" [isOpen]="showEditTxModal()" (closed)="showEditTxModal.set(false)">
+  <form [formGroup]="txForm" (ngSubmit)="submitEditTx()" class="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
+
+    @if (txError()) {
+    <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+        <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
+      </svg>
+      {{ txError() }}
+    </div>
+    }
+
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-1.5">
+        Fecha y hora <span class="text-error">*</span>
+      </label>
+      <input type="datetime-local" formControlName="transactionDate"
+        class="w-full px-3 py-2 rounded-lg border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+        [class.border-slate-200]="!fe(txForm.get('transactionDate'))"
+        [class.border-error]="fe(txForm.get('transactionDate'))" />
+      @if (fe(txForm.get('transactionDate'))) {
+      <p class="mt-1 text-xs text-error">Campo requerido</p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-1.5">
+        Operación <span class="text-error">*</span>
+      </label>
+      <input type="text" formControlName="operation" placeholder="Ej: RETIRO, FACTURAS, RECARGA..."
+        class="w-full px-3 py-2 rounded-lg border text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+        [class.border-slate-200]="!fe(txForm.get('operation'))"
+        [class.border-error]="fe(txForm.get('operation'))" />
+      @if (fe(txForm.get('operation'))) {
+      <p class="mt-1 text-xs text-error">Campo requerido</p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-2">
+        Tipo de movimiento <span class="text-error">*</span>
+      </label>
+      <div class="flex rounded-lg border border-slate-200 overflow-hidden">
+        <button type="button" (click)="setMovementType('EXIT')"
+          class="flex-1 px-4 py-2 text-sm font-medium transition-colors"
+          [class.bg-red-500]="txForm.get('movementType')?.value === 'EXIT'"
+          [class.text-white]="txForm.get('movementType')?.value === 'EXIT'"
+          [class.bg-white]="txForm.get('movementType')?.value !== 'EXIT'"
+          [class.text-text-secondary]="txForm.get('movementType')?.value !== 'EXIT'">
+          Salida
+        </button>
+        <button type="button" (click)="setMovementType('ENTRY')"
+          class="flex-1 px-4 py-2 text-sm font-medium border-l border-slate-200 transition-colors"
+          [class.bg-emerald-500]="txForm.get('movementType')?.value === 'ENTRY'"
+          [class.text-white]="txForm.get('movementType')?.value === 'ENTRY'"
+          [class.bg-white]="txForm.get('movementType')?.value !== 'ENTRY'"
+          [class.text-text-secondary]="txForm.get('movementType')?.value !== 'ENTRY'">
+          Entrada
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-1.5">
+        Monto <span class="text-error">*</span>
+      </label>
+      <input type="number" formControlName="amount" min="1"
+        class="w-full px-3 py-2 rounded-lg border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+        [class.border-slate-200]="!fe(txForm.get('amount'))"
+        [class.border-error]="fe(txForm.get('amount'))" />
+      @if (fe(txForm.get('amount'))) {
+      <p class="mt-1 text-xs text-error">Mínimo $1</p>
+      }
+    </div>
+
+    <!-- Read-only balance info -->
+    @if (editingTransaction()?.balanceBefore !== null || editingTransaction()?.balanceAfter !== null) {
+    <div class="grid grid-cols-2 gap-3 px-3 py-2.5 rounded-lg bg-slate-50 border border-slate-100">
+      <div>
+        <p class="text-xs text-text-secondary mb-0.5">Saldo anterior</p>
+        <p class="text-sm font-medium text-text-primary">
+          {{ editingTransaction()?.balanceBefore !== null ? (editingTransaction()!.balanceBefore | currencyCop) : '—' }}
+        </p>
+      </div>
+      <div>
+        <p class="text-xs text-text-secondary mb-0.5">Saldo siguiente</p>
+        <p class="text-sm font-medium text-text-primary">
+          {{ editingTransaction()?.balanceAfter !== null ? (editingTransaction()!.balanceAfter | currencyCop) : '—' }}
+        </p>
+      </div>
+    </div>
+    }
+
+    <div class="grid gap-3" [class.grid-cols-2]="showExtraCharge()">
+      <div>
+        <label class="block text-sm font-medium text-text-primary mb-1.5">Comisión</label>
+        <input type="number" formControlName="commission" min="0"
+          class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors" />
+      </div>
+      @if (showExtraCharge()) {
+      <div>
+        <label class="block text-sm font-medium text-text-primary mb-1.5">Cargo extra</label>
+        <input type="number" formControlName="extraCharge" min="0"
+          class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors" />
+      </div>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-1.5">Teléfono</label>
+      <input type="text" formControlName="phoneNumber" placeholder="Número opcional"
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-1.5">Notas</label>
+      <textarea formControlName="notes" rows="2" placeholder="Observaciones opcionales..."
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors resize-none">
+      </textarea>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2">
+      <button type="button" (click)="showEditTxModal.set(false)"
+        class="px-4 py-2 rounded-lg border border-slate-200 text-sm text-text-secondary hover:bg-slate-50 transition-colors">
+        Cancelar
+      </button>
+      <button type="submit" [disabled]="submittingTx()"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        @if (submittingTx()) {
+        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+        </svg>
+        }
+        Guardar cambios
       </button>
     </div>
 

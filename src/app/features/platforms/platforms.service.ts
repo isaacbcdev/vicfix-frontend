@@ -43,6 +43,17 @@ export class PlatformsService {
     return this.http.post<PlatformTransaction>(`${base}/${req.platformId}/transactions`, req);
   }
 
+  updateTransaction(
+    id: string,
+    req: Partial<CreateTransactionRequest>,
+  ): Observable<PlatformTransaction> {
+    return this.http.put<PlatformTransaction>(`${base}/transactions/${id}`, req);
+  }
+
+  deleteTransaction(id: string): Observable<void> {
+    return this.http.delete<void>(`${base}/transactions/${id}`);
+  }
+
   createEfectyClose(req: CreateEfectyCloseRequest): Observable<EfectyDailyClose> {
     return this.http.post<EfectyDailyClose>(`${base}/efecty/close`, req);
   }
