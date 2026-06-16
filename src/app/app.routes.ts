@@ -36,9 +36,15 @@ export const routes: Routes = [
       },
       {
         path: 'platforms',
-        canActivate: [roleGuard(['ROLE_ADMIN', 'ROLE_ROOT'])],
         loadComponent: () =>
           import('@features/platforms/platforms').then((m) => m.PlatformsComponent),
+      },
+      {
+        path: 'platforms/:id',
+        loadComponent: () =>
+          import('@features/platforms/platform-detail/platform-detail').then(
+            (m) => m.PlatformDetailComponent,
+          ),
       },
       {
         path: 'reports',

@@ -1,0 +1,273 @@
+<div class="p-6 space-y-5">
+
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-semibold text-text-primary">Plataformas</h1>
+    <p class="text-sm text-text-secondary mt-0.5">Saldos y operaciones</p>
+  </div>
+
+  <!-- Load error -->
+  @if (error()) {
+  <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
+    </svg>
+    {{ error() }}
+  </div>
+  }
+
+  <!-- Loading skeleton -->
+  @if (loading()) {
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    @for (_ of [1,2,3,4,5,6]; track $index) {
+    <div class="bg-white rounded-xl border border-slate-200 p-5 space-y-3 animate-pulse">
+      <div class="flex justify-between">
+        <div class="space-y-2">
+          <div class="h-5 bg-slate-100 rounded w-28"></div>
+          <div class="h-4 bg-slate-100 rounded w-14"></div>
+        </div>
+        <div class="h-5 bg-slate-100 rounded-full w-20"></div>
+      </div>
+      <div class="h-8 bg-slate-100 rounded w-36"></div>
+      <div class="h-2 bg-slate-100 rounded w-full"></div>
+      <div class="h-4 bg-slate-100 rounded w-32"></div>
+      <div class="flex gap-2 pt-1">
+        <div class="h-8 bg-slate-100 rounded w-32"></div>
+        <div class="h-8 bg-slate-100 rounded w-28"></div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Platform cards -->
+  @if (!loading()) {
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    @for (p of platforms(); track p.id) {
+    <div class="bg-white rounded-xl border border-slate-200 border-l-4 p-5 space-y-3"
+         [style.borderLeftColor]="p.color">
+
+      <!-- Name + code + status -->
+      <div class="flex items-start justify-between gap-2">
+        <div>
+          <h3 class="font-semibold text-text-primary leading-tight">{{ p.name }}</h3>
+          <span class="inline-block mt-1 text-xs px-2 py-0.5 rounded bg-slate-100 text-text-secondary font-mono">
+            {{ p.code }}
+          </span>
+        </div>
+        @if (p.status === 'SUFFICIENT') {
+        <span class="shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+          Suficiente
+        </span>
+        } @else if (p.status === 'LOW') {
+        <span class="shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+          Saldo bajo
+        </span>
+        } @else {
+        <span class="shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+          Saldo crítico
+        </span>
+        }
+      </div>
+
+      <!-- Balance -->
+      <div>
+        <p class="text-xs text-text-secondary mb-0.5">Saldo disponible</p>
+        <p class="text-2xl font-bold text-text-primary">{{ p.currentBalance | currencyCop }}</p>
+      </div>
+
+      <!-- Efecty: latest close info -->
+      @if (isEfecty(p) && latestEfectyClose()) {
+      <div class="text-xs text-text-secondary bg-slate-50 rounded-lg px-3 py-2">
+        <span class="font-medium">Último cierre:</span>
+        {{ latestEfectyClose()!.closingBalance | currencyCop }}
+        — {{ latestEfectyClose()!.closeDate | date:'dd/MM/yyyy' }}
+      </div>
+      }
+
+      <!-- Progress bar (when threshold exists) -->
+      @if (p.minimumThreshold !== null) {
+      <div class="space-y-1">
+        <p class="text-xs text-text-secondary">Mín: {{ p.minimumThreshold | currencyCop }}</p>
+        <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+          <div class="h-full rounded-full transition-all duration-300"
+               [class]="progressColorClass(p.status)"
+               [style.width.%]="progressWidth(p)">
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- Last updated -->
+      <p class="text-xs text-text-secondary">
+        Actualizado {{ p.lastUpdated | date:'dd/MM/yyyy HH:mm' }}
+      </p>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-2 pt-1 flex-wrap">
+        @if (auth.hasAnyRole(['ROLE_ADMIN', 'ROLE_ROOT'])) {
+          @if (isEfecty(p)) {
+          <button (click)="openEfectyModal()"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-emerald-300 text-emerald-700 hover:bg-emerald-50 transition-colors">
+            Registrar cierre
+          </button>
+          } @else {
+          <button (click)="openBalanceModal(p)"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-emerald-300 text-emerald-700 hover:bg-emerald-50 transition-colors">
+            Actualizar saldo
+          </button>
+          }
+        }
+        @if (p.tracksTransactions) {
+        <a [routerLink]="['/platforms', p.id]"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 text-text-secondary hover:bg-slate-50 transition-colors">
+          Ver transacciones
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+          </svg>
+        </a>
+        }
+      </div>
+
+    </div>
+    }
+
+    <!-- Empty state -->
+    @empty {
+    <div class="col-span-full flex flex-col items-center gap-3 py-16">
+      <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v13.5" />
+      </svg>
+      <p class="text-text-secondary text-sm">No hay plataformas registradas.</p>
+    </div>
+    }
+  </div>
+  }
+
+</div>
+
+<!-- Update balance modal -->
+<app-modal
+  [title]="'Actualizar saldo — ' + (editingPlatform()?.name ?? '')"
+  [isOpen]="showBalanceModal()"
+  (closed)="closeBalanceModal()">
+  <form [formGroup]="balanceForm" (ngSubmit)="submitBalance()" class="p-5 space-y-4">
+
+    @if (balanceError()) {
+    <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+        <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
+      </svg>
+      {{ balanceError() }}
+    </div>
+    }
+
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-1.5">
+        Saldo actual <span class="text-error">*</span>
+      </label>
+      <input type="number" formControlName="currentBalance" min="0"
+        class="w-full px-3 py-2 rounded-lg border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+        [class.border-slate-200]="!fe(balanceForm.get('currentBalance'))"
+        [class.border-error]="fe(balanceForm.get('currentBalance'))" />
+      @if (fe(balanceForm.get('currentBalance'))) {
+      <p class="mt-1 text-xs text-error">Campo requerido, mínimo 0</p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-1.5">Saldo mínimo</label>
+      <input type="number" formControlName="minimumThreshold" min="0"
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors" />
+      <p class="mt-1 text-xs text-text-secondary">Opcional. Determina el estado de alerta de la plataforma.</p>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2">
+      <button type="button" (click)="closeBalanceModal()"
+        class="px-4 py-2 rounded-lg border border-slate-200 text-sm text-text-secondary hover:bg-slate-50 transition-colors">
+        Cancelar
+      </button>
+      <button type="submit" [disabled]="submittingBalance()"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        @if (submittingBalance()) {
+        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+        </svg>
+        }
+        Guardar saldo
+      </button>
+    </div>
+
+  </form>
+</app-modal>
+
+<!-- Efecty close modal -->
+<app-modal title="Registrar Cierre — Efecty" [isOpen]="showEfectyModal()" (closed)="showEfectyModal.set(false)">
+  <form [formGroup]="efectyForm" (ngSubmit)="submitEfectyClose()" class="p-5 space-y-4">
+
+    @if (efectyError()) {
+    <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+        <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
+      </svg>
+      {{ efectyError() }}
+    </div>
+    }
+
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-1.5">
+        Fecha de cierre <span class="text-error">*</span>
+      </label>
+      <input type="date" formControlName="closeDate"
+        class="w-full px-3 py-2 rounded-lg border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+        [class.border-slate-200]="!fe(efectyForm.get('closeDate'))"
+        [class.border-error]="fe(efectyForm.get('closeDate'))" />
+      @if (fe(efectyForm.get('closeDate'))) {
+      <p class="mt-1 text-xs text-error">Campo requerido</p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-1.5">
+        Saldo de cierre <span class="text-error">*</span>
+      </label>
+      <input type="number" formControlName="closingBalance" min="0"
+        class="w-full px-3 py-2 rounded-lg border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+        [class.border-slate-200]="!fe(efectyForm.get('closingBalance'))"
+        [class.border-error]="fe(efectyForm.get('closingBalance'))" />
+      @if (fe(efectyForm.get('closingBalance'))) {
+      <p class="mt-1 text-xs text-error">Campo requerido, mínimo 0</p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-text-primary mb-1.5">Notas</label>
+      <textarea formControlName="notes" rows="2" placeholder="Observaciones opcionales..."
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors resize-none">
+      </textarea>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2">
+      <button type="button" (click)="showEfectyModal.set(false)"
+        class="px-4 py-2 rounded-lg border border-slate-200 text-sm text-text-secondary hover:bg-slate-50 transition-colors">
+        Cancelar
+      </button>
+      <button type="submit" [disabled]="submittingEfecty()"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        @if (submittingEfecty()) {
+        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+        </svg>
+        }
+        Registrar cierre
+      </button>
+    </div>
+
+  </form>
+</app-modal>
