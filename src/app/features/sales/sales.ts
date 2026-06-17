@@ -15,9 +15,9 @@ import { CartItem } from './sales.models';
   templateUrl: './sales.html',
 })
 export class SalesComponent {
-  private auth = inject(AuthService);
-  private productsService = inject(ProductsService);
-  private salesService = inject(SalesService);
+  private readonly auth = inject(AuthService);
+  private readonly productsService = inject(ProductsService);
+  private readonly salesService = inject(SalesService);
 
   cartItems = signal<CartItem[]>([]);
   searchQuery = signal<string>('');
@@ -27,12 +27,12 @@ export class SalesComponent {
   submitError = signal<string | null>(null);
   submitSuccess = signal<boolean>(false);
 
-  subtotal = computed(() =>
+  readonly subtotal = computed(() =>
     this.cartItems().reduce((sum, item) => sum + item.salePrice * item.quantity, 0),
   );
-  total = computed(() => Math.max(0, this.subtotal() - this.discount()));
-  itemCount = computed(() => this.cartItems().reduce((sum, item) => sum + item.quantity, 0));
-  canSubmit = computed(() => this.cartItems().length > 0 && !this.submitting());
+  readonly total = computed(() => Math.max(0, this.subtotal() - this.discount()));
+  readonly itemCount = computed(() => this.cartItems().reduce((sum, item) => sum + item.quantity, 0));
+  readonly canSubmit = computed(() => this.cartItems().length > 0 && !this.submitting());
 
   searchResults = rxResource({
     params: () =>

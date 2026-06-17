@@ -13,8 +13,8 @@ import { SupplierFormComponent } from './supplier-form/supplier-form';
   templateUrl: './suppliers.html',
 })
 export class SuppliersComponent implements OnInit {
-  private svc = inject(SuppliersService);
-  private destroyRef = inject(DestroyRef);
+  private readonly svc = inject(SuppliersService);
+  private readonly destroyRef = inject(DestroyRef);
 
   suppliers = signal<Supplier[]>([]);
   totalElements = signal(0);
@@ -29,7 +29,7 @@ export class SuppliersComponent implements OnInit {
   deactivatingId = signal<number | null>(null);
   restoringId = signal<number | null>(null);
 
-  totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+  readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
   private search$ = new Subject<string>();
   searchInput = '';

@@ -18,9 +18,9 @@ function today(): string {
   templateUrl: './dashboard.html',
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  private dashboardSvc = inject(DashboardService);
-  private platformsSvc = inject(PlatformsService);
-  private destroyRef = inject(DestroyRef);
+  private readonly dashboardSvc = inject(DashboardService);
+  private readonly platformsSvc = inject(PlatformsService);
+  private readonly destroyRef = inject(DestroyRef);
 
   platforms = signal<Platform[]>([]);
   todayIncome = signal(0);
@@ -33,19 +33,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   readonly todayDate = new Date();
 
-  totalPlatformBalance = computed(() =>
+  readonly totalPlatformBalance = computed(() =>
     this.platforms().reduce((sum, p) => sum + p.currentBalance, 0),
   );
 
-  criticalPlatforms = computed(() => this.platforms().filter((p) => p.status === 'CRITICAL'));
-  lowPlatforms = computed(() => this.platforms().filter((p) => p.status === 'LOW'));
+  readonly criticalPlatforms = computed(() => this.platforms().filter((p) => p.status === 'CRITICAL'));
+  readonly lowPlatforms = computed(() => this.platforms().filter((p) => p.status === 'LOW'));
 
-  efectyClosedToday = computed(() => {
+  readonly efectyClosedToday = computed(() => {
     const close = this.efectyClose();
     return close?.closeDate === today();
   });
 
-  alertCount = computed(
+  readonly alertCount = computed(
     () =>
       this.criticalPlatforms().length +
       this.lowPlatforms().length +

@@ -20,7 +20,7 @@ function today(): string {
   templateUrl: './sales-history.html',
 })
 export class SalesHistoryComponent implements OnInit {
-  private svc = inject(SalesService);
+  private readonly svc = inject(SalesService);
 
   sales = signal<SaleSummary[]>([]);
   totalElements = signal(0);
@@ -36,7 +36,7 @@ export class SalesHistoryComponent implements OnInit {
   cancelingId = signal<number | null>(null);
   deletingId = signal<number | null>(null);
 
-  totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+  readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
   constructor() {
     effect(() => {

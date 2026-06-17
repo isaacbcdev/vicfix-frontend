@@ -8,13 +8,13 @@ import { AuthService } from '../../../auth/auth-api';
   templateUrl: './shell.html',
 })
 export class ShellComponent {
-  protected auth = inject(AuthService);
-  private router = inject(Router);
+  protected readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
   loggingOut = signal(false);
 
-  userInitial = computed(() => (this.auth.user()?.username ?? '?').charAt(0).toUpperCase());
+  readonly userInitial = computed(() => (this.auth.user()?.username ?? '?').charAt(0).toUpperCase());
 
-  roleDisplay = computed(() => {
+  readonly roleDisplay = computed(() => {
     const roles = this.auth.user()?.roles ?? [];
     if (roles.includes('ROLE_ROOT')) return 'Root';
     if (roles.includes('ROLE_ADMIN')) return 'Administrador';

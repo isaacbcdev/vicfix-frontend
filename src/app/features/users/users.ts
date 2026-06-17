@@ -14,9 +14,9 @@ import { UserFormComponent } from './user-form/user-form';
   templateUrl: './users.html',
 })
 export class UsersComponent implements OnInit {
-  private svc = inject(UsersService);
-  private destroyRef = inject(DestroyRef);
-  protected authService = inject(AuthService);
+  private readonly svc = inject(UsersService);
+  private readonly destroyRef = inject(DestroyRef);
+  protected readonly authService = inject(AuthService);
 
   users = signal<UserModel[]>([]);
   totalElements = signal(0);
@@ -30,7 +30,7 @@ export class UsersComponent implements OnInit {
   editingUser = signal<UserModel | null>(null);
   togglingId = signal<number | null>(null);
 
-  totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+  readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
   private search$ = new Subject<string>();
   searchInput = '';

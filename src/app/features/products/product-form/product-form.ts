@@ -17,13 +17,13 @@ interface ErrorResponse {
   templateUrl: './product-form.html',
 })
 export class ProductFormComponent {
-  product = input<Product | null>(null);
-  saved = output<Product>();
-  cancelled = output<void>();
+  readonly product = input<Product | null>(null);
+  readonly saved = output<Product>();
+  readonly cancelled = output<void>();
 
-  private fb = inject(FormBuilder);
-  private svc = inject(ProductsService);
-  private categoriesService = inject(CategoriesService);
+  private readonly fb = inject(FormBuilder);
+  private readonly svc = inject(ProductsService);
+  private readonly categoriesService = inject(CategoriesService);
 
   categories = signal<Category[]>([]);
 

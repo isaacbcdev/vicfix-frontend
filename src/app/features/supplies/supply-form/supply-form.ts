@@ -21,14 +21,14 @@ interface ErrorResponse {
   templateUrl: './supply-form.html',
 })
 export class SupplyFormComponent {
-  saved = output<void>();
-  cancelled = output<void>();
+  readonly saved = output<void>();
+  readonly cancelled = output<void>();
 
-  private fb = inject(FormBuilder);
-  private suppliesService = inject(SuppliesService);
-  private productsService = inject(ProductsService);
-  private suppliersService = inject(SuppliersService);
-  private destroyRef = inject(DestroyRef);
+  private readonly fb = inject(FormBuilder);
+  private readonly suppliesService = inject(SuppliesService);
+  private readonly productsService = inject(ProductsService);
+  private readonly suppliersService = inject(SuppliersService);
+  private readonly destroyRef = inject(DestroyRef);
 
   submitting = signal(false);
   errorMessage = signal<string | null>(null);

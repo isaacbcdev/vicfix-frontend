@@ -16,12 +16,12 @@ interface ErrorResponse {
   templateUrl: './supplier-form.html',
 })
 export class SupplierFormComponent {
-  supplier = input<Supplier | null>(null);
-  saved = output<void>();
-  cancelled = output<void>();
+  readonly supplier = input<Supplier | null>(null);
+  readonly saved = output<void>();
+  readonly cancelled = output<void>();
 
-  private fb = inject(FormBuilder);
-  private svc = inject(SuppliersService);
+  private readonly fb = inject(FormBuilder);
+  private readonly svc = inject(SuppliersService);
 
   submitting = signal(false);
   errorMessage = signal<string | null>(null);

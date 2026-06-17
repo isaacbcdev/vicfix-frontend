@@ -31,13 +31,13 @@ function atLeastOneRole(): ValidatorFn {
   templateUrl: './user-form.html',
 })
 export class UserFormComponent {
-  user = input<UserModel | null>(null);
-  saved = output<void>();
-  cancelled = output<void>();
+  readonly user = input<UserModel | null>(null);
+  readonly saved = output<void>();
+  readonly cancelled = output<void>();
 
-  private fb = inject(FormBuilder);
-  private svc = inject(UsersService);
-  private rolesSvc = inject(RolesService);
+  private readonly fb = inject(FormBuilder);
+  private readonly svc = inject(UsersService);
+  private readonly rolesSvc = inject(RolesService);
 
   submitting = signal(false);
   errorMessage = signal<string | null>(null);

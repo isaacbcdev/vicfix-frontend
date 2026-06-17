@@ -5,9 +5,9 @@ import { Component, input, output } from '@angular/core';
   templateUrl: './modal.html',
 })
 export class ModalComponent {
-  title = input<string>('');
-  isOpen = input<boolean>(false);
-  closed = output<void>();
+  readonly title = input<string>('');
+  readonly isOpen = input<boolean>(false);
+  readonly closed = output<void>();
 
   close(): void {
     this.closed.emit();

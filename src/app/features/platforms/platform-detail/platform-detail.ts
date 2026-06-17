@@ -39,11 +39,11 @@ const EXTRA_CHARGE_CODES = ['PTM', 'PUNTORED', 'REFACIL'];
   templateUrl: './platform-detail.html',
 })
 export class PlatformDetailComponent implements OnInit {
-  protected auth = inject(AuthService);
-  private svc = inject(PlatformsService);
-  private fb = inject(FormBuilder);
-  private route = inject(ActivatedRoute);
-  private destroyRef = inject(DestroyRef);
+  protected readonly auth = inject(AuthService);
+  private readonly svc = inject(PlatformsService);
+  private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
 
   private platformId = signal(0);
   platform = signal<Platform | null>(null);
@@ -70,15 +70,15 @@ export class PlatformDetailComponent implements OnInit {
   submittingBalance = signal(false);
   balanceError = signal<string | null>(null);
 
-  totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+  readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
-  showExtraCharge = computed(() => {
+  readonly showExtraCharge = computed(() => {
     const code = this.platform()?.code ?? '';
     return EXTRA_CHARGE_CODES.includes(code);
   });
 
-  txModalTitle = computed(() => `Registrar transacción — ${this.platform()?.name ?? ''}`);
-  balanceModalTitle = computed(() => `Actualizar saldo — ${this.platform()?.name ?? ''}`);
+  readonly txModalTitle = computed(() => `Registrar transacción — ${this.platform()?.name ?? ''}`);
+  readonly balanceModalTitle = computed(() => `Actualizar saldo — ${this.platform()?.name ?? ''}`);
 
   txForm = this.fb.group({
     transactionDate: [nowDatetimeLocal(), Validators.required],
@@ -182,6 +182,11 @@ export class PlatformDetailComponent implements OnInit {
     this.submittingTx.set(true);
     this.txError.set(null);
     const raw = this.txForm.getRawValue();
+    const platform = this.platform();
+    const balanceBefore = platform?.currentBalance ?? 0;
+    const amount = Number(raw.amount);
+    const balanceAfter =
+      raw.movementType === 'ENTRY' ? balanceBefore + amount : balanceBefore - amount;
 
     const req = {
       platformId: id,
@@ -189,6 +194,8 @@ export class PlatformDetailComponent implements OnInit {
       operation: raw.operation!,
       movementType: raw.movementType!,
       amount: Number(raw.amount),
+      balanceBefore: balanceBefore,
+      balanceAfter: balanceAfter,
       ...(raw.commission != null && { commission: Number(raw.commission) }),
       ...(this.showExtraCharge() &&
         raw.extraCharge != null && { extraCharge: Number(raw.extraCharge) }),

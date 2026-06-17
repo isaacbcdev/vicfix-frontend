@@ -12,7 +12,7 @@ export class AuthService {
   private _token = signal<string | null>(null);
   private _user = signal<User | null>(null);
 
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
   token = computed(this._token);
   user = computed<User | null>(() => this._user());

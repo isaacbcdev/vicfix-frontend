@@ -29,8 +29,8 @@ function today(): string {
   templateUrl: './reports.html',
 })
 export class ReportsComponent implements OnInit {
-  private svc = inject(ReportsService);
-  private destroyRef = inject(DestroyRef);
+  private readonly svc = inject(ReportsService);
+  private readonly destroyRef = inject(DestroyRef);
 
   activeTab = signal<Tab>('sales');
   startDate = signal<string>(firstDayOfCurrentMonth());

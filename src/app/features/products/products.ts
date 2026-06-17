@@ -22,10 +22,10 @@ const CATEGORY_DISPLAY_NAMES: Record<string, string> = {
   templateUrl: './products.html',
 })
 export class ProductsComponent implements OnInit {
-  private svc = inject(ProductsService);
-  private categoriesSvc = inject(CategoriesService);
-  private destroyRef = inject(DestroyRef);
-  protected auth = inject(AuthService);
+  private readonly svc = inject(ProductsService);
+  private readonly categoriesSvc = inject(CategoriesService);
+  private readonly destroyRef = inject(DestroyRef);
+  protected readonly auth = inject(AuthService);
 
   products = signal<Product[]>([]);
   totalElements = signal(0);
@@ -45,9 +45,9 @@ export class ProductsComponent implements OnInit {
   editingProduct = signal<Product | null>(null);
   deletingId = signal<number | null>(null);
 
-  totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+  readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
-  productCountLabel = computed(() => {
+  readonly productCountLabel = computed(() => {
     const count = this.totalElements();
     const filtered =
       this.selectedCategoryId() !== null ||

@@ -20,10 +20,10 @@ function today(): string {
   templateUrl: './platforms.html',
 })
 export class PlatformsComponent implements OnInit {
-  protected auth = inject(AuthService);
-  private svc = inject(PlatformsService);
-  private fb = inject(FormBuilder);
-  private destroyRef = inject(DestroyRef);
+  protected readonly auth = inject(AuthService);
+  private readonly svc = inject(PlatformsService);
+  private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
 
   platforms = signal<Platform[]>([]);
   loading = signal(false);

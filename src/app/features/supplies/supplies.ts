@@ -25,9 +25,9 @@ import { SupplyFormComponent } from './supply-form/supply-form';
   templateUrl: './supplies.html',
 })
 export class SuppliesComponent implements OnInit {
-  protected auth = inject(AuthService);
-  private svc = inject(SuppliesService);
-  private destroyRef = inject(DestroyRef);
+  protected readonly auth = inject(AuthService);
+  private readonly svc = inject(SuppliesService);
+  private readonly destroyRef = inject(DestroyRef);
 
   supplies = signal<Supply[]>([]);
   totalElements = signal(0);
@@ -45,7 +45,7 @@ export class SuppliesComponent implements OnInit {
   cancelingId = signal<number | null>(null);
   deletingId = signal<number | null>(null);
 
-  totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+  readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
   private search$ = new Subject<string>();
   searchInput = '';
