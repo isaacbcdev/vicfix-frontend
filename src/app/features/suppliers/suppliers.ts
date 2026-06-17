@@ -16,23 +16,23 @@ export class SuppliersComponent implements OnInit {
   private readonly svc = inject(SuppliersService);
   private readonly destroyRef = inject(DestroyRef);
 
-  suppliers = signal<Supplier[]>([]);
-  totalElements = signal(0);
-  currentPage = signal(0);
-  pageSize = signal(20);
-  query = signal('');
-  statusFilter = signal<'ACTIVE' | 'INACTIVE'>('ACTIVE');
-  loading = signal(false);
-  error = signal<string | null>(null);
-  showModal = signal(false);
-  editingSupplier = signal<Supplier | null>(null);
-  deactivatingId = signal<number | null>(null);
-  restoringId = signal<number | null>(null);
+  protected suppliers = signal<Supplier[]>([]);
+  protected totalElements = signal(0);
+  protected currentPage = signal(0);
+  protected pageSize = signal(20);
+  protected query = signal('');
+  protected statusFilter = signal<'ACTIVE' | 'INACTIVE'>('ACTIVE');
+  protected loading = signal(false);
+  protected error = signal<string | null>(null);
+  protected showModal = signal(false);
+  protected editingSupplier = signal<Supplier | null>(null);
+  protected deactivatingId = signal<number | null>(null);
+  protected restoringId = signal<number | null>(null);
 
-  readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+  protected readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
   private search$ = new Subject<string>();
-  searchInput = '';
+  protected searchInput = '';
 
   ngOnInit(): void {
     this.search$
@@ -46,7 +46,7 @@ export class SuppliersComponent implements OnInit {
     this.loadSuppliers();
   }
 
-  loadSuppliers(): void {
+  protected loadSuppliers(): void {
     this.loading.set(true);
     this.error.set(null);
     this.svc
@@ -65,28 +65,28 @@ export class SuppliersComponent implements OnInit {
       });
   }
 
-  setStatusFilter(status: 'ACTIVE' | 'INACTIVE'): void {
+  protected setStatusFilter(status: 'ACTIVE' | 'INACTIVE'): void {
     this.statusFilter.set(status);
     this.currentPage.set(0);
     this.loadSuppliers();
   }
 
-  openCreate(): void {
+  protected openCreate(): void {
     this.editingSupplier.set(null);
     this.showModal.set(true);
   }
 
-  openEdit(supplier: Supplier): void {
+  protected openEdit(supplier: Supplier): void {
     this.editingSupplier.set(supplier);
     this.showModal.set(true);
   }
 
-  onSaved(): void {
+  protected onSaved(): void {
     this.showModal.set(false);
     this.loadSuppliers();
   }
 
-  onDeactivate(id: number): void {
+  protected onDeactivate(id: number): void {
     this.deactivatingId.set(id);
     this.error.set(null);
     this.svc
@@ -104,7 +104,7 @@ export class SuppliersComponent implements OnInit {
       });
   }
 
-  onRestore(id: number): void {
+  protected onRestore(id: number): void {
     this.restoringId.set(id);
     this.error.set(null);
     this.svc
@@ -122,17 +122,17 @@ export class SuppliersComponent implements OnInit {
       });
   }
 
-  onSearchChange(value: string): void {
+  protected onSearchChange(value: string): void {
     this.searchInput = value;
     this.search$.next(value);
   }
 
-  clearSearch(): void {
+  protected clearSearch(): void {
     this.searchInput = '';
     this.search$.next('');
   }
 
-  goToPage(page: number): void {
+  protected goToPage(page: number): void {
     this.currentPage.set(page);
     this.loadSuppliers();
   }

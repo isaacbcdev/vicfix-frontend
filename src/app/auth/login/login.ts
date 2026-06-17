@@ -13,27 +13,27 @@ export class LoginComponent {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
-  form = this.fb.group({
+  protected form = this.fb.group({
     username: ['', [Validators.required]],
     password: ['', [Validators.required]],
   });
 
-  readonly submitting = signal(false);
-  readonly showPassword = signal(false);
-  readonly errorMessage = signal<string | null>(null);
+  protected readonly submitting = signal(false);
+  protected readonly showPassword = signal(false);
+  protected readonly errorMessage = signal<string | null>(null);
 
-  get username() {
+  protected get username() {
     return this.form.controls.username;
   }
-  get password() {
+  protected get password() {
     return this.form.controls.password;
   }
 
-  togglePassword(): void {
+  protected togglePassword(): void {
     this.showPassword.update((v) => !v);
   }
 
-  fieldClass(invalid: boolean): Record<string, boolean> {
+  protected fieldClass(invalid: boolean): Record<string, boolean> {
     return {
       'border-red-400': invalid,
       'bg-red-50': invalid,
@@ -42,7 +42,7 @@ export class LoginComponent {
     };
   }
 
-  submit(): void {
+  protected submit(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid || this.submitting()) return;
 

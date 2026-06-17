@@ -23,10 +23,10 @@ export class SupplierFormComponent {
   private readonly fb = inject(FormBuilder);
   private readonly svc = inject(SuppliersService);
 
-  submitting = signal(false);
-  errorMessage = signal<string | null>(null);
+  protected submitting = signal(false);
+  protected errorMessage = signal<string | null>(null);
 
-  form = this.fb.group({
+  protected form = this.fb.group({
     name: ['', Validators.required],
     nit: [''],
     description: [''],
@@ -51,16 +51,16 @@ export class SupplierFormComponent {
     });
   }
 
-  get isEditMode(): boolean {
+  protected get isEditMode(): boolean {
     return this.supplier() !== null;
   }
 
-  fieldError(field: string): boolean {
+  protected fieldError(field: string): boolean {
     const ctrl = this.form.get(field);
     return !!(ctrl?.invalid && ctrl.touched);
   }
 
-  submit(): void {
+  protected submit(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid || this.submitting()) return;
 

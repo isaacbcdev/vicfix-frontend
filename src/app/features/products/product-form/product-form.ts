@@ -25,12 +25,12 @@ export class ProductFormComponent {
   private readonly svc = inject(ProductsService);
   private readonly categoriesService = inject(CategoriesService);
 
-  categories = signal<Category[]>([]);
+  protected categories = signal<Category[]>([]);
 
-  submitting = signal(false);
-  errorMessage = signal<string | null>(null);
+  protected submitting = signal(false);
+  protected errorMessage = signal<string | null>(null);
 
-  form = this.fb.group({
+  protected form = this.fb.group({
     productName: ['', Validators.required],
     productDescription: [''],
     categoryId: [null as number | null, Validators.required],
@@ -44,7 +44,7 @@ export class ProductFormComponent {
     barcode: [''],
   });
 
-  readonly measureUnits = [
+  protected readonly measureUnits = [
     { value: 'UNIT', label: 'Unidad' },
     { value: 'KG', label: 'Kilogramo' },
     { value: 'LITRE', label: 'Litro' },
@@ -76,16 +76,16 @@ export class ProductFormComponent {
     this.categoriesService.getCategories().subscribe((cats) => this.categories.set(cats));
   }
 
-  get isEditMode(): boolean {
+  protected get isEditMode(): boolean {
     return this.product() !== null;
   }
 
-  fieldError(field: string): boolean {
+  protected fieldError(field: string): boolean {
     const ctrl = this.form.get(field);
     return !!(ctrl?.invalid && ctrl.touched);
   }
 
-  submit(): void {
+  protected submit(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid || this.submitting()) return;
 

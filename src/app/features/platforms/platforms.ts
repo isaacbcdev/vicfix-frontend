@@ -25,25 +25,25 @@ export class PlatformsComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
-  platforms = signal<Platform[]>([]);
-  loading = signal(false);
-  error = signal<string | null>(null);
-  editingPlatform = signal<Platform | null>(null);
-  showBalanceModal = signal(false);
-  showEfectyModal = signal(false);
-  latestEfectyClose = signal<EfectyDailyClose | null>(null);
+  protected platforms = signal<Platform[]>([]);
+  protected loading = signal(false);
+  protected error = signal<string | null>(null);
+  protected editingPlatform = signal<Platform | null>(null);
+  protected showBalanceModal = signal(false);
+  protected showEfectyModal = signal(false);
+  protected latestEfectyClose = signal<EfectyDailyClose | null>(null);
 
-  submittingBalance = signal(false);
-  submittingEfecty = signal(false);
-  balanceError = signal<string | null>(null);
-  efectyError = signal<string | null>(null);
+  protected submittingBalance = signal(false);
+  protected submittingEfecty = signal(false);
+  protected balanceError = signal<string | null>(null);
+  protected efectyError = signal<string | null>(null);
 
-  balanceForm = this.fb.group({
+  protected balanceForm = this.fb.group({
     currentBalance: [null as number | null, [Validators.required, Validators.min(0)]],
     minimumThreshold: [null as number | null],
   });
 
-  efectyForm = this.fb.group({
+  protected efectyForm = this.fb.group({
     closeDate: [today(), Validators.required],
     closingBalance: [null as number | null, [Validators.required, Validators.min(0)]],
     notes: [''],
@@ -54,7 +54,7 @@ export class PlatformsComponent implements OnInit {
     this.loadLatestEfectyClose();
   }
 
-  loadPlatforms(): void {
+  protected loadPlatforms(): void {
     this.loading.set(true);
     this.error.set(null);
     this.svc
@@ -82,7 +82,7 @@ export class PlatformsComponent implements OnInit {
       });
   }
 
-  openBalanceModal(platform: Platform): void {
+  protected openBalanceModal(platform: Platform): void {
     this.editingPlatform.set(platform);
     this.balanceError.set(null);
     this.balanceForm.reset({
@@ -92,18 +92,18 @@ export class PlatformsComponent implements OnInit {
     this.showBalanceModal.set(true);
   }
 
-  closeBalanceModal(): void {
+  protected closeBalanceModal(): void {
     this.showBalanceModal.set(false);
     this.editingPlatform.set(null);
   }
 
-  openEfectyModal(): void {
+  protected openEfectyModal(): void {
     this.efectyError.set(null);
     this.efectyForm.reset({ closeDate: today(), closingBalance: null, notes: '' });
     this.showEfectyModal.set(true);
   }
 
-  submitBalance(): void {
+  protected submitBalance(): void {
     this.balanceForm.markAllAsTouched();
     if (this.balanceForm.invalid || this.submittingBalance()) return;
     const platform = this.editingPlatform();
@@ -132,7 +132,7 @@ export class PlatformsComponent implements OnInit {
       });
   }
 
-  submitEfectyClose(): void {
+  protected submitEfectyClose(): void {
     this.efectyForm.markAllAsTouched();
     if (this.efectyForm.invalid || this.submittingEfecty()) return;
 
@@ -160,16 +160,16 @@ export class PlatformsComponent implements OnInit {
       });
   }
 
-  fe(ctrl: AbstractControl | null): boolean {
+  protected fe(ctrl: AbstractControl | null): boolean {
     return !!(ctrl?.invalid && ctrl.touched);
   }
 
-  progressWidth(platform: Platform): number {
+  protected progressWidth(platform: Platform): number {
     if (!platform.minimumThreshold) return 100;
     return Math.min((platform.currentBalance / platform.minimumThreshold) * 100, 100);
   }
 
-  progressColorClass(status: Platform['status']): string {
+  protected progressColorClass(status: Platform['status']): string {
     switch (status) {
       case 'SUFFICIENT':
         return 'bg-emerald-500';
@@ -180,7 +180,7 @@ export class PlatformsComponent implements OnInit {
     }
   }
 
-  isEfecty(platform: Platform): boolean {
+  protected isEfecty(platform: Platform): boolean {
     return platform.code === 'EFECTY';
   }
 }

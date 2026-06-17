@@ -32,30 +32,30 @@ export class ReportsComponent implements OnInit {
   private readonly svc = inject(ReportsService);
   private readonly destroyRef = inject(DestroyRef);
 
-  activeTab = signal<Tab>('sales');
-  startDate = signal<string>(firstDayOfCurrentMonth());
-  endDate = signal<string>(today());
-  loading = signal(false);
-  error = signal<string | null>(null);
+  protected activeTab = signal<Tab>('sales');
+  protected startDate = signal<string>(firstDayOfCurrentMonth());
+  protected endDate = signal<string>(today());
+  protected loading = signal(false);
+  protected error = signal<string | null>(null);
 
-  salesByProductData = signal<SalesByProductReport | null>(null);
-  financialData = signal<FinancialReport | null>(null);
-  stockData = signal<StockReport | null>(null);
-  categoryBalanceData = signal<CategoryBalanceReport | null>(null);
-  cashFlowData = signal<CashFlowReport | null>(null);
+  protected salesByProductData = signal<SalesByProductReport | null>(null);
+  protected financialData = signal<FinancialReport | null>(null);
+  protected stockData = signal<StockReport | null>(null);
+  protected categoryBalanceData = signal<CategoryBalanceReport | null>(null);
+  protected cashFlowData = signal<CashFlowReport | null>(null);
 
   ngOnInit(): void {
     this.loadReport();
   }
 
-  setActiveTab(tab: Tab): void {
+  protected setActiveTab(tab: Tab): void {
     this.activeTab.set(tab);
     if (!this.hasData(tab)) {
       this.loadReport();
     }
   }
 
-  onDateChange(field: 'start' | 'end', value: string): void {
+  protected onDateChange(field: 'start' | 'end', value: string): void {
     if (field === 'start') {
       this.startDate.set(value);
     } else {
@@ -65,7 +65,7 @@ export class ReportsComponent implements OnInit {
     this.loadReport();
   }
 
-  loadReport(): void {
+  protected loadReport(): void {
     const tab = this.activeTab();
     const start = this.startDate();
     const end = this.endDate();
@@ -153,16 +153,16 @@ export class ReportsComponent implements OnInit {
     this.loading.set(false);
   }
 
-  categoryEntries(groupedRows: Record<string, { stockSum: number; valueSum: number }>): [string, { stockSum: number; valueSum: number }][] {
+  protected categoryEntries(groupedRows: Record<string, { stockSum: number; valueSum: number }>): [string, { stockSum: number; valueSum: number }][] {
     return Object.entries(groupedRows);
   }
 
-  profitMargin(profit: number, sales: number): number {
+  protected profitMargin(profit: number, sales: number): number {
     if (sales <= 0) return 0;
     return (profit / sales) * 100;
   }
 
-  cashFlowTypeBadgeClass(type: string): string {
+  protected cashFlowTypeBadgeClass(type: string): string {
     const t = type.toLowerCase();
     if (t === 'income' || t === 'ingreso') return 'bg-emerald-100 text-emerald-700';
     if (t === 'supply' || t === 'compra') return 'bg-amber-100 text-amber-700';

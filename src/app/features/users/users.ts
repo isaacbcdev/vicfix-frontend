@@ -18,22 +18,22 @@ export class UsersComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   protected readonly authService = inject(AuthService);
 
-  users = signal<UserModel[]>([]);
-  totalElements = signal(0);
-  currentPage = signal(0);
-  pageSize = signal(20);
-  query = signal('');
-  activeFilter = signal<boolean | null>(null);
-  loading = signal(false);
-  error = signal<string | null>(null);
-  showModal = signal(false);
-  editingUser = signal<UserModel | null>(null);
-  togglingId = signal<number | null>(null);
+  protected users = signal<UserModel[]>([]);
+  protected totalElements = signal(0);
+  protected currentPage = signal(0);
+  protected pageSize = signal(20);
+  protected query = signal('');
+  protected activeFilter = signal<boolean | null>(null);
+  protected loading = signal(false);
+  protected error = signal<string | null>(null);
+  protected showModal = signal(false);
+  protected editingUser = signal<UserModel | null>(null);
+  protected togglingId = signal<number | null>(null);
 
-  readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+  protected readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
   private search$ = new Subject<string>();
-  searchInput = '';
+  protected searchInput = '';
 
   ngOnInit(): void {
     this.search$
@@ -47,7 +47,7 @@ export class UsersComponent implements OnInit {
     this.loadUsers();
   }
 
-  loadUsers(): void {
+  protected loadUsers(): void {
     this.loading.set(true);
     this.error.set(null);
     const active = this.activeFilter();
@@ -67,28 +67,28 @@ export class UsersComponent implements OnInit {
       });
   }
 
-  setActiveFilter(value: boolean | null): void {
+  protected setActiveFilter(value: boolean | null): void {
     this.activeFilter.set(value);
     this.currentPage.set(0);
     this.loadUsers();
   }
 
-  openCreate(): void {
+  protected openCreate(): void {
     this.editingUser.set(null);
     this.showModal.set(true);
   }
 
-  openEdit(user: UserModel): void {
+  protected openEdit(user: UserModel): void {
     this.editingUser.set(user);
     this.showModal.set(true);
   }
 
-  onSaved(): void {
+  protected onSaved(): void {
     this.showModal.set(false);
     this.loadUsers();
   }
 
-  onToggleStatus(user: UserModel): void {
+  protected onToggleStatus(user: UserModel): void {
     this.togglingId.set(user.id);
     this.error.set(null);
     this.svc
@@ -106,11 +106,11 @@ export class UsersComponent implements OnInit {
       });
   }
 
-  isCurrentUser(user: UserModel): boolean {
+  protected isCurrentUser(user: UserModel): boolean {
     return user.username === this.authService.user()?.username;
   }
 
-  roleBadgeClass(roleName: string): string {
+  protected roleBadgeClass(roleName: string): string {
     const upper = roleName.toUpperCase();
     if (upper.includes('ADMIN') || upper.includes('ROOT')) {
       return 'bg-emerald-100 text-emerald-700';
@@ -118,17 +118,17 @@ export class UsersComponent implements OnInit {
     return 'bg-slate-100 text-slate-600';
   }
 
-  onSearchChange(value: string): void {
+  protected onSearchChange(value: string): void {
     this.searchInput = value;
     this.search$.next(value);
   }
 
-  clearSearch(): void {
+  protected clearSearch(): void {
     this.searchInput = '';
     this.search$.next('');
   }
 
-  goToPage(page: number): void {
+  protected goToPage(page: number): void {
     this.currentPage.set(page);
     this.loadUsers();
   }

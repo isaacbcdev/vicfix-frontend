@@ -10,18 +10,18 @@ import { AuthService } from '../../../auth/auth-api';
 export class ShellComponent {
   protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
-  loggingOut = signal(false);
+  protected loggingOut = signal(false);
 
-  readonly userInitial = computed(() => (this.auth.user()?.username ?? '?').charAt(0).toUpperCase());
+  protected readonly userInitial = computed(() => (this.auth.user()?.username ?? '?').charAt(0).toUpperCase());
 
-  readonly roleDisplay = computed(() => {
+  protected readonly roleDisplay = computed(() => {
     const roles = this.auth.user()?.roles ?? [];
     if (roles.includes('ROLE_ROOT')) return 'Root';
     if (roles.includes('ROLE_ADMIN')) return 'Administrador';
     return 'Vendedor';
   });
 
-  logout(): void {
+  protected logout(): void {
     this.loggingOut.set(true);
     this.auth.logout().subscribe({
       complete: () => this.router.navigate(['/login']),

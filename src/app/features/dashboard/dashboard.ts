@@ -22,30 +22,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private readonly platformsSvc = inject(PlatformsService);
   private readonly destroyRef = inject(DestroyRef);
 
-  platforms = signal<Platform[]>([]);
-  todayIncome = signal(0);
-  todaySaleCount = signal(0);
-  outOfStockCount = signal(0);
-  lowStockCount = signal(0);
-  efectyClose = signal<EfectyDailyClose | null>(null);
-  loading = signal(false);
-  lastRefreshed = signal<Date | null>(null);
+  protected platforms = signal<Platform[]>([]);
+  protected todayIncome = signal(0);
+  protected todaySaleCount = signal(0);
+  protected outOfStockCount = signal(0);
+  protected lowStockCount = signal(0);
+  protected efectyClose = signal<EfectyDailyClose | null>(null);
+  protected loading = signal(false);
+  protected lastRefreshed = signal<Date | null>(null);
 
-  readonly todayDate = new Date();
+  protected readonly todayDate = new Date();
 
-  readonly totalPlatformBalance = computed(() =>
+  protected readonly totalPlatformBalance = computed(() =>
     this.platforms().reduce((sum, p) => sum + p.currentBalance, 0),
   );
 
-  readonly criticalPlatforms = computed(() => this.platforms().filter((p) => p.status === 'CRITICAL'));
-  readonly lowPlatforms = computed(() => this.platforms().filter((p) => p.status === 'LOW'));
+  protected readonly criticalPlatforms = computed(() => this.platforms().filter((p) => p.status === 'CRITICAL'));
+  protected readonly lowPlatforms = computed(() => this.platforms().filter((p) => p.status === 'LOW'));
 
-  readonly efectyClosedToday = computed(() => {
+  protected readonly efectyClosedToday = computed(() => {
     const close = this.efectyClose();
     return close?.closeDate === today();
   });
 
-  readonly alertCount = computed(
+  protected readonly alertCount = computed(
     () =>
       this.criticalPlatforms().length +
       this.lowPlatforms().length +
@@ -64,7 +64,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.refreshTimer !== null) window.clearInterval(this.refreshTimer);
   }
 
-  loadAll(): void {
+  protected loadAll(): void {
     this.loading.set(true);
     this.dashboardSvc
       .loadDashboardData(today())
@@ -98,12 +98,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       });
   }
 
-  progressWidth(p: Platform): number {
+  protected progressWidth(p: Platform): number {
     if (!p.minimumThreshold) return 100;
     return Math.min((p.currentBalance / p.minimumThreshold) * 100, 100);
   }
 
-  progressColorClass(status: Platform['status']): string {
+  protected progressColorClass(status: Platform['status']): string {
     switch (status) {
       case 'SUFFICIENT':
         return 'bg-emerald-500';
@@ -114,7 +114,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  isEfecty(p: Platform): boolean {
+  protected isEfecty(p: Platform): boolean {
     return p.code === 'EFECTY';
   }
 }

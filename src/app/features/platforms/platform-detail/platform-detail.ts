@@ -46,41 +46,41 @@ export class PlatformDetailComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   private platformId = signal(0);
-  platform = signal<Platform | null>(null);
-  transactions = signal<PlatformTransaction[]>([]);
-  totalElements = signal(0);
-  currentPage = signal(0);
-  pageSize = signal(20);
-  startDate = signal(firstDayOfCurrentMonth());
-  endDate = signal(today());
-  loading = signal(false);
-  error = signal<string | null>(null);
-  actionError = signal<string | null>(null);
+  protected platform = signal<Platform | null>(null);
+  protected transactions = signal<PlatformTransaction[]>([]);
+  protected totalElements = signal(0);
+  protected currentPage = signal(0);
+  protected pageSize = signal(20);
+  protected startDate = signal(firstDayOfCurrentMonth());
+  protected endDate = signal(today());
+  protected loading = signal(false);
+  protected error = signal<string | null>(null);
+  protected actionError = signal<string | null>(null);
 
-  showTxModal = signal(false);
-  submittingTx = signal(false);
-  txError = signal<string | null>(null);
+  protected showTxModal = signal(false);
+  protected submittingTx = signal(false);
+  protected txError = signal<string | null>(null);
 
-  editingTransaction = signal<PlatformTransaction | null>(null);
-  showEditTxModal = signal(false);
+  protected editingTransaction = signal<PlatformTransaction | null>(null);
+  protected showEditTxModal = signal(false);
 
-  deletingTxId = signal<string | null>(null);
+  protected deletingTxId = signal<string | null>(null);
 
-  showBalanceModal = signal(false);
-  submittingBalance = signal(false);
-  balanceError = signal<string | null>(null);
+  protected showBalanceModal = signal(false);
+  protected submittingBalance = signal(false);
+  protected balanceError = signal<string | null>(null);
 
-  readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+  protected readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
-  readonly showExtraCharge = computed(() => {
+  protected readonly showExtraCharge = computed(() => {
     const code = this.platform()?.code ?? '';
     return EXTRA_CHARGE_CODES.includes(code);
   });
 
-  readonly txModalTitle = computed(() => `Registrar transacción — ${this.platform()?.name ?? ''}`);
-  readonly balanceModalTitle = computed(() => `Actualizar saldo — ${this.platform()?.name ?? ''}`);
+  protected readonly txModalTitle = computed(() => `Registrar transacción — ${this.platform()?.name ?? ''}`);
+  protected readonly balanceModalTitle = computed(() => `Actualizar saldo — ${this.platform()?.name ?? ''}`);
 
-  txForm = this.fb.group({
+  protected txForm = this.fb.group({
     transactionDate: [nowDatetimeLocal(), Validators.required],
     operation: ['', Validators.required],
     movementType: ['EXIT' as 'ENTRY' | 'EXIT', Validators.required],
@@ -91,7 +91,7 @@ export class PlatformDetailComponent implements OnInit {
     notes: [''],
   });
 
-  balanceForm = this.fb.group({
+  protected balanceForm = this.fb.group({
     currentBalance: [null as number | null, [Validators.required, Validators.min(0)]],
     minimumThreshold: [null as number | null],
   });
@@ -115,7 +115,7 @@ export class PlatformDetailComponent implements OnInit {
       });
   }
 
-  loadTransactions(): void {
+  protected loadTransactions(): void {
     const id = this.platformId();
     if (!id) return;
     this.loading.set(true);
@@ -142,19 +142,19 @@ export class PlatformDetailComponent implements OnInit {
       });
   }
 
-  onDateChange(field: 'start' | 'end', value: string): void {
+  protected onDateChange(field: 'start' | 'end', value: string): void {
     if (field === 'start') this.startDate.set(value);
     else this.endDate.set(value);
     this.currentPage.set(0);
     this.loadTransactions();
   }
 
-  goToPage(page: number): void {
+  protected goToPage(page: number): void {
     this.currentPage.set(page);
     this.loadTransactions();
   }
 
-  openTxModal(): void {
+  protected openTxModal(): void {
     this.txError.set(null);
     this.txForm.reset({
       transactionDate: nowDatetimeLocal(),
@@ -169,11 +169,11 @@ export class PlatformDetailComponent implements OnInit {
     this.showTxModal.set(true);
   }
 
-  setMovementType(type: 'ENTRY' | 'EXIT'): void {
+  protected setMovementType(type: 'ENTRY' | 'EXIT'): void {
     this.txForm.patchValue({ movementType: type });
   }
 
-  submitTx(): void {
+  protected submitTx(): void {
     this.txForm.markAllAsTouched();
     if (this.txForm.invalid || this.submittingTx()) return;
     const id = this.platformId();
@@ -220,7 +220,7 @@ export class PlatformDetailComponent implements OnInit {
       });
   }
 
-  openEditTxModal(tx: PlatformTransaction): void {
+  protected openEditTxModal(tx: PlatformTransaction): void {
     this.editingTransaction.set(tx);
     this.txError.set(null);
     this.txForm.reset({
@@ -236,7 +236,7 @@ export class PlatformDetailComponent implements OnInit {
     this.showEditTxModal.set(true);
   }
 
-  submitEditTx(): void {
+  protected submitEditTx(): void {
     this.txForm.markAllAsTouched();
     if (this.txForm.invalid || this.submittingTx()) return;
     const tx = this.editingTransaction();
@@ -277,7 +277,7 @@ export class PlatformDetailComponent implements OnInit {
       });
   }
 
-  onDeleteTransaction(txId: string): void {
+  protected onDeleteTransaction(txId: string): void {
     if (
       !window.confirm(
         '¿Eliminar esta transacción? El saldo de la plataforma no se ajustará automáticamente.',
@@ -304,7 +304,7 @@ export class PlatformDetailComponent implements OnInit {
       });
   }
 
-  openBalanceModal(): void {
+  protected openBalanceModal(): void {
     const p = this.platform();
     if (!p) return;
     this.balanceError.set(null);
@@ -315,7 +315,7 @@ export class PlatformDetailComponent implements OnInit {
     this.showBalanceModal.set(true);
   }
 
-  submitBalance(): void {
+  protected submitBalance(): void {
     this.balanceForm.markAllAsTouched();
     if (this.balanceForm.invalid || this.submittingBalance()) return;
     const id = this.platformId();
@@ -344,7 +344,7 @@ export class PlatformDetailComponent implements OnInit {
       });
   }
 
-  fe(ctrl: AbstractControl | null): boolean {
+  protected fe(ctrl: AbstractControl | null): boolean {
     return !!(ctrl?.invalid && ctrl.touched);
   }
 }

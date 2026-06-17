@@ -39,12 +39,12 @@ export class UserFormComponent {
   private readonly svc = inject(UsersService);
   private readonly rolesSvc = inject(RolesService);
 
-  submitting = signal(false);
-  errorMessage = signal<string | null>(null);
-  availableRoles = signal<Role[]>([]);
-  rolesLoading = signal(false);
+  protected submitting = signal(false);
+  protected errorMessage = signal<string | null>(null);
+  protected availableRoles = signal<Role[]>([]);
+  protected rolesLoading = signal(false);
 
-  form = this.fb.group({
+  protected form = this.fb.group({
     username: ['', Validators.required],
     name: ['', Validators.required],
     lastname: ['', Validators.required],
@@ -94,16 +94,16 @@ export class UserFormComponent {
     });
   }
 
-  get isEditMode(): boolean {
+  protected get isEditMode(): boolean {
     return this.user() !== null;
   }
 
-  isRoleSelected(roleId: number): boolean {
+  protected isRoleSelected(roleId: number): boolean {
     const ids = this.form.get('roleIds')!.value as number[];
     return ids.includes(roleId);
   }
 
-  toggleRole(roleId: number): void {
+  protected toggleRole(roleId: number): void {
     const ctrl = this.form.get('roleIds')!;
     const ids = [...(ctrl.value as number[])];
     const idx = ids.indexOf(roleId);
@@ -116,12 +116,12 @@ export class UserFormComponent {
     ctrl.markAsTouched();
   }
 
-  fieldError(field: string): boolean {
+  protected fieldError(field: string): boolean {
     const ctrl = this.form.get(field);
     return !!(ctrl?.invalid && ctrl.touched);
   }
 
-  submit(): void {
+  protected submit(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid || this.submitting()) return;
 

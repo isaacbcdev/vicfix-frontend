@@ -19,33 +19,33 @@ export class SalesComponent {
   private readonly productsService = inject(ProductsService);
   private readonly salesService = inject(SalesService);
 
-  cartItems = signal<CartItem[]>([]);
-  searchQuery = signal<string>('');
-  paymentMethod = signal<'CASH' | 'NEQUI'>('CASH');
-  discount = signal<number>(0);
-  submitting = signal<boolean>(false);
-  submitError = signal<string | null>(null);
-  submitSuccess = signal<boolean>(false);
+  protected cartItems = signal<CartItem[]>([]);
+  protected searchQuery = signal<string>('');
+  protected paymentMethod = signal<'CASH' | 'NEQUI'>('CASH');
+  protected discount = signal<number>(0);
+  protected submitting = signal<boolean>(false);
+  protected submitError = signal<string | null>(null);
+  protected submitSuccess = signal<boolean>(false);
 
-  readonly subtotal = computed(() =>
+  protected readonly subtotal = computed(() =>
     this.cartItems().reduce((sum, item) => sum + item.salePrice * item.quantity, 0),
   );
-  readonly total = computed(() => Math.max(0, this.subtotal() - this.discount()));
-  readonly itemCount = computed(() => this.cartItems().reduce((sum, item) => sum + item.quantity, 0));
-  readonly canSubmit = computed(() => this.cartItems().length > 0 && !this.submitting());
+  protected readonly total = computed(() => Math.max(0, this.subtotal() - this.discount()));
+  protected readonly itemCount = computed(() => this.cartItems().reduce((sum, item) => sum + item.quantity, 0));
+  protected readonly canSubmit = computed(() => this.cartItems().length > 0 && !this.submitting());
 
-  searchResults = rxResource({
+  protected searchResults = rxResource({
     params: () =>
       this.searchQuery().length >= 2 ? { query: this.searchQuery(), page: 0, size: 10 } : undefined,
     stream: ({ params }) =>
       this.productsService.getProducts(params.page, params.size, params.query),
   });
 
-  onSearchInput(value: string): void {
+  protected onSearchInput(value: string): void {
     this.searchQuery.set(value);
   }
 
-  addToCart(product: Product): void {
+  protected addToCart(product: Product): void {
     this.cartItems.update((items) => {
       const existing = items.find((i) => i.productId === product.productId);
       if (existing) {
@@ -66,11 +66,11 @@ export class SalesComponent {
     this.searchQuery.set('');
   }
 
-  removeFromCart(productId: number): void {
+  protected removeFromCart(productId: number): void {
     this.cartItems.update((items) => items.filter((i) => i.productId !== productId));
   }
 
-  updateQuantity(productId: number, quantity: number): void {
+  protected updateQuantity(productId: number, quantity: number): void {
     if (quantity <= 0) {
       this.removeFromCart(productId);
       return;
@@ -82,16 +82,16 @@ export class SalesComponent {
     );
   }
 
-  clearCart(): void {
+  protected clearCart(): void {
     this.cartItems.set([]);
   }
 
-  setDiscount(value: string): void {
+  protected setDiscount(value: string): void {
     const n = parseFloat(value);
     this.discount.set(isNaN(n) || n < 0 ? 0 : n);
   }
 
-  submitSale(): void {
+  protected submitSale(): void {
     if (!this.canSubmit()) return;
 
     this.submitting.set(true);

@@ -22,21 +22,21 @@ function today(): string {
 export class SalesHistoryComponent implements OnInit {
   private readonly svc = inject(SalesService);
 
-  sales = signal<SaleSummary[]>([]);
-  totalElements = signal(0);
-  currentPage = signal(0);
-  pageSize = signal(20);
-  statusFilter = signal('');
-  startDate = signal(firstDayOfCurrentMonth());
-  endDate = signal(today());
-  loading = signal(false);
-  error = signal<string | null>(null);
-  actionError = signal<string | null>(null);
-  confirmingId = signal<number | null>(null);
-  cancelingId = signal<number | null>(null);
-  deletingId = signal<number | null>(null);
+  protected sales = signal<SaleSummary[]>([]);
+  protected totalElements = signal(0);
+  protected currentPage = signal(0);
+  protected pageSize = signal(20);
+  protected statusFilter = signal('');
+  protected startDate = signal(firstDayOfCurrentMonth());
+  protected endDate = signal(today());
+  protected loading = signal(false);
+  protected error = signal<string | null>(null);
+  protected actionError = signal<string | null>(null);
+  protected confirmingId = signal<number | null>(null);
+  protected cancelingId = signal<number | null>(null);
+  protected deletingId = signal<number | null>(null);
 
-  readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+  protected readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
   constructor() {
     effect(() => {
@@ -53,7 +53,7 @@ export class SalesHistoryComponent implements OnInit {
     // Initial load is handled by the constructor effect.
   }
 
-  loadSales(): void {
+  protected loadSales(): void {
     this.loading.set(true);
     this.error.set(null);
     this.svc
@@ -77,16 +77,16 @@ export class SalesHistoryComponent implements OnInit {
       });
   }
 
-  setStatusFilter(value: string): void {
+  protected setStatusFilter(value: string): void {
     this.statusFilter.set(value);
   }
 
-  onDateChange(field: 'start' | 'end', value: string): void {
+  protected onDateChange(field: 'start' | 'end', value: string): void {
     if (field === 'start') this.startDate.set(value);
     else this.endDate.set(value);
   }
 
-  onConfirm(id: number): void {
+  protected onConfirm(id: number): void {
     this.confirmingId.set(id);
     this.actionError.set(null);
     this.svc
@@ -101,7 +101,7 @@ export class SalesHistoryComponent implements OnInit {
       });
   }
 
-  onCancel(id: number): void {
+  protected onCancel(id: number): void {
     if (!confirm('¿Cancelar esta venta? Se restaurará el stock.')) return;
     this.cancelingId.set(id);
     this.actionError.set(null);
@@ -117,7 +117,7 @@ export class SalesHistoryComponent implements OnInit {
       });
   }
 
-  onDelete(id: number): void {
+  protected onDelete(id: number): void {
     if (!confirm('¿Eliminar esta venta?')) return;
     this.deletingId.set(id);
     this.actionError.set(null);
@@ -133,12 +133,12 @@ export class SalesHistoryComponent implements OnInit {
       });
   }
 
-  goToPage(page: number): void {
+  protected goToPage(page: number): void {
     this.currentPage.set(page);
     this.loadSales();
   }
 
-  statusBadgeClass(status: SaleSummary['status']): string {
+  protected statusBadgeClass(status: SaleSummary['status']): string {
     switch (status) {
       case 'PENDING':
         return 'bg-amber-100 text-amber-700';

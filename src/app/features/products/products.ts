@@ -27,27 +27,27 @@ export class ProductsComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   protected readonly auth = inject(AuthService);
 
-  products = signal<Product[]>([]);
-  totalElements = signal(0);
-  currentPage = signal(0);
-  pageSize = signal(20);
-  query = signal('');
-  loading = signal(false);
-  error = signal<string | null>(null);
+  protected products = signal<Product[]>([]);
+  protected totalElements = signal(0);
+  protected currentPage = signal(0);
+  protected pageSize = signal(20);
+  protected query = signal('');
+  protected loading = signal(false);
+  protected error = signal<string | null>(null);
 
-  selectedCategoryId = signal<number | null>(null);
-  selectedStatus = signal<string | null>(null);
-  lowStock = signal(false);
-  categories = signal<Category[]>([]);
-  categoriesLoading = signal(false);
+  protected selectedCategoryId = signal<number | null>(null);
+  protected selectedStatus = signal<string | null>(null);
+  protected lowStock = signal(false);
+  protected categories = signal<Category[]>([]);
+  protected categoriesLoading = signal(false);
 
-  showModal = signal(false);
-  editingProduct = signal<Product | null>(null);
-  deletingId = signal<number | null>(null);
+  protected showModal = signal(false);
+  protected editingProduct = signal<Product | null>(null);
+  protected deletingId = signal<number | null>(null);
 
-  readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+  protected readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
-  readonly productCountLabel = computed(() => {
+  protected readonly productCountLabel = computed(() => {
     const count = this.totalElements();
     const filtered =
       this.selectedCategoryId() !== null ||
@@ -60,7 +60,7 @@ export class ProductsComponent implements OnInit {
       : `${count} producto${suffix} registrado${suffix}`;
   });
 
-  readonly statusOptions = [
+  protected readonly statusOptions = [
     { value: null, label: 'Todos' },
     { value: 'ACTIVE', label: 'Activo' },
     { value: 'LOW_STOCK', label: 'Stock bajo' }, // sentinel — handled specially in setStatus()
@@ -68,7 +68,7 @@ export class ProductsComponent implements OnInit {
   ];
 
   private search$ = new Subject<string>();
-  searchInput = '';
+  protected searchInput = '';
 
   ngOnInit(): void {
     this.search$
@@ -83,7 +83,7 @@ export class ProductsComponent implements OnInit {
     this.loadProducts();
   }
 
-  loadCategories(): void {
+  protected loadCategories(): void {
     this.categoriesLoading.set(true);
     this.categoriesSvc
       .getCategories()
@@ -97,7 +97,7 @@ export class ProductsComponent implements OnInit {
       });
   }
 
-  loadProducts(): void {
+  protected loadProducts(): void {
     this.loading.set(true);
     this.error.set(null);
     this.svc
@@ -123,14 +123,14 @@ export class ProductsComponent implements OnInit {
       });
   }
 
-  setCategory(id: number | null): void {
+  protected setCategory(id: number | null): void {
     this.selectedCategoryId.set(id);
     this.lowStock.set(false);
     this.currentPage.set(0);
     this.loadProducts();
   }
 
-  setStatus(status: string | null): void {
+  protected setStatus(status: string | null): void {
     if (status === 'LOW_STOCK') {
       this.selectedStatus.set(null);
       this.lowStock.set(true);
@@ -142,7 +142,7 @@ export class ProductsComponent implements OnInit {
     this.loadProducts();
   }
 
-  isStatusActive(value: string | null): boolean {
+  protected isStatusActive(value: string | null): boolean {
     if (value === 'LOW_STOCK') return this.lowStock();
     if (value === null || value === '') {
       return !this.lowStock() && this.selectedStatus() === null;
@@ -150,29 +150,29 @@ export class ProductsComponent implements OnInit {
     return this.selectedStatus() === value;
   }
 
-  displayCategoryName(name: string): string {
+  protected displayCategoryName(name: string): string {
     return (
       CATEGORY_DISPLAY_NAMES[name.toUpperCase()] ??
       name.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     );
   }
 
-  openCreate(): void {
+  protected openCreate(): void {
     this.editingProduct.set(null);
     this.showModal.set(true);
   }
 
-  openEdit(product: Product): void {
+  protected openEdit(product: Product): void {
     this.editingProduct.set(product);
     this.showModal.set(true);
   }
 
-  onProductSaved(_product: Product): void {
+  protected onProductSaved(_product: Product): void {
     this.showModal.set(false);
     this.loadProducts();
   }
 
-  deleteProduct(id: number): void {
+  protected deleteProduct(id: number): void {
     this.deletingId.set(id);
     this.error.set(null);
     this.svc
@@ -190,22 +190,22 @@ export class ProductsComponent implements OnInit {
       });
   }
 
-  onSearchChange(value: string): void {
+  protected onSearchChange(value: string): void {
     this.searchInput = value;
     this.search$.next(value);
   }
 
-  clearSearch(): void {
+  protected clearSearch(): void {
     this.searchInput = '';
     this.search$.next('');
   }
 
-  goToPage(page: number): void {
+  protected goToPage(page: number): void {
     this.currentPage.set(page);
     this.loadProducts();
   }
 
-  statusClass(status: Product['status']): string {
+  protected statusClass(status: Product['status']): string {
     switch (status) {
       case 'ACTIVE':
         return 'bg-emerald-100 text-emerald-700';

@@ -30,17 +30,17 @@ export class SupplyFormComponent {
   private readonly suppliersService = inject(SuppliersService);
   private readonly destroyRef = inject(DestroyRef);
 
-  submitting = signal(false);
-  errorMessage = signal<string | null>(null);
+  protected submitting = signal(false);
+  protected errorMessage = signal<string | null>(null);
 
-  suppliers = signal<Supplier[]>([]);
-  suppliersLoading = signal(false);
+  protected suppliers = signal<Supplier[]>([]);
+  protected suppliersLoading = signal(false);
 
-  productSearchQuery = signal('');
-  selectedProduct = signal<{ id: number; name: string } | null>(null);
-  showProductDropdown = signal(false);
+  protected productSearchQuery = signal('');
+  protected selectedProduct = signal<{ id: number; name: string } | null>(null);
+  protected showProductDropdown = signal(false);
 
-  productResults = rxResource({
+  protected productResults = rxResource({
     params: () =>
       this.productSearchQuery().length >= 2
         ? { query: this.productSearchQuery(), page: 0, size: 10 }
@@ -51,7 +51,7 @@ export class SupplyFormComponent {
 
   readonly today = new Date().toISOString().split('T')[0];
 
-  form = this.fb.group({
+  protected form = this.fb.group({
     supplierId: [null as number | null, Validators.required],
     productId: [null as number | null, Validators.required],
     quantity: [null as number | null, [Validators.required, Validators.min(1)]],
@@ -79,30 +79,30 @@ export class SupplyFormComponent {
       });
   }
 
-  onProductSearch(value: string): void {
+  protected onProductSearch(value: string): void {
     this.productSearchQuery.set(value);
     this.showProductDropdown.set(value.length >= 2);
     if (!value) this.clearProduct();
   }
 
-  selectProduct(product: Product): void {
+  protected selectProduct(product: Product): void {
     this.selectedProduct.set({ id: product.productId, name: product.productName });
     this.form.patchValue({ productId: product.productId });
     this.productSearchQuery.set('');
     this.showProductDropdown.set(false);
   }
 
-  clearProduct(): void {
+  protected clearProduct(): void {
     this.selectedProduct.set(null);
     this.form.patchValue({ productId: null });
   }
 
-  fieldError(field: string): boolean {
+  protected fieldError(field: string): boolean {
     const ctrl = this.form.get(field);
     return !!(ctrl?.invalid && ctrl.touched);
   }
 
-  submit(): void {
+  protected submit(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid || this.submitting()) return;
 

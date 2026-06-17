@@ -29,26 +29,26 @@ export class SuppliesComponent implements OnInit {
   private readonly svc = inject(SuppliesService);
   private readonly destroyRef = inject(DestroyRef);
 
-  supplies = signal<Supply[]>([]);
-  totalElements = signal(0);
-  currentPage = signal(0);
-  pageSize = signal(20);
-  query = signal('');
-  statusFilter = signal('');
-  startDate = signal(firstDayOfCurrentMonth());
-  endDate = signal(today());
-  loading = signal(false);
-  error = signal<string | null>(null);
-  actionError = signal<string | null>(null);
-  showModal = signal(false);
-  confirmingId = signal<number | null>(null);
-  cancelingId = signal<number | null>(null);
-  deletingId = signal<number | null>(null);
+  protected supplies = signal<Supply[]>([]);
+  protected totalElements = signal(0);
+  protected currentPage = signal(0);
+  protected pageSize = signal(20);
+  protected query = signal('');
+  protected statusFilter = signal('');
+  protected startDate = signal(firstDayOfCurrentMonth());
+  protected endDate = signal(today());
+  protected loading = signal(false);
+  protected error = signal<string | null>(null);
+  protected actionError = signal<string | null>(null);
+  protected showModal = signal(false);
+  protected confirmingId = signal<number | null>(null);
+  protected cancelingId = signal<number | null>(null);
+  protected deletingId = signal<number | null>(null);
 
-  readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+  protected readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
   private search$ = new Subject<string>();
-  searchInput = '';
+  protected searchInput = '';
 
   ngOnInit(): void {
     this.search$
@@ -62,7 +62,7 @@ export class SuppliesComponent implements OnInit {
     this.loadSupplies();
   }
 
-  loadSupplies(): void {
+  protected loadSupplies(): void {
     this.loading.set(true);
     this.error.set(null);
     this.svc
@@ -88,30 +88,30 @@ export class SuppliesComponent implements OnInit {
       });
   }
 
-  setStatusFilter(status: string): void {
+  protected setStatusFilter(status: string): void {
     this.statusFilter.set(status);
     this.currentPage.set(0);
     this.loadSupplies();
   }
 
-  onSearchChange(value: string): void {
+  protected onSearchChange(value: string): void {
     this.searchInput = value;
     this.search$.next(value);
   }
 
-  onDateChange(field: 'start' | 'end', value: string): void {
+  protected onDateChange(field: 'start' | 'end', value: string): void {
     if (field === 'start') this.startDate.set(value);
     else this.endDate.set(value);
     this.currentPage.set(0);
     this.loadSupplies();
   }
 
-  clearSearch(): void {
+  protected clearSearch(): void {
     this.searchInput = '';
     this.search$.next('');
   }
 
-  onConfirm(id: number): void {
+  protected onConfirm(id: number): void {
     this.confirmingId.set(id);
     this.actionError.set(null);
     this.svc
@@ -130,7 +130,7 @@ export class SuppliesComponent implements OnInit {
       });
   }
 
-  onCancel(id: number): void {
+  protected onCancel(id: number): void {
     if (
       !window.confirm('¿Cancelar este suministro? Se revertirá el stock si fue entregado.')
     )
@@ -154,7 +154,7 @@ export class SuppliesComponent implements OnInit {
       });
   }
 
-  onDelete(id: number): void {
+  protected onDelete(id: number): void {
     if (!window.confirm('¿Eliminar este suministro? Esta acción no se puede deshacer.')) return;
 
     this.deletingId.set(id);
@@ -175,12 +175,12 @@ export class SuppliesComponent implements OnInit {
       });
   }
 
-  onSaved(): void {
+  protected onSaved(): void {
     this.showModal.set(false);
     this.loadSupplies();
   }
 
-  goToPage(page: number): void {
+  protected goToPage(page: number): void {
     this.currentPage.set(page);
     this.loadSupplies();
   }
