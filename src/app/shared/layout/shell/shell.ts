@@ -11,6 +11,15 @@ export class ShellComponent {
   protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   protected loggingOut = signal(false);
+  protected sidebarOpen = signal(false);
+
+  protected toggleSidebar(): void {
+    this.sidebarOpen.update(v => !v);
+  }
+
+  protected closeSidebar(): void {
+    this.sidebarOpen.set(false);
+  }
 
   protected readonly userInitial = computed(() => (this.auth.user()?.username ?? '?').charAt(0).toUpperCase());
 

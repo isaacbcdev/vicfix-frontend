@@ -1,14 +1,26 @@
 <div class="flex h-screen overflow-hidden">
 
+  <!-- Mobile backdrop -->
+  @if (sidebarOpen()) {
+  <div class="fixed inset-0 bg-black/50 z-30 md:hidden" (click)="closeSidebar()"></div>
+  }
+
   <!-- Sidebar -->
-  <aside class="w-64 bg-sidebar flex-none flex flex-col">
+  <aside
+    class="fixed inset-y-0 left-0 z-40 w-64 bg-sidebar flex-none flex flex-col transition-transform duration-200 md:relative md:translate-x-0"
+    [class]="{ 'translate-x-0': sidebarOpen(), '-translate-x-full': !sidebarOpen() }">
 
     <!-- Wordmark -->
-    <div class="h-16 flex items-center px-5 border-b border-white/10 shrink-0">
+    <div class="h-16 flex items-center justify-between px-5 border-b border-white/10 shrink-0">
       <div>
         <div class="text-white text-base font-semibold leading-tight">VicFix</div>
         <div class="text-slate-500 text-xs">Tienda &amp; Corresponsal</div>
       </div>
+      <button (click)="closeSidebar()" class="md:hidden ml-auto text-slate-400 hover:text-white p-1">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
 
     <!-- Navigation -->
@@ -18,6 +30,7 @@
       <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 mb-1">Operación</p>
 
       <a routerLink="/dashboard" routerLinkActive="!text-emerald-400 bg-emerald-600/20 font-medium"
+        (click)="closeSidebar()"
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-sm">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -28,6 +41,7 @@
 
       <a routerLink="/sales" [routerLinkActiveOptions]="{ exact: true }"
         routerLinkActive="!text-emerald-400 bg-emerald-600/20 font-medium"
+        (click)="closeSidebar()"
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-sm">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -37,6 +51,7 @@
       </a>
 
       <a routerLink="/sales/history" routerLinkActive="!text-emerald-400 bg-emerald-600/20 font-medium"
+        (click)="closeSidebar()"
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-sm">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -45,6 +60,7 @@
       </a>
 
       <a routerLink="/platforms" routerLinkActive="!text-emerald-400 bg-emerald-600/20 font-medium"
+        (click)="closeSidebar()"
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-sm">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -55,6 +71,7 @@
 
       @if (auth.hasAnyRole(['ROLE_ADMIN', 'ROLE_ROOT'])) {
       <a routerLink="/close" routerLinkActive="!text-emerald-400 bg-emerald-600/20 font-medium"
+        (click)="closeSidebar()"
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-sm">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -68,6 +85,7 @@
       <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 mb-1 mt-6">Gestión</p>
 
       <a routerLink="/products" routerLinkActive="!text-emerald-400 bg-emerald-600/20 font-medium"
+        (click)="closeSidebar()"
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-sm">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -77,6 +95,7 @@
       </a>
 
       <a routerLink="/reports" routerLinkActive="!text-emerald-400 bg-emerald-600/20 font-medium"
+        (click)="closeSidebar()"
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-sm">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -87,6 +106,7 @@
 
       @if (auth.hasAnyRole(['ROLE_ADMIN', 'ROLE_ROOT'])) {
       <a routerLink="/supplies" routerLinkActive="!text-emerald-400 bg-emerald-600/20 font-medium"
+        (click)="closeSidebar()"
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-sm">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -98,6 +118,7 @@
 
       @if (auth.hasAnyRole(['ROLE_ADMIN', 'ROLE_ROOT'])) {
       <a routerLink="/suppliers" routerLinkActive="!text-emerald-400 bg-emerald-600/20 font-medium"
+        (click)="closeSidebar()"
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-sm">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -111,6 +132,7 @@
       @if (auth.isRoot()) {
       <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 mb-1 mt-6">Administración</p>
       <a routerLink="/users" routerLinkActive="!text-emerald-400 bg-emerald-600/20 font-medium"
+        (click)="closeSidebar()"
         class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors text-sm">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round"
@@ -157,7 +179,14 @@
   <div class="flex flex-col flex-1 min-w-0 overflow-hidden">
 
     <!-- Header -->
-    <header class="h-16 bg-surface border-b border-slate-200 flex-none flex items-center px-6">
+    <header class="h-16 bg-surface border-b border-slate-200 flex-none flex items-center gap-3 px-4 md:px-6">
+      <button (click)="toggleSidebar()"
+        class="md:hidden text-text-secondary hover:text-text-primary p-1">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+      </button>
       <span class="text-text-primary font-semibold text-sm">VicFix</span>
     </header>
 
