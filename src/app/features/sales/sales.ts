@@ -15,7 +15,7 @@ import { CartItem } from './sales.models';
   templateUrl: './sales.html',
 })
 export class SalesComponent {
-  private readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
   private readonly productsService = inject(ProductsService);
   private readonly salesService = inject(SalesService);
 
@@ -59,6 +59,7 @@ export class SalesComponent {
           productId: product.productId,
           productName: product.productName,
           salePrice: product.salePrice,
+          costPrice: product.costPrice ?? 0,
           quantity: 1,
         },
       ];
@@ -90,6 +91,15 @@ export class SalesComponent {
     const n = parseFloat(value);
     this.discount.set(isNaN(n) || n < 0 ? 0 : n);
   }
+
+  protected maxDiscount = computed(() => {
+  const subtotal = this.subtotal();
+  const cost = this.cartItems().reduce(
+    (sum, item) => sum + (item.costPrice ?? 0) * item.quantity, 0
+  );
+  const profit = subtotal - cost;
+  return Math.max(0, profit * 0.2);
+});
 
   protected submitSale(): void {
     if (!this.canSubmit()) return;

@@ -81,6 +81,11 @@
                 <th class="text-left px-4 py-3 font-medium text-text-secondary">Producto</th>
                 <th class="text-center px-4 py-3 font-medium text-text-secondary">Cantidad</th>
                 <th class="text-right px-4 py-3 font-medium text-text-secondary">Precio unit.</th>
+                @if (auth.hasAnyRole(['ROLE_ADMIN', 'ROLE_ROOT'])) {
+                <th class="text-right px-4 py-3 font-medium text-text-secondary">
+                  Costo
+                </th>
+                }
                 <th class="text-right px-4 py-3 font-medium text-text-secondary">Subtotal</th>
                 <th class="px-4 py-3"></th>
               </tr>
@@ -101,6 +106,11 @@
                   </div>
                 </td>
                 <td class="px-4 py-3 text-right text-text-secondary">{{ item.salePrice | currencyCop }}</td>
+                @if (auth.hasAnyRole(['ROLE_ADMIN', 'ROLE_ROOT'])) {
+                <td class="px-4 py-3 text-right text-text-secondary">
+                  {{ item.costPrice | currencyCop }}
+                </td>
+                }
                 <td class="px-4 py-3 text-right font-medium text-text-primary">{{ item.salePrice * item.quantity |
                   currencyCop }}</td>
                 <td class="px-4 py-3 text-right">
@@ -152,6 +162,11 @@
                 <span class="text-xs">−</span>
                 <input type="number" [value]="discount()" (change)="setDiscount($any($event.target).value)" min="0"
                   class="w-24 text-right px-2 py-1 rounded border border-slate-200 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent" />
+                @if (cartItems().length > 0) {
+                <p class="text-xs text-text-secondary">
+                  Descuento máx: {{ maxDiscount() | currencyCop }}
+                </p>
+                }
               </div>
             </div>
             <div class="flex justify-between pt-2 border-t border-slate-100 font-semibold text-base">
