@@ -26,7 +26,12 @@ export function jwtInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn) {
   const isAuthEndpoint = req.url.includes('/api/v1/auth/');
 
   // All requests to our API: attach credentials cookie + bearer token when present
-  const apiReq = addToken(req, token);
+  const skipToken =
+    req.url.includes('/api/v1/auth/login') ||
+    req.url.includes('/api/v1/auth/refresh') ||
+    req.url.includes('/api/v1/auth/logout');
+
+  const apiReq = skipToken ? req : addToken(req, token);
 
   return next(apiReq).pipe(
     catchError((err: HttpErrorResponse) => {
