@@ -75,8 +75,9 @@ export class ProductsComponent implements OnInit {
   protected readonly statusOptions = [
     { value: null, label: 'Todos' },
     { value: 'ACTIVE', label: 'Activo' },
-    { value: 'LOW_STOCK', label: 'Stock bajo' }, // sentinel — handled specially in setStatus()
-    { value: 'NEAR_EXPIRY', label: 'Por vencer' }, // sentinel — handled specially in setStatus()
+    { value: 'LOW_STOCK', label: 'Stock bajo' },
+    { value: 'NEAR_EXPIRY', label: 'Por vencer' },
+    { value: 'EXPIRED', label: 'Vencido' },
     { value: 'OUT_OF_STOCK', label: 'Agotado' },
   ];
 

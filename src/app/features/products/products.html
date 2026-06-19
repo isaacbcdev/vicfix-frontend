@@ -147,16 +147,18 @@
             <td class="px-4 py-3 text-right font-medium text-text-primary">{{ p.salePrice | currencyCop }}</td>
             <td class="px-4 py-3 text-text-secondary">{{ p.measureUnitDisplay ?? p.measureUnit }}</td>
             <td class="px-4 py-3">
-              <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ statusClass(p.status) }}">
-                {{ p.statusDisplay ?? p.status }}
-              </span>
-              @if (isNearExpiry(p.expirationDate)) {
-              <span
-                class="ml-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
-                Por vencer
-              </span>
-              }
+              <div class="flex flex-col gap-1 items-start">
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ statusClass(p.status) }}">
+                  {{ p.statusDisplay ?? p.status }}
+                </span>
+                @if (isNearExpiry(p.expirationDate)) {
+                <span
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                  Por vencer
+                </span>
+                }
+              </div>
             </td>
             <td class="px-4 py-3">
               <div class="flex items-center justify-end gap-1">
