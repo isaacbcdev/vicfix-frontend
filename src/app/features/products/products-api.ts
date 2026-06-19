@@ -17,11 +17,13 @@ export class ProductsService {
     categoryId?: number | null,
     status?: string | null,
     lowStock?: boolean,
+    nearExpiry?: boolean,
   ): Observable<Page<Product>> {
     let params = new HttpParams().set('page', page).set('size', size).set('query', query);
     if (categoryId != null) params = params.set('categoryId', categoryId);
     if (status != null) params = params.set('status', status);
     if (lowStock) params = params.set('lowStock', true);
+    if (nearExpiry) params = params.set('nearExpiry', true);
     return this.http.get<Page<Product>>(base, { params });
   }
 

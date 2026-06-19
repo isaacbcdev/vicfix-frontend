@@ -35,8 +35,7 @@
   <!-- Category tabs -->
   <div class="border-b border-slate-200">
     <div class="flex items-end gap-1 overflow-x-auto">
-      <button (click)="setCategory(null)"
-        [class]="selectedCategoryId() === null
+      <button (click)="setCategory(null)" [class]="selectedCategoryId() === null
           ? 'px-4 py-2 text-sm font-medium text-accent border-b-2 border-accent -mb-px whitespace-nowrap'
           : 'px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap'">
         Todos
@@ -49,8 +48,7 @@
       </div>
       }
       @for (cat of categories(); track cat.categoryId) {
-      <button (click)="setCategory(cat.categoryId)"
-        [class]="selectedCategoryId() === cat.categoryId
+      <button (click)="setCategory(cat.categoryId)" [class]="selectedCategoryId() === cat.categoryId
           ? 'px-4 py-2 text-sm font-medium text-accent border-b-2 border-accent -mb-px whitespace-nowrap'
           : 'px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap'">
         {{ displayCategoryName(cat.categoryName) }}
@@ -137,7 +135,7 @@
           <!-- Data rows -->
           @if (!loading()) {
           @for (p of products(); track p.productId) {
-          <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+          <tr (click)="openView(p)" class="border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer">
             <td class="px-4 py-3">
               <span class="font-medium text-text-primary">{{ p.productName }}</span>
               @if (p.productBrand) {
@@ -153,6 +151,12 @@
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ statusClass(p.status) }}">
                 {{ p.statusDisplay ?? p.status }}
               </span>
+              @if (isNearExpiry(p.expirationDate)) {
+              <span
+                class="ml-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                Por vencer
+              </span>
+              }
             </td>
             <td class="px-4 py-3">
               <div class="flex items-center justify-end gap-1">
@@ -236,4 +240,73 @@
 <app-modal [title]="editingProduct() ? 'Editar producto' : 'Agregar producto'" [isOpen]="showModal()"
   (closed)="showModal.set(false)">
   <app-product-form [product]="editingProduct()" (saved)="onProductSaved($event)" (cancelled)="showModal.set(false)" />
+</app-modal>
+
+<!-- View modal -->
+<app-modal title="Detalle del producto" [isOpen]="showViewModal()" (closed)="showViewModal.set(false)">
+  @if (viewingProduct(); as p) {
+  <div class="space-y-3 text-sm m-5">
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <p class="text-text-secondary text-xs">Nombre</p>
+        <p class="font-medium text-text-primary">{{ p.productName }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Marca</p>
+        <p class="font-medium text-text-primary">{{ p.productBrand ?? '—' }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Categoría</p>
+        <p class="font-medium text-text-primary">{{ p.categoryName ?? '—' }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Código de barras</p>
+        <p class="font-medium text-text-primary">{{ p.barcode ?? '—' }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Precio de venta</p>
+        <p class="font-medium text-text-primary">{{ p.salePrice | currencyCop }}</p>
+      </div>
+      @if (auth.hasAnyRole(['ROLE_ADMIN', 'ROLE_ROOT'])) {
+      <div>
+        <p class="text-text-secondary text-xs">Precio de costo</p>
+        <p class="font-medium text-text-primary">{{ p.costPrice | currencyCop }}</p>
+      </div>
+      }
+      <div>
+        <p class="text-text-secondary text-xs">Stock</p>
+        <p class="font-medium text-text-primary">{{ p.productStock }} {{ p.measureUnitDisplay ?? p.measureUnit }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Punto de reorden</p>
+        <p class="font-medium text-text-primary">{{ p.reorderQuantity }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Vencimiento</p>
+        <p class="font-medium text-text-primary">
+          {{ p.expirationDate ? (p.expirationDate | date:'dd/MM/yyyy') : 'No aplica' }}
+        </p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Estado</p>
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ statusClass(p.status) }}">
+          {{ p.statusDisplay ?? p.status }}
+        </span>
+      </div>
+    </div>
+    @if (p.productDescription) {
+    <div class="pt-2 border-t border-slate-100">
+      <p class="text-text-secondary text-xs">Descripción</p>
+      <p class="text-text-primary">{{ p.productDescription }}</p>
+    </div>
+    }
+    <div class="pt-2 border-t border-slate-100 flex justify-end">
+      <button (click)="showViewModal.set(false); openEdit(p)"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
+        Editar producto
+      </button>
+    </div>
+  </div>
+  }
 </app-modal>

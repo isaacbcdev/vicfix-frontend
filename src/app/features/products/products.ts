@@ -9,6 +9,7 @@ import { Category, Product } from '@shared/models/product.model';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { ModalComponent } from '@shared/ui/modal/modal';
 import { ProductFormComponent } from './product-form/product-form';
+import { DatePipe } from '@angular/common';
 
 const CATEGORY_DISPLAY_NAMES: Record<string, string> = {
   'SERVICIOS DIGITALES E IMPRESIONES': 'Servicios Digitales',
@@ -18,7 +19,7 @@ const CATEGORY_DISPLAY_NAMES: Record<string, string> = {
 
 @Component({
   selector: 'app-products',
-  imports: [FormsModule, CurrencyCopPipe, ModalComponent, ProductFormComponent],
+  imports: [FormsModule, CurrencyCopPipe, ModalComponent, ProductFormComponent, DatePipe],
   templateUrl: './products.html',
 })
 export class ProductsComponent implements OnInit {
@@ -38,14 +39,24 @@ export class ProductsComponent implements OnInit {
   protected selectedCategoryId = signal<number | null>(null);
   protected selectedStatus = signal<string | null>(null);
   protected lowStock = signal(false);
+  protected nearExpiry = signal(false);
   protected categories = signal<Category[]>([]);
   protected categoriesLoading = signal(false);
 
   protected showModal = signal(false);
   protected editingProduct = signal<Product | null>(null);
   protected deletingId = signal<number | null>(null);
+  protected viewingProduct = signal<Product | null>(null);
+  protected showViewModal = signal(false);
 
-  protected readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
+  protected readonly totalPages = computed(
+    () => Math.ceil(this.totalElements() / this.pageSize()) || 1,
+  );
+
+  protected openView(p: Product): void {
+    this.viewingProduct.set(p);
+    this.showViewModal.set(true);
+  }
 
   protected readonly productCountLabel = computed(() => {
     const count = this.totalElements();
@@ -53,6 +64,7 @@ export class ProductsComponent implements OnInit {
       this.selectedCategoryId() !== null ||
       this.selectedStatus() !== null ||
       this.lowStock() ||
+      this.nearExpiry() ||
       this.query() !== '';
     const suffix = count === 1 ? '' : 's';
     return filtered
@@ -64,6 +76,7 @@ export class ProductsComponent implements OnInit {
     { value: null, label: 'Todos' },
     { value: 'ACTIVE', label: 'Activo' },
     { value: 'LOW_STOCK', label: 'Stock bajo' }, // sentinel — handled specially in setStatus()
+    { value: 'NEAR_EXPIRY', label: 'Por vencer' }, // sentinel — handled specially in setStatus()
     { value: 'OUT_OF_STOCK', label: 'Agotado' },
   ];
 
@@ -108,6 +121,7 @@ export class ProductsComponent implements OnInit {
         this.selectedCategoryId(),
         this.selectedStatus(),
         this.lowStock(),
+        this.nearExpiry(),
       )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -126,17 +140,32 @@ export class ProductsComponent implements OnInit {
   protected setCategory(id: number | null): void {
     this.selectedCategoryId.set(id);
     this.lowStock.set(false);
+    this.nearExpiry.set(false);
     this.currentPage.set(0);
     this.loadProducts();
+  }
+
+  protected isNearExpiry(expirationDate: string | null): boolean {
+    if (!expirationDate) return false;
+    const expDate = new Date(expirationDate);
+    const today = new Date();
+    const diffDays = Math.ceil((expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    return diffDays > 0 && diffDays <= 30;
   }
 
   protected setStatus(status: string | null): void {
     if (status === 'LOW_STOCK') {
       this.selectedStatus.set(null);
       this.lowStock.set(true);
+      this.nearExpiry.set(false);
+    } else if (status === 'NEAR_EXPIRY') {
+      this.selectedStatus.set(null);
+      this.lowStock.set(false);
+      this.nearExpiry.set(true);
     } else {
       this.selectedStatus.set(status);
       this.lowStock.set(false);
+      this.nearExpiry.set(false);
     }
     this.currentPage.set(0);
     this.loadProducts();
@@ -144,8 +173,9 @@ export class ProductsComponent implements OnInit {
 
   protected isStatusActive(value: string | null): boolean {
     if (value === 'LOW_STOCK') return this.lowStock();
+    if (value === 'NEAR_EXPIRY') return this.nearExpiry();
     if (value === null || value === '') {
-      return !this.lowStock() && this.selectedStatus() === null;
+      return !this.lowStock() && !this.nearExpiry() && this.selectedStatus() === null;
     }
     return this.selectedStatus() === value;
   }
