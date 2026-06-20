@@ -15,6 +15,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '@auth/auth-api';
 import { ModalComponent } from '@shared/ui/modal/modal';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
+import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
 import { SuppliesService } from './supplies.service';
 import { Supply } from './supplies.models';
 import { SupplyFormComponent } from './supply-form/supply-form';
@@ -27,6 +28,7 @@ import { SupplyFormComponent } from './supply-form/supply-form';
 export class SuppliesComponent implements OnInit {
   protected readonly auth = inject(AuthService);
   private readonly svc = inject(SuppliesService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected supplies = signal<Supply[]>([]);
@@ -130,11 +132,14 @@ export class SuppliesComponent implements OnInit {
       });
   }
 
-  protected onCancel(id: number): void {
-    if (
-      !window.confirm('¿Cancelar este suministro? Se revertirá el stock si fue entregado.')
-    )
-      return;
+  protected async onCancel(id: number): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Cancelar suministro',
+      message: '¿Cancelar este suministro? Se revertirá el stock si fue entregado.',
+      confirmLabel: 'Cancelar suministro',
+      variant: 'default',
+    });
+    if (!confirmed) return;
 
     this.cancelingId.set(id);
     this.actionError.set(null);
@@ -154,8 +159,14 @@ export class SuppliesComponent implements OnInit {
       });
   }
 
-  protected onDelete(id: number): void {
-    if (!window.confirm('¿Eliminar este suministro? Esta acción no se puede deshacer.')) return;
+  protected async onDelete(id: number): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Eliminar suministro',
+      message: '¿Eliminar este suministro? Esta acción no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
 
     this.deletingId.set(id);
     this.actionError.set(null);

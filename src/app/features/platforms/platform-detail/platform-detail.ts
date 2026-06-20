@@ -7,6 +7,7 @@ import { finalize } from 'rxjs';
 import { AuthService } from '@auth/auth-api';
 import { ModalComponent } from '@shared/ui/modal/modal';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
+import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
 import { PlatformsService } from '../platforms.service';
 import { Platform, PlatformTransaction } from '../platforms.models';
 
@@ -41,6 +42,7 @@ const EXTRA_CHARGE_CODES = ['PTM', 'PUNTORED', 'REFACIL'];
 export class PlatformDetailComponent implements OnInit {
   protected readonly auth = inject(AuthService);
   private readonly svc = inject(PlatformsService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
@@ -277,13 +279,14 @@ export class PlatformDetailComponent implements OnInit {
       });
   }
 
-  protected onDeleteTransaction(txId: string): void {
-    if (
-      !window.confirm(
-        '¿Eliminar esta transacción? El saldo de la plataforma no se ajustará automáticamente.',
-      )
-    )
-      return;
+  protected async onDeleteTransaction(txId: string): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Eliminar transacción',
+      message: '¿Eliminar esta transacción? El saldo de la plataforma no se ajustará automáticamente.',
+      confirmLabel: 'Eliminar',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
 
     this.deletingTxId.set(txId);
     this.actionError.set(null);
