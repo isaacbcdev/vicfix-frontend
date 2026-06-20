@@ -8,6 +8,7 @@ import { AuthService } from '@auth/auth-api';
 import { Category, Product } from '@shared/models/product.model';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { ModalComponent } from '@shared/ui/modal/modal';
+import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
 import { ProductFormComponent } from './product-form/product-form';
 import { DatePipe } from '@angular/common';
 
@@ -25,6 +26,7 @@ const CATEGORY_DISPLAY_NAMES: Record<string, string> = {
 export class ProductsComponent implements OnInit {
   private readonly svc = inject(ProductsService);
   private readonly categoriesSvc = inject(CategoriesService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly auth = inject(AuthService);
 
@@ -203,7 +205,14 @@ export class ProductsComponent implements OnInit {
     this.loadProducts();
   }
 
-  protected deleteProduct(id: number): void {
+  protected async deleteProduct(id: number): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Eliminar producto',
+      message: '¿Eliminar este producto? Esta acción no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
     this.deletingId.set(id);
     this.error.set(null);
     this.svc

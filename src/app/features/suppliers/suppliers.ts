@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalComponent } from '@shared/ui/modal/modal';
+import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
 import { SuppliersService } from './suppliers-api';
 import { Supplier } from './suppliers.models';
 import { SupplierFormComponent } from './supplier-form/supplier-form';
@@ -14,6 +15,7 @@ import { SupplierFormComponent } from './supplier-form/supplier-form';
 })
 export class SuppliersComponent implements OnInit {
   private readonly svc = inject(SuppliersService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly destroyRef = inject(DestroyRef);
 
   protected suppliers = signal<Supplier[]>([]);
@@ -86,7 +88,14 @@ export class SuppliersComponent implements OnInit {
     this.loadSuppliers();
   }
 
-  protected onDeactivate(id: number): void {
+  protected async onDeactivate(id: number): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Desactivar proveedor',
+      message: '¿Desactivar este proveedor? Podrás reactivarlo más tarde.',
+      confirmLabel: 'Desactivar',
+      variant: 'default',
+    });
+    if (!confirmed) return;
     this.deactivatingId.set(id);
     this.error.set(null);
     this.svc

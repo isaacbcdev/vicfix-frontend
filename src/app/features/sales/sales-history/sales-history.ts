@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, OnInit, signal } from '@angular/co
 import { DatePipe } from '@angular/common';
 import { finalize } from 'rxjs';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
+import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
 import { SalesService } from '../sales-api';
 import { SaleSummary } from '../sales.models';
 
@@ -21,6 +22,7 @@ function today(): string {
 })
 export class SalesHistoryComponent implements OnInit {
   private readonly svc = inject(SalesService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   protected sales = signal<SaleSummary[]>([]);
   protected totalElements = signal(0);
@@ -101,8 +103,14 @@ export class SalesHistoryComponent implements OnInit {
       });
   }
 
-  protected onCancel(id: number): void {
-    if (!confirm('¿Cancelar esta venta? Se restaurará el stock.')) return;
+  protected async onCancel(id: number): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Cancelar venta',
+      message: '¿Cancelar esta venta? Se restaurará el stock.',
+      confirmLabel: 'Cancelar venta',
+      variant: 'default',
+    });
+    if (!confirmed) return;
     this.cancelingId.set(id);
     this.actionError.set(null);
     this.svc
@@ -117,8 +125,14 @@ export class SalesHistoryComponent implements OnInit {
       });
   }
 
-  protected onDelete(id: number): void {
-    if (!confirm('¿Eliminar esta venta?')) return;
+  protected async onDelete(id: number): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Eliminar venta',
+      message: '¿Eliminar esta venta? Esta acción no se puede deshacer.',
+      confirmLabel: 'Eliminar',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
     this.deletingId.set(id);
     this.actionError.set(null);
     this.svc

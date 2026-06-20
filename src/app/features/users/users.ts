@@ -4,6 +4,7 @@ import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalComponent } from '@shared/ui/modal/modal';
 import { AuthService } from '../../auth/auth-api';
+import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
 import { UsersService } from './users-api';
 import { UserModel } from './users.models';
 import { UserFormComponent } from './user-form/user-form';
@@ -15,6 +16,7 @@ import { UserFormComponent } from './user-form/user-form';
 })
 export class UsersComponent implements OnInit {
   private readonly svc = inject(UsersService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly authService = inject(AuthService);
 
@@ -88,7 +90,16 @@ export class UsersComponent implements OnInit {
     this.loadUsers();
   }
 
-  protected onToggleStatus(user: UserModel): void {
+  protected async onToggleStatus(user: UserModel): Promise<void> {
+    if (user.active) {
+      const confirmed = await this.confirmDialog.confirm({
+        title: 'Desactivar usuario',
+        message: '¿Desactivar este usuario? Perderá acceso al sistema inmediatamente.',
+        confirmLabel: 'Desactivar',
+        variant: 'default',
+      });
+      if (!confirmed) return;
+    }
     this.togglingId.set(user.id);
     this.error.set(null);
     this.svc
