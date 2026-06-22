@@ -11,6 +11,18 @@
   </div>
   }
 
+  <!-- Servicio toggle -->
+  <div class="px-4 py-3 rounded-lg border border-slate-200 bg-slate-50">
+    <label class="flex items-start gap-3 cursor-pointer">
+      <input formControlName="isService" type="checkbox"
+        class="mt-0.5 h-4 w-4 rounded border-slate-300 text-accent accent-accent focus:ring-accent" />
+      <div>
+        <span class="text-sm font-medium text-text-primary">Es un servicio (sin stock físico)</span>
+        <p class="mt-0.5 text-xs text-text-secondary">Activa esto para servicios como impresiones, escaneos o trámites que no tienen inventario físico. El stock no afectará su estado.</p>
+      </div>
+    </label>
+  </div>
+
   <!-- Two-column grid -->
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
@@ -63,7 +75,8 @@
         class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent" />
     </div>
 
-    <!-- Stock -->
+    <!-- Stock (hidden for services) -->
+    @if (!isServiceMode()) {
     <div>
       <label class="block text-sm font-medium text-text-primary mb-1">
         Stock <span class="text-red-500">*</span>
@@ -76,6 +89,7 @@
       <p class="mt-1 text-xs text-red-600">El stock no puede ser negativo.</p>
       }
     </div>
+    }
 
     <!-- Unidad de medida -->
     <div>
@@ -132,12 +146,14 @@
         class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent" />
     </div>
 
-    <!-- Código de barras -->
+    <!-- Código de barras (hidden for services) -->
+    @if (!isServiceMode()) {
     <div class="sm:col-span-2">
       <label class="block text-sm font-medium text-text-primary mb-1">Código de barras</label>
       <input formControlName="barcode" type="text" placeholder="Ej: 7702001234567"
         class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent" />
     </div>
+    }
 
   </div>
 

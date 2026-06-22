@@ -137,13 +137,18 @@
           @for (p of products(); track p.productId) {
           <tr (click)="openView(p)" class="border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer">
             <td class="px-4 py-3">
-              <span class="font-medium text-text-primary">{{ p.productName }}</span>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-medium text-text-primary">{{ p.productName }}</span>
+                @if (p.isService) {
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Servicio</span>
+                }
+              </div>
               @if (p.productBrand) {
               <div class="text-xs text-text-secondary">{{ p.productBrand }}</div>
               }
             </td>
             <td class="px-4 py-3 text-text-secondary">{{ p.categoryName ?? '—' }}</td>
-            <td class="px-4 py-3 text-right font-medium text-text-primary">{{ p.productStock }}</td>
+            <td class="px-4 py-3 text-right font-medium text-text-primary">{{ p.isService ? '—' : p.productStock }}</td>
             <td class="px-4 py-3 text-right font-medium text-text-primary">{{ p.salePrice | currencyCop }}</td>
             <td class="px-4 py-3 text-text-secondary">{{ p.measureUnitDisplay ?? p.measureUnit }}</td>
             <td class="px-4 py-3">
@@ -152,7 +157,7 @@
                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ statusClass(p.status) }}">
                   {{ p.statusDisplay ?? p.status }}
                 </span>
-                @if (isNearExpiry(p.expirationDate)) {
+                @if (!p.isService && isNearExpiry(p.expirationDate)) {
                 <span
                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
                   Por vencer
@@ -248,6 +253,12 @@
 <app-modal title="Detalle del producto" [isOpen]="showViewModal()" (closed)="showViewModal.set(false)">
   @if (viewingProduct(); as p) {
   <div class="space-y-3 text-sm m-5">
+    @if (p.isService) {
+    <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-50 border border-purple-100">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Servicio</span>
+      <span class="text-xs text-purple-700">Este producto es un servicio digital sin inventario físico.</span>
+    </div>
+    }
     <div class="grid grid-cols-2 gap-3">
       <div>
         <p class="text-text-secondary text-xs">Nombre</p>
@@ -261,10 +272,12 @@
         <p class="text-text-secondary text-xs">Categoría</p>
         <p class="font-medium text-text-primary">{{ p.categoryName ?? '—' }}</p>
       </div>
+      @if (!p.isService) {
       <div>
         <p class="text-text-secondary text-xs">Código de barras</p>
         <p class="font-medium text-text-primary">{{ p.barcode ?? '—' }}</p>
       </div>
+      }
       <div>
         <p class="text-text-secondary text-xs">Precio de venta</p>
         <p class="font-medium text-text-primary">{{ p.salePrice | currencyCop }}</p>
@@ -275,6 +288,7 @@
         <p class="font-medium text-text-primary">{{ p.costPrice | currencyCop }}</p>
       </div>
       }
+      @if (!p.isService) {
       <div>
         <p class="text-text-secondary text-xs">Stock</p>
         <p class="font-medium text-text-primary">{{ p.productStock }} {{ p.measureUnitDisplay ?? p.measureUnit }}</p>
@@ -289,6 +303,7 @@
           {{ p.expirationDate ? (p.expirationDate | date:'dd/MM/yyyy') : 'No aplica' }}
         </p>
       </div>
+      }
       <div>
         <p class="text-text-secondary text-xs">Estado</p>
         <span

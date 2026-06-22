@@ -20,6 +20,7 @@ export interface Product {
   measureUnitDisplay: string | null;
   reorderQuantity: number;
   expirationDate: string | null;
+  isService: boolean;
   status: 'ACTIVE' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'EXPIRED';
   statusDisplay: string | null;
   registerDate: string | null;

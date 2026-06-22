@@ -29,8 +29,10 @@ export class ProductFormComponent {
 
   protected submitting = signal(false);
   protected errorMessage = signal<string | null>(null);
+  protected isServiceMode = signal(false);
 
   protected form = this.fb.group({
+    isService: [false],
     productName: ['', Validators.required],
     productDescription: [''],
     categoryId: [null as number | null, Validators.required],
@@ -52,10 +54,20 @@ export class ProductFormComponent {
   ];
 
   constructor() {
+    this.form.get('isService')!.valueChanges.subscribe((val) => {
+      const isService = !!val;
+      this.isServiceMode.set(isService);
+      if (isService) {
+        this.form.patchValue({ productStock: 0, barcode: '' }, { emitEvent: false });
+      }
+    });
+
     effect(() => {
       const p = this.product();
       if (p) {
+        this.isServiceMode.set(p.isService ?? false);
         this.form.patchValue({
+          isService: p.isService ?? false,
           productName: p.productName,
           productDescription: p.productDescription ?? '',
           categoryId: p.categoryId,
@@ -69,7 +81,8 @@ export class ProductFormComponent {
           barcode: p.barcode ?? '',
         });
       } else {
-        this.form.reset();
+        this.isServiceMode.set(false);
+        this.form.reset({ isService: false });
       }
     });
 
@@ -94,17 +107,18 @@ export class ProductFormComponent {
 
     const raw = this.form.getRawValue();
     const dto: Partial<Product> = {
+      isService: raw.isService ?? false,
       productName: raw.productName ?? undefined,
       productDescription: raw.productDescription || null,
       categoryId: raw.categoryId ?? undefined,
       productBrand: raw.productBrand || null,
-      productStock: raw.productStock ?? 0,
+      productStock: raw.isService ? 0 : (raw.productStock ?? 0),
       salePrice: raw.salePrice ?? 0,
       costPrice: raw.costPrice ?? null,
       measureUnit: raw.measureUnit ?? 'UNIT',
-      reorderQuantity: raw.reorderQuantity ?? 0,
-      expirationDate: raw.expirationDate || null,
-      barcode: raw.barcode || null,
+      reorderQuantity: raw.isService ? 0 : (raw.reorderQuantity ?? 0),
+      expirationDate: raw.isService ? null : (raw.expirationDate || null),
+      barcode: raw.isService ? null : (raw.barcode || null),
     };
 
     const p = this.product();
