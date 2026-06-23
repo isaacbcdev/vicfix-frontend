@@ -1,3 +1,29 @@
+export interface SaleLineItem {
+  productId: number;
+  productName: string;
+  productBarcode: string | null;
+  quantity: number;
+  pricePerUnit: number;
+  costPrice: number;
+  subtotal: number;
+  profit: number;
+  comments: string | null;
+}
+
+export interface SaleDetail {
+  saleId: number;
+  userName: string;
+  saleDate: string;
+  paymentMethodDisplay: string;
+  discount: number;
+  profit: number;
+  total: number;
+  totalCost: number;
+  statusDisplay: string;
+  comments: string | null;
+  productsSales: SaleLineItem[];
+}
+
 export interface SaleSummary {
   saleId: number;
   saleDate: string;

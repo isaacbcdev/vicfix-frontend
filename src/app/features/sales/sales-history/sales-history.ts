@@ -1,10 +1,13 @@
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
+import { ModalComponent } from '@shared/ui/modal/modal';
+import { AuthService } from '@auth/auth-api';
 import { SalesService } from '../sales-api';
-import { SaleSummary } from '../sales.models';
+import { SaleDetail, SaleSummary } from '../sales.models';
 
 function firstDayOfCurrentMonth(): string {
   const d = new Date();
@@ -17,12 +20,14 @@ function today(): string {
 
 @Component({
   selector: 'app-sales-history',
-  imports: [CurrencyCopPipe, DatePipe],
+  imports: [CurrencyCopPipe, DatePipe, ModalComponent],
   templateUrl: './sales-history.html',
 })
 export class SalesHistoryComponent implements OnInit {
   private readonly svc = inject(SalesService);
   private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly destroyRef = inject(DestroyRef);
+  protected readonly auth = inject(AuthService);
 
   protected sales = signal<SaleSummary[]>([]);
   protected totalElements = signal(0);
@@ -37,6 +42,9 @@ export class SalesHistoryComponent implements OnInit {
   protected confirmingId = signal<number | null>(null);
   protected cancelingId = signal<number | null>(null);
   protected deletingId = signal<number | null>(null);
+  protected viewingSale = signal<SaleDetail | null>(null);
+  protected showSaleDetailModal = signal(false);
+  protected loadingSaleDetail = signal(false);
 
   protected readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
@@ -150,6 +158,25 @@ export class SalesHistoryComponent implements OnInit {
   protected goToPage(page: number): void {
     this.currentPage.set(page);
     this.loadSales();
+  }
+
+  protected openSaleDetail(saleId: number): void {
+    this.loadingSaleDetail.set(true);
+    this.showSaleDetailModal.set(true);
+    this.svc
+      .getSaleById(saleId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (sale) => {
+          this.viewingSale.set(sale);
+          this.loadingSaleDetail.set(false);
+        },
+        error: () => {
+          this.loadingSaleDetail.set(false);
+          this.showSaleDetailModal.set(false);
+          this.actionError.set('No se pudo cargar el detalle de la venta.');
+        },
+      });
   }
 
   protected statusBadgeClass(status: SaleSummary['status']): string {

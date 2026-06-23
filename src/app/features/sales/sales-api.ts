@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
-import { CreateSaleRequest, SaleSummary } from './sales.models';
+import { CreateSaleRequest, SaleDetail, SaleSummary } from './sales.models';
 import { Page } from '@shared/models/product.model';
 
 const base = `${environment.apiUrl}/api/v1/sales`;
@@ -39,5 +39,9 @@ export class SalesService {
 
   deleteSale(id: number): Observable<void> {
     return this.http.delete<void>(`${base}/${id}`);
+  }
+
+  getSaleById(id: number): Observable<SaleDetail> {
+    return this.http.get<SaleDetail>(`${base}/${id}`);
   }
 }

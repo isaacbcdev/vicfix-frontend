@@ -103,7 +103,7 @@
           }
           } @else {
           @for (sale of sales(); track sale.saleId) {
-          <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+          <tr (click)="openSaleDetail(sale.saleId)" class="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer">
             <td class="px-4 py-3 text-text-primary whitespace-nowrap">
               {{ sale.saleDate | date:'dd/MM/yyyy HH:mm' }}
             </td>
@@ -121,7 +121,7 @@
                 {{ sale.statusDisplay }}
               </span>
             </td>
-            <td class="px-4 py-3">
+            <td class="px-4 py-3" (click)="$event.stopPropagation()">
               @if (sale.status === 'PENDING') {
               <div class="flex items-center gap-2">
                 <button (click)="onConfirm(sale.saleId)"
@@ -209,3 +209,86 @@
 
   </div>
 </div>
+
+<!-- Sale detail modal -->
+<app-modal title="Detalle de la venta" [isOpen]="showSaleDetailModal()" (closed)="showSaleDetailModal.set(false)">
+  @if (loadingSaleDetail()) {
+  <div class="p-5 space-y-3">
+    @for (i of [1,2,3,4]; track i) {
+    <div class="h-4 bg-slate-200 rounded animate-pulse"></div>
+    }
+  </div>
+  } @else if (viewingSale(); as sale) {
+  <div class="space-y-4 p-5">
+    <!-- Header info -->
+    <div class="grid grid-cols-2 gap-3 text-sm pb-3 border-b border-slate-100">
+      <div>
+        <p class="text-text-secondary text-xs">Cajero</p>
+        <p class="font-medium text-text-primary">{{ sale.userName }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Fecha</p>
+        <p class="font-medium text-text-primary">{{ sale.saleDate | date:'dd/MM/yyyy HH:mm' }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Método de pago</p>
+        <p class="font-medium text-text-primary">{{ sale.paymentMethodDisplay }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Estado</p>
+        <p class="font-medium text-text-primary">{{ sale.statusDisplay }}</p>
+      </div>
+    </div>
+
+    <!-- Line items table -->
+    <div>
+      <p class="text-sm font-semibold text-text-primary mb-2">Productos</p>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-100 text-text-secondary">
+            <th class="text-left py-1.5">Producto</th>
+            <th class="text-center py-1.5">Cant.</th>
+            <th class="text-right py-1.5">Precio</th>
+            <th class="text-right py-1.5">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of sale.productsSales; track item.productId) {
+          <tr class="border-b border-slate-50">
+            <td class="py-1.5 font-medium text-text-primary">{{ item.productName }}</td>
+            <td class="py-1.5 text-center">{{ item.quantity }}</td>
+            <td class="py-1.5 text-right text-text-secondary">{{ item.pricePerUnit | currencyCop }}</td>
+            <td class="py-1.5 text-right font-medium">{{ item.subtotal | currencyCop }}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Totals -->
+    <div class="pt-2 border-t border-slate-100 space-y-1 text-sm">
+      <div class="flex justify-between text-text-secondary">
+        <span>Descuento</span>
+        <span>−{{ sale.discount | currencyCop }}</span>
+      </div>
+      <div class="flex justify-between font-semibold text-base">
+        <span class="text-text-primary">Total</span>
+        <span class="text-accent">{{ sale.total | currencyCop }}</span>
+      </div>
+      @if (auth.hasAnyRole(['ROLE_ADMIN', 'ROLE_ROOT'])) {
+      <div class="flex justify-between text-text-secondary text-xs pt-1">
+        <span>Ganancia</span>
+        <span>{{ sale.profit | currencyCop }}</span>
+      </div>
+      }
+    </div>
+
+    @if (sale.comments) {
+    <div class="pt-2 border-t border-slate-100">
+      <p class="text-text-secondary text-xs">Comentarios</p>
+      <p class="text-text-primary text-sm">{{ sale.comments }}</p>
+    </div>
+    }
+  </div>
+  }
+</app-modal>
