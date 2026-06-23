@@ -43,6 +43,9 @@ export class SuppliesComponent implements OnInit {
   protected error = signal<string | null>(null);
   protected actionError = signal<string | null>(null);
   protected showModal = signal(false);
+  protected viewingSupply = signal<Supply | null>(null);
+  protected showDetailModal = signal(false);
+  protected loadingDetail = signal(false);
   protected confirmingId = signal<number | null>(null);
   protected cancelingId = signal<number | null>(null);
   protected deletingId = signal<number | null>(null);
@@ -182,6 +185,25 @@ export class SuppliesComponent implements OnInit {
           this.deletingId.set(null);
           const msg = err?.error?.message as string | undefined;
           this.actionError.set(msg ?? 'No se pudo eliminar el suministro. Intenta de nuevo.');
+        },
+      });
+  }
+
+  protected openSupplyDetail(id: number): void {
+    this.loadingDetail.set(true);
+    this.showDetailModal.set(true);
+    this.svc
+      .getSupplyById(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (supply) => {
+          this.viewingSupply.set(supply);
+          this.loadingDetail.set(false);
+        },
+        error: () => {
+          this.loadingDetail.set(false);
+          this.showDetailModal.set(false);
+          this.actionError.set('No se pudo cargar el detalle del suministro.');
         },
       });
   }

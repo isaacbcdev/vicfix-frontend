@@ -41,6 +41,10 @@ export class SuppliesService {
     return this.http.post<void>(`${base}/${id}/cancel`, {});
   }
 
+  getSupplyById(id: number): Observable<Supply> {
+    return this.http.get<Supply>(`${base}/${id}`);
+  }
+
   deleteSupply(id: number): Observable<void> {
     return this.http.delete<void>(`${base}/${id}`);
   }

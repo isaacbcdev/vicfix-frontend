@@ -135,7 +135,7 @@
           <!-- Data rows -->
           @if (!loading()) {
           @for (s of supplies(); track s.supplyId) {
-          <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+          <tr (click)="openSupplyDetail(s.supplyId)" class="border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer">
             <td class="px-4 py-3 text-text-secondary whitespace-nowrap">
               {{ s.supplyDate | date:'dd/MM/yyyy' }}
             </td>
@@ -159,7 +159,7 @@
               </span>
               }
             </td>
-            <td class="px-4 py-3">
+            <td class="px-4 py-3" (click)="$event.stopPropagation()">
               <div class="flex items-center justify-end gap-1">
                 @if (s.status === 'PENDING') {
                 <button (click)="onConfirm(s.supplyId)" [disabled]="confirmingId() === s.supplyId"
@@ -261,4 +261,58 @@
 <!-- Create modal -->
 <app-modal title="Registrar suministro" [isOpen]="showModal()" (closed)="showModal.set(false)">
   <app-supply-form (saved)="onSaved()" (cancelled)="showModal.set(false)" />
+</app-modal>
+
+<!-- Supply detail modal -->
+<app-modal title="Detalle del suministro" [isOpen]="showDetailModal()" (closed)="showDetailModal.set(false)">
+  @if (loadingDetail()) {
+  <div class="p-5 space-y-3">
+    @for (i of [1,2,3,4]; track i) {
+    <div class="h-4 bg-slate-200 rounded animate-pulse"></div>
+    }
+  </div>
+  } @else if (viewingSupply(); as supply) {
+  <div class="space-y-3 text-sm p-5">
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <p class="text-text-secondary text-xs">Producto</p>
+        <p class="font-medium text-text-primary">{{ supply.productName }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Proveedor</p>
+        <p class="font-medium text-text-primary">{{ supply.supplierName }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Fecha</p>
+        <p class="font-medium text-text-primary">{{ supply.supplyDate | date:'dd/MM/yyyy HH:mm' }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Estado</p>
+        <p class="font-medium text-text-primary">{{ supply.statusDisplay }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Cantidad</p>
+        <p class="font-medium text-text-primary">{{ supply.quantity }}</p>
+      </div>
+      <div>
+        <p class="text-text-secondary text-xs">Precio unit.</p>
+        <p class="font-medium text-text-primary">{{ supply.pricePerUnit | currencyCop }}</p>
+      </div>
+    </div>
+
+    <div class="pt-2 border-t border-slate-100 flex justify-between font-semibold text-base">
+      <span class="text-text-primary">Total</span>
+      <span class="text-accent">{{ supply.totalAmount | currencyCop }}</span>
+    </div>
+
+    @if (supply.comments) {
+    <div class="pt-2 border-t border-slate-100">
+      <p class="text-text-secondary text-xs">Comentarios</p>
+      <p class="text-text-primary">{{ supply.comments }}</p>
+    </div>
+    } @else {
+    <p class="text-text-secondary text-xs italic">Sin comentarios.</p>
+    }
+  </div>
+  }
 </app-modal>
