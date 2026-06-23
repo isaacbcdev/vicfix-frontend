@@ -34,7 +34,7 @@
 
   <!-- Category tabs -->
   <div class="border-b border-slate-200">
-    <div class="flex items-end gap-1 overflow-x-auto">
+    <div class="flex items-end gap-1 overflow-x-auto scrollbar-hide">
       <button (click)="setCategory(null)" [class]="selectedCategoryId() === null
           ? 'px-4 py-2 text-sm font-medium text-accent border-b-2 border-accent -mb-px whitespace-nowrap'
           : 'px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap'">
@@ -57,7 +57,7 @@
     </div>
   </div>
 
-  <!-- Status filter -->
+  <!-- Status filter + service-only toggle -->
   <div class="flex items-center gap-2 flex-wrap">
     @for (s of statusOptions; track s.value) {
     <button (click)="setStatus(s.value)"
@@ -67,6 +67,13 @@
       {{ s.label }}
     </button>
     }
+    <span class="w-px h-5 bg-slate-200 self-center"></span>
+    <button (click)="toggleServiceOnly()"
+      [class]="serviceOnly()
+  ? 'px-3 py-1.5 rounded-lg text-sm font-medium bg-purple-100 text-purple-700 border border-purple-200 transition-colors'
+  : 'px-3 py-1.5 rounded-lg text-sm font-medium bg-white border border-slate-200 text-text-secondary hover:bg-slate-50 transition-colors'">
+      Solo servicios
+    </button>
   </div>
 
   <!-- Product count -->
@@ -95,6 +102,7 @@
             <th class="text-left px-4 py-3 font-medium text-text-secondary">Categoría</th>
             <th class="text-right px-4 py-3 font-medium text-text-secondary">Stock</th>
             <th class="text-right px-4 py-3 font-medium text-text-secondary">Precio venta</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Precio costo</th>
             <th class="text-left px-4 py-3 font-medium text-text-secondary">Unidad</th>
             <th class="text-left px-4 py-3 font-medium text-text-secondary">Estado</th>
             <th class="px-4 py-3"></th>
@@ -118,6 +126,9 @@
             </td>
             <td class="px-4 py-3 text-right">
               <div class="h-4 bg-slate-100 rounded w-20 ml-auto"></div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="h-4 bg-slate-100 rounded w-14"></div>
             </td>
             <td class="px-4 py-3">
               <div class="h-4 bg-slate-100 rounded w-14"></div>
@@ -150,6 +161,7 @@
             <td class="px-4 py-3 text-text-secondary">{{ p.categoryName ?? '—' }}</td>
             <td class="px-4 py-3 text-right font-medium text-text-primary">{{ p.isService ? '—' : p.productStock }}</td>
             <td class="px-4 py-3 text-right font-medium text-text-primary">{{ p.salePrice | currencyCop }}</td>
+            <td class="px-4 py-3 text-right font-medium text-text-primary">{{ p.costPrice | currencyCop }}</td>
             <td class="px-4 py-3 text-text-secondary">{{ p.measureUnitDisplay ?? p.measureUnit }}</td>
             <td class="px-4 py-3">
               <div class="flex flex-col gap-1 items-start">
@@ -227,6 +239,13 @@
     <div class="flex items-center justify-between px-4 py-3 border-t border-slate-100 text-sm text-text-secondary">
       <span>{{ totalElements() }} producto{{ totalElements() === 1 ? '' : 's' }}</span>
       <div class="flex items-center gap-3">
+        <select (change)="setPageSize($any($event.target).value)" [value]="pageSize()"
+          class="px-2 py-1.5 rounded-lg border border-slate-200 bg-white text-sm text-text-secondary hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors">
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
         <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 0"
           class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
           Anterior

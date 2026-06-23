@@ -10,6 +10,16 @@
   --color-text-secondary: #64748B;
 }
 
+@layer utilities {
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @layer base {
   body {
     @apply font-sans;

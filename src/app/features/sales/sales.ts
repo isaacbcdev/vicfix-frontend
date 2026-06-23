@@ -8,6 +8,7 @@ import { Product } from '@shared/models/product.model';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { SalesService } from './sales-api';
 import { CartItem } from './sales.models';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-sales',

@@ -42,6 +42,7 @@ export class ProductsComponent implements OnInit {
   protected selectedStatus = signal<string | null>(null);
   protected lowStock = signal(false);
   protected nearExpiry = signal(false);
+  protected serviceOnly = signal(false);
   protected categories = signal<Category[]>([]);
   protected categoriesLoading = signal(false);
 
@@ -67,6 +68,7 @@ export class ProductsComponent implements OnInit {
       this.selectedStatus() !== null ||
       this.lowStock() ||
       this.nearExpiry() ||
+      this.serviceOnly() ||
       this.query() !== '';
     const suffix = count === 1 ? '' : 's';
     return filtered
@@ -125,6 +127,7 @@ export class ProductsComponent implements OnInit {
         this.selectedStatus(),
         this.lowStock(),
         this.nearExpiry(),
+        this.serviceOnly() ? true : null,
       )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -238,6 +241,18 @@ export class ProductsComponent implements OnInit {
   protected clearSearch(): void {
     this.searchInput = '';
     this.search$.next('');
+  }
+
+  protected toggleServiceOnly(): void {
+    this.serviceOnly.update((v) => !v);
+    this.currentPage.set(0);
+    this.loadProducts();
+  }
+
+  protected setPageSize(value: string): void {
+    this.pageSize.set(Number(value));
+    this.currentPage.set(0);
+    this.loadProducts();
   }
 
   protected goToPage(page: number): void {
