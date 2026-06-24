@@ -231,6 +231,6 @@
 
 <!-- Create / Edit modal -->
 <app-modal [title]="editingSupplier() ? 'Editar proveedor' : 'Agregar proveedor'" [isOpen]="showModal()"
-  (closed)="showModal.set(false)">
+  [closeOnBackdropClick]="false" (closed)="showModal.set(false)">
   <app-supplier-form [supplier]="editingSupplier()" (saved)="onSaved()" (cancelled)="showModal.set(false)" />
 </app-modal>

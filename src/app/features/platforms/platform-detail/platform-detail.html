@@ -281,7 +281,7 @@
 </div>
 
 <!-- Create transaction modal -->
-<app-modal [title]="txModalTitle()" [isOpen]="showTxModal()" (closed)="showTxModal.set(false)">
+<app-modal [title]="txModalTitle()" [isOpen]="showTxModal()" [closeOnBackdropClick]="false" (closed)="showTxModal.set(false)">
   <form [formGroup]="txForm" (ngSubmit)="submitTx()" class="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
 
     @if (txError()) {
@@ -404,7 +404,7 @@
 </app-modal>
 
 <!-- Edit transaction modal -->
-<app-modal title="Editar transacción" [isOpen]="showEditTxModal()" (closed)="showEditTxModal.set(false)">
+<app-modal title="Editar transacción" [isOpen]="showEditTxModal()" [closeOnBackdropClick]="false" (closed)="showEditTxModal.set(false)">
   <form [formGroup]="txForm" (ngSubmit)="submitEditTx()" class="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
 
     @if (txError()) {
@@ -545,7 +545,7 @@
 </app-modal>
 
 <!-- Update balance modal -->
-<app-modal [title]="balanceModalTitle()" [isOpen]="showBalanceModal()" (closed)="showBalanceModal.set(false)">
+<app-modal [title]="balanceModalTitle()" [isOpen]="showBalanceModal()" [closeOnBackdropClick]="false" (closed)="showBalanceModal.set(false)">
   <form [formGroup]="balanceForm" (ngSubmit)="submitBalance()" class="p-5 space-y-4">
 
     @if (balanceError()) {

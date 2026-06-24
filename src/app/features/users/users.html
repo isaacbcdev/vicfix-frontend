@@ -233,6 +233,6 @@
 
 <!-- Create / Edit modal -->
 <app-modal [title]="editingUser() ? 'Editar usuario' : 'Agregar usuario'" [isOpen]="showModal()"
-  (closed)="showModal.set(false)">
+  [closeOnBackdropClick]="false" (closed)="showModal.set(false)">
   <app-user-form [user]="editingUser()" (saved)="onSaved()" (cancelled)="showModal.set(false)" />
 </app-modal>

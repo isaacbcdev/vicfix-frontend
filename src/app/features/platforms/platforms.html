@@ -152,6 +152,7 @@
 <app-modal
   [title]="'Actualizar saldo — ' + (editingPlatform()?.name ?? '')"
   [isOpen]="showBalanceModal()"
+  [closeOnBackdropClick]="false"
   (closed)="closeBalanceModal()">
   <form [formGroup]="balanceForm" (ngSubmit)="submitBalance()" class="p-5 space-y-4">
 
@@ -206,7 +207,7 @@
 </app-modal>
 
 <!-- Efecty close modal -->
-<app-modal title="Registrar Cierre — Efecty" [isOpen]="showEfectyModal()" (closed)="showEfectyModal.set(false)">
+<app-modal title="Registrar Cierre — Efecty" [isOpen]="showEfectyModal()" [closeOnBackdropClick]="false" (closed)="showEfectyModal.set(false)">
   <form [formGroup]="efectyForm" (ngSubmit)="submitEfectyClose()" class="p-5 space-y-4">
 
     @if (efectyError()) {

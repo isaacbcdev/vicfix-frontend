@@ -259,7 +259,7 @@
 </div>
 
 <!-- Create modal -->
-<app-modal title="Registrar suministro" [isOpen]="showModal()" (closed)="showModal.set(false)">
+<app-modal title="Registrar suministro" [isOpen]="showModal()" [closeOnBackdropClick]="false" (closed)="showModal.set(false)">
   <app-supply-form (saved)="onSaved()" (cancelled)="showModal.set(false)" />
 </app-modal>
 

@@ -290,7 +290,7 @@
 
 <!-- Create / Edit modal -->
 <app-modal [title]="editingProduct() ? 'Editar producto' : 'Agregar producto'" [isOpen]="showModal()"
-  (closed)="showModal.set(false)">
+  [closeOnBackdropClick]="false" (closed)="showModal.set(false)">
   <app-product-form [product]="editingProduct()" (saved)="onProductSaved($event)" (cancelled)="showModal.set(false)" />
 </app-modal>
 
