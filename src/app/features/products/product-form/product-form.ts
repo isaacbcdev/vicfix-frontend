@@ -1,4 +1,5 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { ProductsService } from '../products-api';
@@ -24,6 +25,7 @@ export class ProductFormComponent {
   private readonly fb = inject(FormBuilder);
   private readonly svc = inject(ProductsService);
   private readonly categoriesService = inject(CategoriesService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected categories = signal<Category[]>([]);
 
@@ -54,7 +56,7 @@ export class ProductFormComponent {
   ];
 
   constructor() {
-    this.form.get('isService')!.valueChanges.subscribe((val) => {
+    this.form.get('isService')!.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((val) => {
       const isService = !!val;
       this.isServiceMode.set(isService);
       if (isService) {
@@ -86,7 +88,7 @@ export class ProductFormComponent {
       }
     });
 
-    this.categoriesService.getCategories().subscribe((cats) => this.categories.set(cats));
+    this.categoriesService.getCategories().pipe(takeUntilDestroyed(this.destroyRef)).subscribe((cats) => this.categories.set(cats));
   }
 
   protected get isEditMode(): boolean {

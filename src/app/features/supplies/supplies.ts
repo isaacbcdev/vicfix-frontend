@@ -1,4 +1,5 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 
 function firstDayOfCurrentMonth(): string {
   const d = new Date();
@@ -8,7 +9,6 @@ function firstDayOfCurrentMonth(): string {
 function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
-import { DatePipe, AsyncPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';

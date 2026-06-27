@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -23,7 +23,7 @@ function today(): string {
   imports: [CurrencyCopPipe, DatePipe, ModalComponent],
   templateUrl: './sales-history.html',
 })
-export class SalesHistoryComponent implements OnInit {
+export class SalesHistoryComponent {
   private readonly svc = inject(SalesService);
   private readonly confirmDialog = inject(ConfirmDialogService);
   private readonly destroyRef = inject(DestroyRef);
@@ -57,10 +57,6 @@ export class SalesHistoryComponent implements OnInit {
       this.currentPage.set(0);
       this.loadSales();
     });
-  }
-
-  ngOnInit(): void {
-    // Initial load is handled by the constructor effect.
   }
 
   protected loadSales(): void {

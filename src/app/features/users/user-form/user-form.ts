@@ -1,4 +1,5 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -38,6 +39,7 @@ export class UserFormComponent {
   private readonly fb = inject(FormBuilder);
   private readonly svc = inject(UsersService);
   private readonly rolesSvc = inject(RolesService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected submitting = signal(false);
   protected errorMessage = signal<string | null>(null);
@@ -85,7 +87,7 @@ export class UserFormComponent {
 
   private loadRoles(): void {
     this.rolesLoading.set(true);
-    this.rolesSvc.getRoles().subscribe({
+    this.rolesSvc.getRoles().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (page) => {
         this.availableRoles.set(page.content);
         this.rolesLoading.set(false);
