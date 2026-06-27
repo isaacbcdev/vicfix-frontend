@@ -7,7 +7,7 @@ import { ProductsService } from '@features/products/products-api';
 import { SuppliersService } from '@features/suppliers/suppliers-api';
 import { Supplier } from '@features/suppliers/suppliers.models';
 import { Product } from '@shared/models/product.model';
-import { SuppliesService } from '../supplies.service';
+import { SuppliesService } from '../supplies-api';
 
 interface ErrorResponse {
   status: number;

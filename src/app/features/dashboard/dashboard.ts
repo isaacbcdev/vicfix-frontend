@@ -4,9 +4,9 @@ import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
-import { PlatformsService } from '../platforms/platforms.service';
-import { EfectyDailyClose, Platform } from '../platforms/platforms.models';
-import { DashboardService } from './dashboard.service';
+import { PlatformsService } from '@features/platforms/platforms-api';
+import { EfectyDailyClose, Platform } from '@features/platforms/platforms.models';
+import { DashboardService } from './dashboard-data';
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);

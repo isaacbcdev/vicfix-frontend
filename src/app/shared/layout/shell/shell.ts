@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService } from '../../../auth/auth-api';
+import { AuthService } from '@auth/auth-api';
 import { ConfirmDialogComponent } from '@shared/ui/confirm-dialog/confirm-dialog';
 
 @Component({

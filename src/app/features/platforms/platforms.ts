@@ -7,7 +7,7 @@ import { finalize } from 'rxjs';
 import { AuthService } from '@auth/auth-api';
 import { ModalComponent } from '@shared/ui/modal/modal';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
-import { PlatformsService } from './platforms.service';
+import { PlatformsService } from './platforms-api';
 import { EfectyDailyClose, Platform } from './platforms.models';
 
 function today(): string {

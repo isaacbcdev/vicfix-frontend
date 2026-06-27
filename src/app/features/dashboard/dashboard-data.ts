@@ -1,12 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, forkJoin, Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { PlatformsService } from '../platforms/platforms.service';
-import { ReportsService } from '../reports/reports-api';
-import { SalesService } from '../sales/sales-api';
-import { ProductsService } from '../products/products-api';
-import { EfectyDailyClose, Platform } from '../platforms/platforms.models';
-import { FinancialReport } from '../reports/reports.models';
+import { catchError, forkJoin, map, Observable, of } from 'rxjs';
+import { PlatformsService } from '@features/platforms/platforms-api';
+import { ReportsService } from '@features/reports/reports-api';
+import { SalesService } from '@features/sales/sales-api';
+import { ProductsService } from '@features/products/products-api';
+import { EfectyDailyClose, Platform } from '@features/platforms/platforms.models';
+import { FinancialReport } from '@features/reports/reports.models';
 
 export interface DashboardData {
   platforms: Platform[];

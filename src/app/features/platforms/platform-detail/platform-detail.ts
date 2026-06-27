@@ -8,7 +8,7 @@ import { AuthService } from '@auth/auth-api';
 import { ModalComponent } from '@shared/ui/modal/modal';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
-import { PlatformsService } from '../platforms.service';
+import { PlatformsService } from '../platforms-api';
 import { Platform, PlatformTransaction } from '../platforms.models';
 
 function firstDayOfCurrentMonth(): string {

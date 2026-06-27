@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalComponent } from '@shared/ui/modal/modal';
-import { AuthService } from '../../auth/auth-api';
+import { AuthService } from '@auth/auth-api';
 import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
 import { UsersService } from './users-api';
 import { UserModel } from './users.models';
