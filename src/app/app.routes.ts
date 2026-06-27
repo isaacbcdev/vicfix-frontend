@@ -50,11 +50,7 @@ export const routes: Routes = [
         path: 'reports',
         loadComponent: () => import('@features/reports/reports').then((m) => m.ReportsComponent),
       },
-      {
-        path: 'close',
-        canActivate: [roleGuard(['ROLE_ADMIN', 'ROLE_ROOT'])],
-        loadComponent: () => import('@features/close/close').then((m) => m.CloseComponent),
-      },
+      // Cierre del Día — pending implementation, route removed until ready
       {
         path: 'supplies',
         canActivate: [roleGuard(['ROLE_ADMIN', 'ROLE_ROOT'])],
