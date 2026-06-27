@@ -35,7 +35,7 @@ export class UsersComponent implements OnInit {
   protected readonly totalPages = computed(() => Math.ceil(this.totalElements() / this.pageSize()) || 1);
 
   private search$ = new Subject<string>();
-  protected searchInput = '';
+  protected searchInput = signal('');
 
   ngOnInit(): void {
     this.search$
@@ -130,12 +130,12 @@ export class UsersComponent implements OnInit {
   }
 
   protected onSearchChange(value: string): void {
-    this.searchInput = value;
+    this.searchInput.set(value);
     this.search$.next(value);
   }
 
   protected clearSearch(): void {
-    this.searchInput = '';
+    this.searchInput.set('');
     this.search$.next('');
   }
 
