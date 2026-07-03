@@ -51,6 +51,7 @@ export class PlatformDetailComponent implements OnInit {
   protected platform = signal<Platform | null>(null);
   protected transactions = signal<PlatformTransaction[]>([]);
   protected totalElements = signal(0);
+  protected commissionTotal = signal<number | null>(null);
   protected currentPage = signal(0);
   protected pageSize = signal(20);
   protected startDate = signal(firstDayOfCurrentMonth());
@@ -136,12 +137,40 @@ export class PlatformDetailComponent implements OnInit {
           this.transactions.set(page.content);
           this.totalElements.set(page.page.totalElements);
           this.loading.set(false);
+          // The table is paginated, so sum commission across the whole date
+          // range, not just the visible page. Skip the extra fetch when the
+          // current page already holds every row in range.
+          if (page.content.length === page.page.totalElements) {
+            this.commissionTotal.set(this.sumCommission(page.content));
+          } else {
+            this.loadCommissionTotal(page.page.totalElements);
+          }
         },
         error: () => {
           this.error.set('No se pudieron cargar las transacciones. Intenta de nuevo.');
           this.loading.set(false);
         },
       });
+  }
+
+  private loadCommissionTotal(total: number): void {
+    const id = this.platformId();
+    if (!id) return;
+    if (total === 0) {
+      this.commissionTotal.set(0);
+      return;
+    }
+    this.svc
+      .getTransactions(id, 0, total, this.startDate() || undefined, this.endDate() || undefined)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (page) => this.commissionTotal.set(this.sumCommission(page.content)),
+        error: () => this.commissionTotal.set(null),
+      });
+  }
+
+  private sumCommission(txs: PlatformTransaction[]): number {
+    return txs.reduce((sum, tx) => sum + tx.commission, 0);
   }
 
   protected onDateChange(field: 'start' | 'end', value: string): void {
