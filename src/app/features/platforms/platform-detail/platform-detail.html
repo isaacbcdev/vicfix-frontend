@@ -78,6 +78,14 @@
     </div>
   </div>
 
+  <!-- Commission total over the filtered range (summed server-side across all pages) -->
+  <div class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-200 text-sm">
+    <span class="text-text-secondary">Comisión total (rango):</span>
+    <span class="font-semibold text-text-primary">
+      {{ commissionTotal() !== null ? (commissionTotal()! | currencyCop) : '—' }}
+    </span>
+  </div>
+
   <!-- Load error -->
   @if (error()) {
   <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
@@ -262,12 +270,7 @@
     <!-- Pagination -->
     @if (!loading() && totalElements() > 0) {
     <div class="flex items-center justify-between px-4 py-3 border-t border-slate-100 text-sm text-text-secondary">
-      <div class="flex items-center gap-4">
-        <span>{{ totalElements() }} transacción{{ totalElements() === 1 ? '' : 'es' }}</span>
-        @if (commissionTotal() !== null) {
-        <span>Comisión total <span class="font-semibold text-text-primary">{{ commissionTotal()! | currencyCop }}</span></span>
-        }
-      </div>
+      <span>{{ totalElements() }} transacción{{ totalElements() === 1 ? '' : 'es' }}</span>
       <div class="flex items-center gap-3">
         <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 0"
           class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">

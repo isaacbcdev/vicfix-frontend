@@ -137,40 +137,27 @@ export class PlatformDetailComponent implements OnInit {
           this.transactions.set(page.content);
           this.totalElements.set(page.page.totalElements);
           this.loading.set(false);
-          // The table is paginated, so sum commission across the whole date
-          // range, not just the visible page. Skip the extra fetch when the
-          // current page already holds every row in range.
-          if (page.content.length === page.page.totalElements) {
-            this.commissionTotal.set(this.sumCommission(page.content));
-          } else {
-            this.loadCommissionTotal(page.page.totalElements);
-          }
         },
         error: () => {
           this.error.set('No se pudieron cargar las transacciones. Intenta de nuevo.');
           this.loading.set(false);
         },
       });
+    // Commission total is summed server-side over the full date range: the table is
+    // paginated (max 50/page), so a client-side sum of the loaded rows would be wrong.
+    this.loadCommissionTotal();
   }
 
-  private loadCommissionTotal(total: number): void {
+  private loadCommissionTotal(): void {
     const id = this.platformId();
     if (!id) return;
-    if (total === 0) {
-      this.commissionTotal.set(0);
-      return;
-    }
     this.svc
-      .getTransactions(id, 0, total, this.startDate() || undefined, this.endDate() || undefined)
+      .getCommissionTotal(id, this.startDate() || undefined, this.endDate() || undefined)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (page) => this.commissionTotal.set(this.sumCommission(page.content)),
+        next: (r) => this.commissionTotal.set(r.total),
         error: () => this.commissionTotal.set(null),
       });
-  }
-
-  private sumCommission(txs: PlatformTransaction[]): number {
-    return txs.reduce((sum, tx) => sum + tx.commission, 0);
   }
 
   protected onDateChange(field: 'start' | 'end', value: string): void {

@@ -39,6 +39,19 @@ export class PlatformsService {
     return this.http.get<Page<PlatformTransaction>>(`${base}/${id}/transactions`, { params });
   }
 
+  getCommissionTotal(
+    id: number,
+    startDate?: string,
+    endDate?: string,
+  ): Observable<{ total: number }> {
+    let params = new HttpParams();
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    return this.http.get<{ total: number }>(`${base}/${id}/transactions/commission-total`, {
+      params,
+    });
+  }
+
   createTransaction(req: CreateTransactionRequest): Observable<PlatformTransaction> {
     return this.http.post<PlatformTransaction>(`${base}/${req.platformId}/transactions`, req);
   }
