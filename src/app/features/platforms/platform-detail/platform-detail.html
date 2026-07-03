@@ -78,12 +78,22 @@
     </div>
   </div>
 
-  <!-- Commission total over the filtered range (summed server-side across all pages) -->
-  <div class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-200 text-sm">
-    <span class="text-text-secondary">Comisión total (rango):</span>
-    <span class="font-semibold text-text-primary">
-      {{ commissionTotal() !== null ? (commissionTotal()! | currencyCop) : '—' }}
-    </span>
+  <!-- Commission / extra charge totals over the filtered range (summed server-side across all pages) -->
+  <div class="flex items-center flex-wrap gap-4 px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-200 text-sm">
+    <div class="flex items-center gap-2">
+      <span class="text-text-secondary">Comisión total (rango):</span>
+      <span class="font-semibold text-text-primary">
+        {{ commissionTotal() !== null ? (commissionTotal()! | currencyCop) : '—' }}
+      </span>
+    </div>
+    @if (showExtraCharge()) {
+    <div class="flex items-center gap-2 pl-4 border-l border-slate-200">
+      <span class="text-text-secondary">Cargo extra total (rango):</span>
+      <span class="font-semibold text-text-primary">
+        {{ extraChargeTotal() !== null ? (extraChargeTotal()! | currencyCop) : '—' }}
+      </span>
+    </div>
+    }
   </div>
 
   <!-- Load error -->

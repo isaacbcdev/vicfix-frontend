@@ -52,6 +52,7 @@ export class PlatformDetailComponent implements OnInit {
   protected transactions = signal<PlatformTransaction[]>([]);
   protected totalElements = signal(0);
   protected commissionTotal = signal<number | null>(null);
+  protected extraChargeTotal = signal<number | null>(null);
   protected currentPage = signal(0);
   protected pageSize = signal(20);
   protected startDate = signal(firstDayOfCurrentMonth());
@@ -113,6 +114,7 @@ export class PlatformDetailComponent implements OnInit {
       .subscribe({
         next: (list) => {
           this.platform.set(list.find((p) => p.id === id) ?? null);
+          if (this.showExtraCharge()) this.loadExtraChargeTotal();
         },
         error: () => {},
       });
@@ -146,6 +148,7 @@ export class PlatformDetailComponent implements OnInit {
     // Commission total is summed server-side over the full date range: the table is
     // paginated (max 50/page), so a client-side sum of the loaded rows would be wrong.
     this.loadCommissionTotal();
+    if (this.showExtraCharge()) this.loadExtraChargeTotal();
   }
 
   private loadCommissionTotal(): void {
@@ -157,6 +160,18 @@ export class PlatformDetailComponent implements OnInit {
       .subscribe({
         next: (r) => this.commissionTotal.set(r.total),
         error: () => this.commissionTotal.set(null),
+      });
+  }
+
+  private loadExtraChargeTotal(): void {
+    const id = this.platformId();
+    if (!id) return;
+    this.svc
+      .getExtraChargeTotal(id, this.startDate() || undefined, this.endDate() || undefined)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (r) => this.extraChargeTotal.set(r.total),
+        error: () => this.extraChargeTotal.set(null),
       });
   }
 
