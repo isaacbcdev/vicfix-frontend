@@ -50,7 +50,11 @@ export const routes: Routes = [
         path: 'reports',
         loadComponent: () => import('@features/reports/reports').then((m) => m.ReportsComponent),
       },
-      // Cierre del Día — pending implementation, route removed until ready
+      // Cierre del Día — test harness only, intentionally not in sidebar nav
+      {
+        path: 'close',
+        loadComponent: () => import('@features/close/close').then((m) => m.CloseComponent),
+      },
       {
         path: 'supplies',
         canActivate: [roleGuard(['ROLE_ADMIN', 'ROLE_ROOT'])],

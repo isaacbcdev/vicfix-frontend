@@ -1,0 +1,298 @@
+<div class="p-6 max-w-4xl mx-auto space-y-5">
+
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-semibold text-text-primary">Cierre del Día</h1>
+    <p class="text-sm text-text-secondary mt-0.5">{{ headerDate }}</p>
+  </div>
+
+  <!-- Preview load error -->
+  @if (previewError()) {
+  <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
+    </svg>
+    {{ previewError() }}
+  </div>
+  }
+
+  <!-- Loading skeleton -->
+  @if (loadingPreview()) {
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+    @for (_ of [1,2,3]; track $index) {
+    <div class="bg-white rounded-xl border border-slate-200 p-4 space-y-2 animate-pulse">
+      <div class="h-3 bg-slate-100 rounded w-16"></div>
+      <div class="h-6 bg-slate-100 rounded w-24"></div>
+    </div>
+    }
+  </div>
+  }
+
+  @if (preview(); as p) {
+
+  <!-- Live platform balances -->
+  <section class="space-y-2">
+    <h2 class="text-sm font-semibold text-text-primary">Saldos de plataformas (en vivo)</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+      @for (line of p.platformBalances; track line.platformId) {
+      <div class="bg-white rounded-xl border border-slate-200 border-l-4 border-l-emerald-600 p-4">
+        <p class="text-xs text-text-secondary font-mono">{{ line.platformCode }}</p>
+        <p class="text-lg font-bold text-text-primary leading-tight">{{ line.balance | currencyCop }}</p>
+      </div>
+      }
+    </div>
+  </section>
+
+  <!-- Outstanding Efecty movements -->
+  <section class="space-y-2">
+    <h2 class="text-sm font-semibold text-text-primary">Movimientos Efecty pendientes</h2>
+    @if (p.outstandingEfectyMovements.length === 0) {
+    <div class="flex flex-col items-center gap-2 py-8 bg-white rounded-xl border border-slate-200">
+      <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <p class="text-text-secondary text-sm">Ninguno.</p>
+    </div>
+    } @else {
+    <div class="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
+      @for (m of p.outstandingEfectyMovements; track m.id) {
+      <label class="flex items-center gap-3 px-4 py-3 text-sm cursor-pointer hover:bg-slate-50 transition-colors">
+        <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-accent focus:ring-accent/40"
+          [checked]="resolveEfectyMovementIds().has(m.id)" (change)="toggleEfectyMovement(m.id)" />
+        <div class="flex-1 min-w-0">
+          <p class="text-text-primary font-medium">{{ m.amount | currencyCop }}</p>
+          <p class="text-text-secondary text-xs truncate">
+            {{ m.description || 'Sin descripción' }} · {{ m.createdAt | date:'dd/MM/yyyy' }}
+          </p>
+        </div>
+        <span class="shrink-0 text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+          Marcar devuelto
+        </span>
+      </label>
+      }
+    </div>
+    }
+  </section>
+
+  <!-- Outstanding debts -->
+  <section class="space-y-2">
+    <h2 class="text-sm font-semibold text-text-primary">Deudas pendientes</h2>
+    @if (p.outstandingDebts.length === 0) {
+    <div class="flex flex-col items-center gap-2 py-8 bg-white rounded-xl border border-slate-200">
+      <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <p class="text-text-secondary text-sm">Ninguna.</p>
+    </div>
+    } @else {
+    <div class="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
+      @for (d of p.outstandingDebts; track d.id) {
+      <label class="flex items-center gap-3 px-4 py-3 text-sm cursor-pointer hover:bg-slate-50 transition-colors">
+        <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-accent focus:ring-accent/40"
+          [checked]="resolveDebtIds().has(d.id)" (change)="toggleDebt(d.id)" />
+        <div class="flex-1 min-w-0">
+          <p class="text-text-primary font-medium">
+            {{ d.amount | currencyCop }}
+            <span class="ml-1 text-xs font-normal text-text-secondary">
+              {{ d.debtKind === 'PERSONAL_LOAN' ? 'Préstamo personal' : 'Crédito a cliente' }}
+            </span>
+          </p>
+          <p class="text-text-secondary text-xs truncate">
+            {{ d.description || 'Sin descripción' }} · {{ d.createdAt | date:'dd/MM/yyyy' }}
+          </p>
+        </div>
+        <span class="shrink-0 text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+          Marcar resuelta
+        </span>
+      </label>
+      }
+    </div>
+    }
+  </section>
+
+  }
+
+  <!-- Close data form -->
+  <section class="bg-white rounded-xl border border-slate-200 p-5 space-y-4">
+    <h2 class="text-sm font-semibold text-text-primary">Datos del cierre</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-text-primary mb-1.5">
+          Fecha de cierre <span class="text-red-500">*</span>
+        </label>
+        <input type="date"
+          class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+          [ngModel]="closeDate()" (ngModelChange)="closeDate.set($event)" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-text-primary mb-1.5">
+          Saldo reportado Efecty <span class="text-red-500">*</span>
+        </label>
+        <input type="number"
+          class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+          [ngModel]="efectyReportedBalance()" (ngModelChange)="efectyReportedBalance.set($event)" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-text-primary mb-1.5">
+          Efectivo contado <span class="text-red-500">*</span>
+        </label>
+        <input type="number"
+          class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+          [ngModel]="cashCounted()" (ngModelChange)="cashCounted.set($event)" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-text-primary mb-1.5">Base de caja</label>
+        <input type="number"
+          class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+          [ngModel]="cashBase()" (ngModelChange)="cashBase.set($event)" />
+        <p class="mt-1 text-xs text-text-secondary">Sugerida del último cierre, editable.</p>
+      </div>
+
+      <div class="sm:col-span-2">
+        <label class="block text-sm font-medium text-text-primary mb-1.5">Notas</label>
+        <textarea rows="2" placeholder="Observaciones opcionales..."
+          class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors resize-none"
+          [ngModel]="notes()" (ngModelChange)="notes.set($event)"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- New Efecty movements -->
+  <section class="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
+    <h2 class="text-sm font-semibold text-text-primary">Nuevos movimientos Efecty</h2>
+    @for (row of newEfectyMovements(); track trackByIndex($index); let i = $index) {
+    <div class="flex gap-2 items-center">
+      <input type="number" placeholder="Monto"
+        class="w-36 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+        [ngModel]="row.amount" (ngModelChange)="updateEfectyMovementRow(i, { amount: $event })" />
+      <input type="text" placeholder="Descripción"
+        class="flex-1 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+        [ngModel]="row.description" (ngModelChange)="updateEfectyMovementRow(i, { description: $event })" />
+      <button type="button" (click)="removeEfectyMovementRow(i)"
+        class="shrink-0 p-2 rounded-lg text-text-secondary hover:bg-red-50 hover:text-red-600 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    }
+    <button type="button" (click)="addEfectyMovementRow()"
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-text-secondary hover:bg-slate-50 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      </svg>
+      Agregar movimiento Efecty
+    </button>
+  </section>
+
+  <!-- New debts -->
+  <section class="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
+    <h2 class="text-sm font-semibold text-text-primary">Nuevas deudas</h2>
+    @for (row of newDebts(); track trackByIndex($index); let i = $index) {
+    <div class="flex gap-2 items-center">
+      <select
+        class="w-44 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+        [ngModel]="row.debtKind" (ngModelChange)="updateDebtRow(i, { debtKind: $event })">
+        <option value="PERSONAL_LOAN">Préstamo personal</option>
+        <option value="CUSTOMER_CREDIT">Crédito a cliente</option>
+      </select>
+      <input type="number" placeholder="Monto"
+        class="w-36 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+        [ngModel]="row.amount" (ngModelChange)="updateDebtRow(i, { amount: $event })" />
+      <input type="text" placeholder="Descripción"
+        class="flex-1 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+        [ngModel]="row.description" (ngModelChange)="updateDebtRow(i, { description: $event })" />
+      <button type="button" (click)="removeDebtRow(i)"
+        class="shrink-0 p-2 rounded-lg text-text-secondary hover:bg-red-50 hover:text-red-600 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    }
+    <button type="button" (click)="addDebtRow()"
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-text-secondary hover:bg-slate-50 transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      </svg>
+      Agregar deuda
+    </button>
+  </section>
+
+  <!-- Submit -->
+  <div class="flex items-center gap-3">
+    <button type="button" [disabled]="submitting()" (click)="submit()"
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+      @if (submitting()) {
+      <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+      </svg>
+      }
+      {{ submitting() ? 'Enviando...' : 'Enviar cierre' }}
+    </button>
+  </div>
+
+  @if (submitError()) {
+  <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
+    </svg>
+    {{ submitError() }}
+  </div>
+  }
+
+  <!-- Result -->
+  @if (result(); as r) {
+  <section class="space-y-2">
+    <h2 class="text-sm font-semibold text-text-primary">Resultado del cierre</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+      <div class="rounded-xl border p-4"
+        [class.bg-emerald-50]="diferenciaSeverity() === 'ok'" [class.border-emerald-200]="diferenciaSeverity() === 'ok'"
+        [class.bg-amber-50]="diferenciaSeverity() === 'warning'" [class.border-amber-200]="diferenciaSeverity() === 'warning'"
+        [class.bg-red-50]="diferenciaSeverity() === 'error'" [class.border-red-200]="diferenciaSeverity() === 'error'">
+        <p class="text-xs font-medium text-text-secondary">Diferencia</p>
+        <p class="text-2xl font-bold mt-1"
+          [class.text-emerald-700]="diferenciaSeverity() === 'ok'"
+          [class.text-amber-700]="diferenciaSeverity() === 'warning'"
+          [class.text-red-700]="diferenciaSeverity() === 'error'">
+          {{ r.diferencia | currencyCop }}
+        </p>
+      </div>
+
+      <div class="rounded-xl border p-4"
+        [class.bg-emerald-50]="efectyFlotanteSeverity() === 'ok'" [class.border-emerald-200]="efectyFlotanteSeverity() === 'ok'"
+        [class.bg-amber-50]="efectyFlotanteSeverity() === 'warning'" [class.border-amber-200]="efectyFlotanteSeverity() === 'warning'">
+        <p class="text-xs font-medium text-text-secondary">Efecty flotante</p>
+        <p class="text-2xl font-bold mt-1"
+          [class.text-emerald-700]="efectyFlotanteSeverity() === 'ok'"
+          [class.text-amber-700]="efectyFlotanteSeverity() === 'warning'">
+          {{ r.efectyFlotante | currencyCop }}
+        </p>
+      </div>
+
+      <div class="rounded-xl border p-4"
+        [class.bg-emerald-50]="sobranteRealSeverity() === 'ok'" [class.border-emerald-200]="sobranteRealSeverity() === 'ok'"
+        [class.bg-amber-50]="sobranteRealSeverity() === 'warning'" [class.border-amber-200]="sobranteRealSeverity() === 'warning'"
+        [class.bg-red-50]="sobranteRealSeverity() === 'error'" [class.border-red-200]="sobranteRealSeverity() === 'error'">
+        <p class="text-xs font-medium text-text-secondary">Sobrante real</p>
+        <p class="text-2xl font-bold mt-1"
+          [class.text-emerald-700]="sobranteRealSeverity() === 'ok'"
+          [class.text-amber-700]="sobranteRealSeverity() === 'warning'"
+          [class.text-red-700]="sobranteRealSeverity() === 'error'">
+          {{ r.sobranteReal | currencyCop }}
+        </p>
+      </div>
+
+    </div>
+  </section>
+  }
+
+</div>
