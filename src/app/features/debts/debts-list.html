@@ -1,0 +1,118 @@
+<div class="p-6 space-y-5">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-semibold text-text-primary">Deudas pendientes</h1>
+  </div>
+
+  <!-- Error -->
+  @if (error()) {
+  <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
+    </svg>
+    {{ error() }}
+  </div>
+  }
+
+  <!-- Table card -->
+  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-100 bg-slate-50">
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Tipo</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Descripción</th>
+            <th class="text-left px-4 py-3 font-medium text-text-secondary">Fecha</th>
+            <th class="text-right px-4 py-3 font-medium text-text-secondary">Monto</th>
+            <th class="px-4 py-3"></th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- Loading skeletons -->
+          @if (loading()) {
+          @for (_ of [1,2,3]; track $index) {
+          <tr class="border-b border-slate-50 animate-pulse">
+            <td class="px-4 py-3">
+              <div class="h-5 bg-slate-100 rounded-full w-32"></div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="h-4 bg-slate-100 rounded w-48"></div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="h-4 bg-slate-100 rounded w-24"></div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="h-4 bg-slate-100 rounded w-20 ml-auto"></div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="h-8 bg-slate-100 rounded w-32 ml-auto"></div>
+            </td>
+          </tr>
+          }
+          }
+
+          <!-- Data rows -->
+          @if (!loading()) {
+          @for (d of debts(); track d.id) {
+          <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-3">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                [class.bg-emerald-100]="d.debtKind === 'CUSTOMER_CREDIT'"
+                [class.text-emerald-700]="d.debtKind === 'CUSTOMER_CREDIT'"
+                [class.bg-amber-100]="d.debtKind === 'PERSONAL_LOAN'"
+                [class.text-amber-700]="d.debtKind === 'PERSONAL_LOAN'">
+                {{ kindLabel(d.debtKind) }}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-text-primary">{{ d.description ?? '—' }}</td>
+            <td class="px-4 py-3 text-text-secondary">{{ d.createdAt | date: 'd MMM y' }}</td>
+            <td class="px-4 py-3 text-right font-medium text-text-primary">{{ d.amount | currencyCop }}</td>
+            <td class="px-4 py-3">
+              @if (canResolve()) {
+              <div class="flex justify-end">
+                <button (click)="onResolve(d)" [disabled]="resolvingId() === d.id"
+                  class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-text-secondary hover:text-accent hover:border-accent hover:bg-emerald-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs font-medium">
+                  @if (resolvingId() === d.id) {
+                  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  } @else {
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                  }
+                  Marcar como pagada
+                </button>
+              </div>
+              }
+            </td>
+          </tr>
+          }
+
+          <!-- Empty state -->
+          @empty {
+          <tr>
+            <td colspan="5" class="px-4 py-16 text-center">
+              <div class="flex flex-col items-center gap-3">
+                <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-text-secondary text-sm">No hay deudas pendientes por resolver.</p>
+              </div>
+            </td>
+          </tr>
+          }
+          }
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

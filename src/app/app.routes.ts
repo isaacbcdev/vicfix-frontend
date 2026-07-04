@@ -50,7 +50,11 @@ export const routes: Routes = [
         path: 'reports',
         loadComponent: () => import('@features/reports/reports').then((m) => m.ReportsComponent),
       },
-      // Cierre del Día — test harness only, intentionally not in sidebar nav
+      {
+        path: 'debts',
+        loadComponent: () =>
+          import('@features/debts/debts-list').then((m) => m.DebtsListComponent),
+      },
       {
         path: 'close',
         loadComponent: () => import('@features/close/close').then((m) => m.CloseComponent),
