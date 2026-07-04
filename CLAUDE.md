@@ -53,19 +53,38 @@ That migration is done — this is the live production UI at `www.vicfix.shop`.
 
 ## Screen status
 
-Shipped: Login, Productos (full CRUD), Nueva Venta (POS), Historial de Ventas,
+Shipped: Login, Productos, Nueva Venta (POS), Historial de Ventas,
 Dashboard (platform balances + alerts), Plataformas Bancarias, Reportes
-(5 tabs), Proveedores, Usuarios y Roles.
+(5 tabs), Proveedores, Usuarios y Roles, Cierre del Día (wizard pattern,
+in sidebar nav under Operación).
 
-Not yet built: **Cierre del Día** (wizard pattern) — currently unrouted/hidden
-from nav, not a placeholder stub in production. Don't wire it back into
-routing or the sidebar until it's actually implemented.
+- **Productos**: full CRUD, plus `isService` flag support — service
+  products hide stock/reorder/expiration fields (table, detail modal,
+  product form), are excluded from supply creation (backend guard +
+  frontend filtering), and show a distinct "Servicio" badge wherever
+  product status is displayed. Also has category tabs, status filter
+  pills, an "solo servicios" toggle, and a page-size selector on the
+  product list.
+- **Plataformas Bancarias**: per-platform detail view (balance, "Suficiente"/
+  low-balance indicator, transaction history with Fecha/Operación/Tipo/
+  Monto/Saldo ant./Saldo sig./Comisión/Cargo extra/Referencia columns),
+  manual balance update, manual transaction create/edit/delete, and
+  PTM/Refacil import. Backend maintains a chained `balanceBefore`/
+  `balanceAfter` history — see "Out of scope" below for exactly which
+  actions trigger recalculation.
+
+**Puntored**: not yet integrated as an importable/scraped platform — blocked
+on external account/device verification on Puntored's side, not a code gap.
+Don't attempt to add Puntored import support without confirming access is
+resolved.
 
 ## Design reference
 
 Mockups generated in Claude Design are saved locally in
 `~/vicfix-design-reference/`. Reference them when building. Do not commit
 them to this repo — they are reference material, not source code.
+(Confirm this path is still current before relying on it — verify with the
+project owner if a referenced file isn't found.)
 
 ## Naming conventions
 
@@ -94,6 +113,16 @@ Only `login`/`refresh`/`logout` are excluded from bearer-token stripping —
 not the whole `/api/v1/auth/**` namespace. Don't widen that exclusion without
 checking why it's scoped this tightly (it was a deliberate bug fix).
 
+## Modals
+
+`ModalComponent` accepts `closeOnBackdropClick` (default `true`). Set to
+`false` for destructive dialogs (delete/cancel confirmations) and
+in-progress forms (product edit, supply form, transaction edit/create) —
+anywhere accidental data loss from a stray click matters. Leave default
+`true` for read-only detail/view modals (product detail, supply detail,
+sale detail). Don't add a new `<app-modal>` usage without deciding which
+category it falls into.
+
 ## Out of scope (confirmed decisions, not gaps to silently "fix")
 
 - PDF export — intentionally not in this frontend; the backend's PDF stack
@@ -106,9 +135,20 @@ checking why it's scoped this tightly (it was a deliberate bug fix).
 - Multi-tenant or SaaS features
 - Native mobile app (this is a responsive web app)
 - Expenses tracking — explicitly decided against, not a missing feature.
-- Platform balance auto-computation from every code path — only PTM import,
-  Refacil import, manual transaction CRUD, and NEQUI sale creation trigger
-  balance recalculation. Don't add new auto-recalc triggers without confirming.
+- Platform balance auto-computation from every code path — only these
+  trigger recalculation of the balance chain: PTM import, Refacil import,
+  manual transaction create/edit/delete, NEQUI sale **confirmation** (creates
+  the platform transaction), and NEQUI sale **cancellation** (reverses it and
+  re-chains). Cancelling a NEQUI sale correctly reverses its balance impact —
+  confirmed working. Don't add new auto-recalc triggers without confirming
+  with the backend first; per the backend's own audit, the chain has known
+  gaps (no concurrency lock, zero-seed edge case on inserts before the
+  earliest transaction) — treat any new balance-mutation code path as
+  something to design carefully, not bolt on casually.
+- Commission total (platform-detail) is computed via a full-range frontend
+  fetch (`size=totalElements`), not a backend aggregate — fine at current
+  volume, revisit if any platform's transaction count grows large enough to
+  make that fetch expensive.
 
 ---
 
@@ -134,6 +174,12 @@ Don't assume. Don't hide confusion. Surface tradeoffs.
   Observable + `toSignal()`, default to: HTTP streams are Observables,
   component state is signals (see rule 3 below) — but say which you're
   choosing and why if it's not obvious.
+- If a request touches platform balances or Nequi sale sync, read the
+  backend's `PlatformServiceImpl` and its own CLAUDE.md first — this is the
+  most intricate and currently under-tested logic in the system (per the
+  backend audit: zero direct tests on the chain recalculation, and known
+  edge cases around zero-seeding and concurrency). Don't assume frontend
+  changes here are purely cosmetic.
 
 ### 2. Simplicity First
 
