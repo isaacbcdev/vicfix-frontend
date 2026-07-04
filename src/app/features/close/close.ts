@@ -1,24 +1,20 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 import { DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { DailyCloseService } from './daily-close-api';
-import {
-  DailyClose,
-  DailyClosePreview,
-  DebtKind,
-  NewDebtEntryRequest,
-  NewEfectyMovementRequest,
-} from './close.models';
+import { DenominationCounterComponent } from './denomination-counter/denomination-counter';
+import { DailyClose, DailyClosePreview, DebtKind, NewDebtEntryRequest } from './close.models';
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
 export type StatSeverity = 'ok' | 'warning' | 'error';
+
+type CounterId = 'general' | 'efecty';
 
 /**
  * Diferencia/sobrante are cash-count mismatches in COP with no decimals — a few hundred
@@ -32,14 +28,9 @@ function severityForBalance(value: number): StatSeverity {
   return 'error';
 }
 
-/** Efecty float is informational (money already counted elsewhere), never itself an error. */
-function severityForFloat(value: number): StatSeverity {
-  return value <= 0 ? 'ok' : 'warning';
-}
-
 @Component({
   selector: 'app-close',
-  imports: [FormsModule, CurrencyCopPipe, DatePipe],
+  imports: [FormsModule, CurrencyCopPipe, DenominationCounterComponent],
   templateUrl: './close.html',
 })
 export class CloseComponent implements OnInit {
@@ -52,14 +43,13 @@ export class CloseComponent implements OnInit {
 
   protected closeDate = signal(today());
   protected efectyReportedBalance = signal<number | null>(null);
+  protected efectyPileCounted = signal<number | null>(null);
   protected cashCounted = signal<number | null>(null);
   protected cashBase = signal<number | null>(null);
   protected notes = signal('');
 
-  protected resolveEfectyMovementIds = signal<Set<number>>(new Set());
-  protected resolveDebtIds = signal<Set<number>>(new Set());
+  protected showDenominationCounter = signal(false);
 
-  protected newEfectyMovements = signal<NewEfectyMovementRequest[]>([]);
   protected newDebts = signal<NewDebtEntryRequest[]>([]);
 
   protected submitting = signal(false);
@@ -70,11 +60,26 @@ export class CloseComponent implements OnInit {
     .toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     .replace(/^\p{L}/u, (c) => c.toUpperCase());
 
+  // Cash-denomination counters (frontend-only; never persisted). The General counter drives
+  // the `cashCounted` field; the Efecty counter drives the `efectyPileCounted` field.
+  protected readonly counterTabs: { id: CounterId; label: string }[] = [
+    { id: 'general', label: 'General' },
+    { id: 'efecty', label: 'Efecty' },
+  ];
+  protected readonly activeCounter = signal<CounterId>('general');
+
+  protected readonly efectyGapPreview = computed(
+    () => (this.efectyPileCounted() ?? 0) - (this.efectyReportedBalance() ?? 0),
+  );
+  protected readonly efectyGapPreviewSeverity = computed<StatSeverity>(() =>
+    severityForBalance(this.efectyGapPreview()),
+  );
+
   protected readonly diferenciaSeverity = computed<StatSeverity>(() =>
     severityForBalance(this.result()?.diferencia ?? 0),
   );
-  protected readonly efectyFlotanteSeverity = computed<StatSeverity>(() =>
-    severityForFloat(this.result()?.efectyFlotante ?? 0),
+  protected readonly efectyGapSeverity = computed<StatSeverity>(() =>
+    severityForBalance(this.result()?.efectyGap ?? 0),
   );
   protected readonly sobranteRealSeverity = computed<StatSeverity>(() =>
     severityForBalance(this.result()?.sobranteReal ?? 0),
@@ -105,31 +110,6 @@ export class CloseComponent implements OnInit {
       });
   }
 
-  protected toggleEfectyMovement(id: number): void {
-    const set = new Set(this.resolveEfectyMovementIds());
-    if (set.has(id)) set.delete(id);
-    else set.add(id);
-    this.resolveEfectyMovementIds.set(set);
-  }
-
-  protected toggleDebt(id: number): void {
-    const set = new Set(this.resolveDebtIds());
-    if (set.has(id)) set.delete(id);
-    else set.add(id);
-    this.resolveDebtIds.set(set);
-  }
-
-  protected addEfectyMovementRow(): void {
-    this.newEfectyMovements.set([
-      ...this.newEfectyMovements(),
-      { amount: 0, description: '' },
-    ]);
-  }
-
-  protected removeEfectyMovementRow(index: number): void {
-    this.newEfectyMovements.set(this.newEfectyMovements().filter((_, i) => i !== index));
-  }
-
   protected addDebtRow(): void {
     this.newDebts.set([
       ...this.newDebts(),
@@ -139,12 +119,6 @@ export class CloseComponent implements OnInit {
 
   protected removeDebtRow(index: number): void {
     this.newDebts.set(this.newDebts().filter((_, i) => i !== index));
-  }
-
-  protected updateEfectyMovementRow(index: number, patch: Partial<NewEfectyMovementRequest>): void {
-    const rows = [...this.newEfectyMovements()];
-    rows[index] = { ...rows[index], ...patch };
-    this.newEfectyMovements.set(rows);
   }
 
   protected updateDebtRow(index: number, patch: Partial<NewDebtEntryRequest>): void {
@@ -162,13 +136,11 @@ export class CloseComponent implements OnInit {
     const req = {
       closeDate: this.closeDate(),
       efectyReportedBalance: this.efectyReportedBalance() ?? 0,
+      efectyPileCounted: this.efectyPileCounted() ?? 0,
       cashCounted: this.cashCounted() ?? 0,
       cashBase: this.cashBase(),
       notes: this.notes() || null,
-      newEfectyMovements: this.newEfectyMovements(),
-      resolveEfectyMovementIds: [...this.resolveEfectyMovementIds()],
       newDebts: this.newDebts(),
-      resolveDebtIds: [...this.resolveDebtIds()],
     };
 
     this.svc

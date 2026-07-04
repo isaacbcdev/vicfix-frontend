@@ -1,0 +1,26 @@
+<div class="space-y-2">
+
+  <!-- Column headers -->
+  <div class="flex items-center gap-3 px-1 pb-1 text-xs font-medium text-text-secondary">
+    <span class="w-24">Denominación</span>
+    <span class="w-24">Cantidad</span>
+    <span class="flex-1 text-right">Total</span>
+  </div>
+
+  @for (denom of denominations; track denom) {
+  <div class="flex items-center gap-3">
+    <span class="w-24 text-sm font-medium text-text-primary tabular-nums">{{ denom | currencyCop }}</span>
+    <input type="number" min="0" step="1" placeholder="0"
+      class="w-24 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+      [ngModel]="quantities()[denom] || null" (ngModelChange)="setQuantity(denom, $event)" />
+    <span class="flex-1 text-right text-sm text-text-secondary tabular-nums">{{ lineTotal(denom) | currencyCop }}</span>
+  </div>
+  }
+
+  <!-- Running grand total -->
+  <div class="flex items-center justify-between pt-3 mt-1 border-t border-slate-200">
+    <span class="text-sm font-semibold text-text-primary">Total contado</span>
+    <span class="text-lg font-bold text-text-primary tabular-nums">{{ grandTotal() | currencyCop }}</span>
+  </div>
+
+</div>
