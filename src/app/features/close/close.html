@@ -44,6 +44,28 @@
     </div>
   </section>
 
+  <!-- Outstanding debts from previous closes (read-only) -->
+  <section class="bg-white rounded-xl border border-slate-200 p-5 space-y-4">
+    <h2 class="text-sm font-semibold text-text-primary">Pendientes de cierres anteriores</h2>
+    @for (kind of debtKindOrder; track kind) {
+    <div class="space-y-1.5">
+      <p class="text-xs font-medium text-text-secondary">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+          [class]="debtKinds[kind].badgeClass">{{ debtKinds[kind].label }}</span>
+        <span class="ml-1">· {{ debtKinds[kind].hint }}</span>
+      </p>
+      @for (d of outstandingByKind()[kind]; track d.id) {
+      <div class="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-3 py-2">
+        <span class="text-sm text-text-primary min-w-0 truncate">{{ d.description ?? '—' }}</span>
+        <span class="text-sm font-medium text-text-primary shrink-0">{{ d.amount | currencyCop }}</span>
+      </div>
+      } @empty {
+      <p class="text-sm text-text-secondary">Nada pendiente.</p>
+      }
+    </div>
+    }
+  </section>
+
   }
 
   <!-- Close data form -->
@@ -166,39 +188,40 @@
     }
   </section>
 
-  <!-- New debts -->
+  <!-- New debts: one section per kind; the section defines the kind -->
+  @for (kind of debtKindOrder; track kind) {
   <section class="bg-white rounded-xl border border-slate-200 p-5 space-y-3">
-    <h2 class="text-sm font-semibold text-text-primary">Nuevas deudas</h2>
-    @for (row of newDebts(); track trackByIndex($index); let i = $index) {
+    <h2 class="text-sm font-semibold text-text-primary">
+      {{ debtKinds[kind].label }}
+      <span class="font-normal text-text-secondary">· {{ debtKinds[kind].hint }}</span>
+    </h2>
+    @for (item of newDebtsByKind()[kind]; track item.index) {
     <div class="flex gap-2 items-center">
-      <select
-        class="w-44 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
-        [ngModel]="row.debtKind" (ngModelChange)="updateDebtRow(i, { debtKind: $event })">
-        <option value="PERSONAL_LOAN">Préstamo personal</option>
-        <option value="CUSTOMER_CREDIT">Crédito a cliente</option>
-      </select>
       <input type="number" placeholder="Monto"
         class="w-36 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
-        [ngModel]="row.amount" (ngModelChange)="updateDebtRow(i, { amount: $event })" />
+        [ngModel]="item.row.amount" (ngModelChange)="updateDebtRow(item.index, { amount: $event })" />
       <input type="text" placeholder="Descripción"
         class="flex-1 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
-        [ngModel]="row.description" (ngModelChange)="updateDebtRow(i, { description: $event })" />
-      <button type="button" (click)="removeDebtRow(i)"
+        [ngModel]="item.row.description" (ngModelChange)="updateDebtRow(item.index, { description: $event })" />
+      <button type="button" (click)="removeDebtRow(item.index)"
         class="shrink-0 p-2 rounded-lg text-text-secondary hover:bg-red-50 hover:text-red-600 transition-colors">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
     </div>
+    } @empty {
+    <p class="text-sm text-text-secondary">No hay registros nuevos en este cierre.</p>
     }
-    <button type="button" (click)="addDebtRow()"
+    <button type="button" (click)="addDebtRow(kind)"
       class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-text-secondary hover:bg-slate-50 transition-colors">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
       </svg>
-      Agregar deuda
+      Agregar {{ debtKinds[kind].label.toLowerCase() }}
     </button>
   </section>
+  }
 
   <!-- Submit -->
   <div class="flex items-center gap-3">

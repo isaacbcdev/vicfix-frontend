@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -6,13 +6,9 @@ import { AuthService } from '@auth/auth-api';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { ModalComponent } from '@shared/ui/modal/modal';
 import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
+import { DEBT_KINDS } from '@shared/models/debt-kind';
 import { DebtsService } from './debts-api';
 import { DebtEntry } from './debts.models';
-
-const KIND_LABELS: Record<DebtEntry['debtKind'], string> = {
-  CUSTOMER_CREDIT: 'Crédito cliente',
-  PERSONAL_LOAN: 'Préstamo personal',
-};
 
 @Component({
   selector: 'app-debts-list',
@@ -34,6 +30,12 @@ export class DebtsListComponent implements OnInit {
   protected resolveModalOpen = signal(false);
   protected resolveTarget = signal<DebtEntry | null>(null);
   protected resolutionNote = signal('');
+
+  protected readonly debtKinds = DEBT_KINDS;
+  protected readonly resolveMeta = computed(() => {
+    const debt = this.resolveTarget();
+    return debt ? DEBT_KINDS[debt.debtKind] : null;
+  });
 
   ngOnInit(): void {
     this.loadDebts();
@@ -57,10 +59,6 @@ export class DebtsListComponent implements OnInit {
         this.loading.set(false);
       },
     });
-  }
-
-  protected kindLabel(kind: DebtEntry['debtKind']): string {
-    return KIND_LABELS[kind];
   }
 
   protected canResolve(): boolean {
@@ -114,7 +112,7 @@ export class DebtsListComponent implements OnInit {
     const confirmed = await this.confirmDialog.confirm({
       title: 'Eliminar deuda',
       message:
-        'Esta acción eliminará la deuda permanentemente. Úsala solo si fue creada por error — si ya fue pagada, usa "Marcar como pagada" en su lugar.',
+        `Esta acción eliminará la deuda permanentemente. Úsala solo si fue creada por error — si ya se saldó, usa "${DEBT_KINDS[debt.debtKind].markPaidAction}" en su lugar.`,
       confirmLabel: 'Eliminar',
       variant: 'danger',
     });

@@ -122,13 +122,11 @@
             <div class="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-3 py-2">
               <div class="min-w-0">
                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
-                  [class.bg-emerald-100]="d.debtKind === 'CUSTOMER_CREDIT'"
-                  [class.text-emerald-700]="d.debtKind === 'CUSTOMER_CREDIT'"
-                  [class.bg-amber-100]="d.debtKind === 'PERSONAL_LOAN'"
-                  [class.text-amber-700]="d.debtKind === 'PERSONAL_LOAN'">
-                  {{ kindLabel(d.debtKind) }}
+                  [class]="debtKinds[d.debtKind].badgeClass">
+                  {{ debtKinds[d.debtKind].label }}
                 </span>
                 <span class="ml-2 text-sm text-text-primary">{{ d.description ?? '—' }}</span>
+                <p class="text-xs text-text-secondary mt-0.5">{{ debtKinds[d.debtKind].hint }}</p>
               </div>
               <span class="text-sm font-medium text-text-primary shrink-0">{{ d.amount | currencyCop }}</span>
             </div>

@@ -4,9 +4,16 @@ import { DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
+import { DEBT_KIND_ORDER, DEBT_KINDS } from '@shared/models/debt-kind';
 import { DailyCloseService } from './daily-close-api';
 import { DenominationCounterComponent } from './denomination-counter/denomination-counter';
-import { DailyClose, DailyClosePreview, DebtKind, NewDebtEntryRequest } from './close.models';
+import {
+  DailyClose,
+  DailyClosePreview,
+  DebtEntry,
+  DebtKind,
+  NewDebtEntryRequest,
+} from './close.models';
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);
@@ -51,6 +58,27 @@ export class CloseComponent implements OnInit {
   protected showDenominationCounter = signal(false);
 
   protected newDebts = signal<NewDebtEntryRequest[]>([]);
+
+  protected readonly debtKinds = DEBT_KINDS;
+  protected readonly debtKindOrder = DEBT_KIND_ORDER;
+
+  // Rows live in one array (that's what the API takes) but render in one section per kind;
+  // `index` points back into `newDebts` for update/remove.
+  protected readonly newDebtsByKind = computed(() => {
+    const groups: Record<DebtKind, { row: NewDebtEntryRequest; index: number }[]> = {
+      CUSTOMER_CREDIT: [],
+      PERSONAL_LOAN: [],
+    };
+    this.newDebts().forEach((row, index) => groups[row.debtKind].push({ row, index }));
+    return groups;
+  });
+
+  // Read-only: debts still open from previous closes, grouped like the new-debt sections.
+  protected readonly outstandingByKind = computed(() => {
+    const groups: Record<DebtKind, DebtEntry[]> = { CUSTOMER_CREDIT: [], PERSONAL_LOAN: [] };
+    for (const d of this.preview()?.outstandingDebts ?? []) groups[d.debtKind].push(d);
+    return groups;
+  });
 
   protected submitting = signal(false);
   protected submitError = signal<string | null>(null);
@@ -110,11 +138,8 @@ export class CloseComponent implements OnInit {
       });
   }
 
-  protected addDebtRow(): void {
-    this.newDebts.set([
-      ...this.newDebts(),
-      { debtKind: 'PERSONAL_LOAN' as DebtKind, amount: 0, description: '' },
-    ]);
+  protected addDebtRow(debtKind: DebtKind): void {
+    this.newDebts.set([...this.newDebts(), { debtKind, amount: 0, description: '' }]);
   }
 
   protected removeDebtRow(index: number): void {
@@ -158,9 +183,5 @@ export class CloseComponent implements OnInit {
           this.submitError.set(msg ?? 'No se pudo enviar el cierre. Intenta de nuevo.');
         },
       });
-  }
-
-  protected trackByIndex(index: number): number {
-    return index;
   }
 }

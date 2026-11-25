@@ -4,14 +4,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '@auth/auth-api';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
+import { DEBT_KINDS } from '@shared/models/debt-kind';
 import { DailyCloseService } from '../daily-close-api';
 import { severityForBalance } from '../close';
-import { DailyClose, DebtKind } from '../close.models';
-
-const KIND_LABELS: Record<DebtKind, string> = {
-  CUSTOMER_CREDIT: 'Crédito cliente',
-  PERSONAL_LOAN: 'Préstamo personal',
-};
+import { DailyClose } from '../close.models';
 
 @Component({
   selector: 'app-close-history',
@@ -26,6 +22,7 @@ export class CloseHistoryComponent implements OnInit {
   private readonly locale = inject(LOCALE_ID);
 
   protected readonly severityForBalance = severityForBalance;
+  protected readonly debtKinds = DEBT_KINDS;
 
   protected closes = signal<DailyClose[]>([]);
   protected loading = signal(false);
@@ -57,10 +54,6 @@ export class CloseHistoryComponent implements OnInit {
 
   protected toggleExpanded(id: number): void {
     this.expandedId.set(this.expandedId() === id ? null : id);
-  }
-
-  protected kindLabel(kind: DebtKind): string {
-    return KIND_LABELS[kind];
   }
 
   protected canDelete(): boolean {

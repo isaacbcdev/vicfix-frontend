@@ -62,18 +62,16 @@
           <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors" [class.opacity-60]="d.resolved">
             <td class="px-4 py-3">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                [class.bg-emerald-100]="d.debtKind === 'CUSTOMER_CREDIT'"
-                [class.text-emerald-700]="d.debtKind === 'CUSTOMER_CREDIT'"
-                [class.bg-amber-100]="d.debtKind === 'PERSONAL_LOAN'"
-                [class.text-amber-700]="d.debtKind === 'PERSONAL_LOAN'">
-                {{ kindLabel(d.debtKind) }}
+                [class]="debtKinds[d.debtKind].badgeClass">
+                {{ debtKinds[d.debtKind].label }}
               </span>
               @if (d.resolved) {
               <span
                 class="ml-1.5 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-text-secondary">
-                Pagada
+                {{ debtKinds[d.debtKind].paidBadge }}
               </span>
               }
+              <p class="text-xs text-text-secondary mt-1">{{ debtKinds[d.debtKind].hint }}</p>
             </td>
             <td class="px-4 py-3 text-text-primary">
               <p>{{ d.description ?? '—' }}</p>
@@ -81,7 +79,7 @@
               <p class="text-xs text-text-secondary mt-0.5">Nota: {{ d.resolutionNote }}</p>
               }
               @if (d.resolved && d.resolvedAt) {
-              <p class="text-xs text-text-secondary mt-0.5">Pagada el {{ d.resolvedAt | date: 'd MMM y' }}</p>
+              <p class="text-xs text-text-secondary mt-0.5">{{ debtKinds[d.debtKind].paidOnPrefix }} {{ d.resolvedAt | date: 'd MMM y' }}</p>
               }
             </td>
             <td class="px-4 py-3 text-text-secondary">{{ d.createdAt | date: 'd MMM y' }}</td>
@@ -102,7 +100,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                   </svg>
                   }
-                  Marcar como pagada
+                  {{ debtKinds[d.debtKind].markPaidAction }}
                 </button>
                 }
                 <button (click)="deleteDebt(d)" [disabled]="resolvingId() === d.id || deletingId() === d.id"
@@ -154,13 +152,14 @@
 </div>
 
 <!-- Resolve dialog -->
-<app-modal [isOpen]="resolveModalOpen()" [closeOnBackdropClick]="false" title="Marcar deuda como pagada"
+<app-modal [isOpen]="resolveModalOpen()" [closeOnBackdropClick]="false"
+  [title]="resolveMeta()?.markPaidTitle ?? ''"
   (closed)="closeResolveModal()">
   @if (resolveTarget(); as debt) {
   <div class="px-5 py-4 space-y-4">
     <p class="text-sm text-text-secondary">
-      ¿Marcar esta {{ kindLabel(debt.debtKind).toLowerCase() }} de {{ debt.amount | currencyCop }} como pagada? Esta
-      acción no se puede deshacer.
+      {{ debtKinds[debt.debtKind].markPaidQuestion }} {{ debt.amount | currencyCop }}? Esta acción no se puede
+      deshacer.
     </p>
     <div>
       <label class="block text-sm font-medium text-text-primary mb-1.5">Nota (opcional)</label>
@@ -181,7 +180,7 @@
       }
       <button type="button" (click)="confirmResolve()"
         class="px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-emerald-700 transition-colors">
-        Marcar como pagada
+        {{ debtKinds[debt.debtKind].markPaidAction }}
       </button>
     </div>
   </div>
