@@ -19,8 +19,8 @@ function firstDayOfCurrentMonth(): string {
 }
 
 function today(): string {
-  const d = new Date();
-  return d.toISOString().slice(0, 10);
+  // Bogota calendar date (YYYY-MM-DD); toISOString() is UTC and rolls over at 7 p.m. local.
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Bogota' });
 }
 
 @Component({

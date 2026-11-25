@@ -49,7 +49,8 @@ export class SupplyFormComponent {
       this.productsService.getProducts(params.page, params.size, params.query),
   });
 
-  readonly today = new Date().toISOString().split('T')[0];
+  // Bogota calendar date (YYYY-MM-DD); toISOString() is UTC and rolls over at 7 p.m. local.
+  readonly today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Bogota' });
 
   protected form = this.fb.group({
     supplierId: [null as number | null, Validators.required],

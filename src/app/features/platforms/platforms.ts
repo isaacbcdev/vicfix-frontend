@@ -11,7 +11,8 @@ import { PlatformsService } from './platforms-api';
 import { EfectyDailyClose, Platform } from './platforms.models';
 
 function today(): string {
-  return new Date().toISOString().slice(0, 10);
+  // Bogota calendar date (YYYY-MM-DD); toISOString() is UTC and rolls over at 7 p.m. local.
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Bogota' });
 }
 
 @Component({
