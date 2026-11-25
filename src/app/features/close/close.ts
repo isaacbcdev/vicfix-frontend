@@ -6,8 +6,14 @@ import { finalize } from 'rxjs';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { DEBT_KIND_ORDER, DEBT_KINDS } from '@shared/models/debt-kind';
 import { DailyCloseService } from './daily-close-api';
-import { DenominationCounterComponent } from './denomination-counter/denomination-counter';
 import {
+  countTotal,
+  DenominationCounterComponent,
+  DenominationQuantities,
+  toCountRequests,
+} from './denomination-counter/denomination-counter';
+import {
+  CreateDailyCloseRequest,
   DailyClose,
   DailyClosePreview,
   DebtEntry,
@@ -50,12 +56,17 @@ export class CloseComponent implements OnInit {
 
   protected closeDate = signal(today());
   protected efectyReportedBalance = signal<number | null>(null);
-  protected efectyPileCounted = signal<number | null>(null);
-  protected cashCounted = signal<number | null>(null);
   protected cashBase = signal<number | null>(null);
   protected notes = signal('');
 
-  protected showDenominationCounter = signal(false);
+  // Counting is mandatory: the backend derives cashCounted/efectyPileCounted from these.
+  protected cashQuantities = signal<DenominationQuantities>({});
+  protected efectyQuantities = signal<DenominationQuantities>({});
+  private readonly cashTotal = computed(() => countTotal(this.cashQuantities()));
+  private readonly efectyTotal = computed(() => countTotal(this.efectyQuantities()));
+  protected readonly bothCountsZero = computed(
+    () => this.cashTotal() === 0 && this.efectyTotal() === 0,
+  );
 
   protected newDebts = signal<NewDebtEntryRequest[]>([]);
 
@@ -88,8 +99,7 @@ export class CloseComponent implements OnInit {
     .toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     .replace(/^\p{L}/u, (c) => c.toUpperCase());
 
-  // Cash-denomination counters (frontend-only; never persisted). The General counter drives
-  // the `cashCounted` field; the Efecty counter drives the `efectyPileCounted` field.
+  // Cash-denomination counters: General = cash pile, Efecty = Efecty pile.
   protected readonly counterTabs: { id: CounterId; label: string }[] = [
     { id: 'general', label: 'General' },
     { id: 'efecty', label: 'Efecty' },
@@ -97,7 +107,7 @@ export class CloseComponent implements OnInit {
   protected readonly activeCounter = signal<CounterId>('general');
 
   protected readonly efectyGapPreview = computed(
-    () => (this.efectyPileCounted() ?? 0) - (this.efectyReportedBalance() ?? 0),
+    () => this.efectyTotal() - (this.efectyReportedBalance() ?? 0),
   );
   protected readonly efectyGapPreviewSeverity = computed<StatSeverity>(() =>
     severityForBalance(this.efectyGapPreview()),
@@ -158,11 +168,11 @@ export class CloseComponent implements OnInit {
     this.submitError.set(null);
     this.result.set(null);
 
-    const req = {
+    const req: CreateDailyCloseRequest = {
       closeDate: this.closeDate(),
       efectyReportedBalance: this.efectyReportedBalance() ?? 0,
-      efectyPileCounted: this.efectyPileCounted() ?? 0,
-      cashCounted: this.cashCounted() ?? 0,
+      cashCounts: toCountRequests(this.cashQuantities()),
+      efectyCounts: toCountRequests(this.efectyQuantities()),
       cashBase: this.cashBase(),
       notes: this.notes() || null,
       newDebts: this.newDebts(),

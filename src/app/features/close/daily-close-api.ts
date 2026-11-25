@@ -2,7 +2,12 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
-import { CreateDailyCloseRequest, DailyClose, DailyClosePreview } from './close.models';
+import {
+  CreateDailyCloseRequest,
+  DailyClose,
+  DailyClosePreview,
+  UpdateDailyCloseRequest,
+} from './close.models';
 
 const base = `${environment.apiUrl}/api/v1/daily-close`;
 
@@ -24,6 +29,10 @@ export class DailyCloseService {
 
   getAll(): Observable<DailyClose[]> {
     return this.http.get<DailyClose[]>(base);
+  }
+
+  update(closeDate: string, req: UpdateDailyCloseRequest): Observable<DailyClose> {
+    return this.http.put<DailyClose>(`${base}/${closeDate}`, req);
   }
 
   delete(closeDate: string): Observable<void> {

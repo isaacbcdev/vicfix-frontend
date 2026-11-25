@@ -1,5 +1,6 @@
-import { Component, DestroyRef, inject, LOCALE_ID, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, LOCALE_ID, OnInit, signal } from '@angular/core';
 import { DatePipe, formatDate } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '@auth/auth-api';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
@@ -7,11 +8,22 @@ import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.s
 import { DEBT_KINDS } from '@shared/models/debt-kind';
 import { DailyCloseService } from '../daily-close-api';
 import { severityForBalance } from '../close';
-import { DailyClose } from '../close.models';
+import { DailyClose, DenominationCount } from '../close.models';
+import { CloseEditComponent } from './close-edit';
+
+/** Local (not UTC) current month as `YYYY-MM`, matching `<input type="month">`. */
+function currentMonth(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function hasNoCounts(counts: DenominationCount[] | null | undefined): boolean {
+  return (counts ?? []).every((c) => c.quantity === 0);
+}
 
 @Component({
   selector: 'app-close-history',
-  imports: [DatePipe, CurrencyCopPipe],
+  imports: [DatePipe, FormsModule, CurrencyCopPipe, CloseEditComponent],
   templateUrl: './close-history.html',
 })
 export class CloseHistoryComponent implements OnInit {
@@ -29,6 +41,17 @@ export class CloseHistoryComponent implements OnInit {
   protected error = signal<string | null>(null);
   protected expandedId = signal<number | null>(null);
   protected deletingId = signal<number | null>(null);
+  protected editing = signal<DailyClose | null>(null);
+
+  // GET /daily-close returns every close; filter by month client-side for now.
+  protected month = signal(currentMonth());
+  protected readonly filteredCloses = computed(() => {
+    const month = this.month();
+    return month ? this.closes().filter((c) => c.closeDate.startsWith(month)) : this.closes();
+  });
+  protected readonly monthLabel = computed(() =>
+    this.month() ? formatDate(`${this.month()}-01T00:00:00`, 'MMMM y', this.locale) : '',
+  );
 
   ngOnInit(): void {
     this.loadCloses();
@@ -54,6 +77,22 @@ export class CloseHistoryComponent implements OnInit {
 
   protected toggleExpanded(id: number): void {
     this.expandedId.set(this.expandedId() === id ? null : id);
+  }
+
+  /**
+   * Closes saved before denomination counts existed (V20) have totals but all-zero counts.
+   * Editing them would replace the original totals with a recount that can't be done anymore.
+   */
+  protected isPreCountClose(c: DailyClose): boolean {
+    return (
+      (c.cashCounted > 0 && hasNoCounts(c.cashCounts)) ||
+      (c.efectyPileCounted > 0 && hasNoCounts(c.efectyCounts))
+    );
+  }
+
+  protected onSaved(updated: DailyClose): void {
+    this.closes.set(this.closes().map((c) => (c.id === updated.id ? updated : c)));
+    this.editing.set(updated);
   }
 
   protected canDelete(): boolean {

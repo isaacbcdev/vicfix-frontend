@@ -84,29 +84,11 @@
 
       <div>
         <label class="block text-sm font-medium text-text-primary mb-1.5">
-          Efectivo contado <span class="text-red-500">*</span>
-        </label>
-        <input type="number"
-          class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
-          [ngModel]="cashCounted()" (ngModelChange)="cashCounted.set($event)" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-text-primary mb-1.5">
           Saldo reportado Efecty <span class="text-red-500">*</span>
         </label>
         <input type="number"
           class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
           [ngModel]="efectyReportedBalance()" (ngModelChange)="efectyReportedBalance.set($event)" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-text-primary mb-1.5">
-          Efectivo Efecty <span class="text-red-500">*</span>
-        </label>
-        <input type="number"
-          class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
-          [ngModel]="efectyPileCounted()" (ngModelChange)="efectyPileCounted.set($event)" />
       </div>
     </div>
 
@@ -142,19 +124,12 @@
     </div>
   </section>
 
-  <!-- Cash denomination counter (optional aid, collapsed by default) -->
-  <section class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-    <button type="button" (click)="showDenominationCounter.set(!showDenominationCounter())"
-      class="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-slate-50 transition-colors">
-      <span class="text-sm font-semibold text-text-primary">Calculadora de denominaciones (opcional)</span>
-      <svg class="w-4 h-4 text-text-secondary transition-transform" [class.rotate-180]="showDenominationCounter()"
-        fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-      </svg>
-    </button>
-
-    @if (showDenominationCounter()) {
-    <div class="px-5 pb-5 space-y-4 border-t border-slate-200 pt-4">
+  <!-- Cash count by denomination (required; totals are computed by the backend) -->
+  <section class="bg-white rounded-xl border border-slate-200 p-5 space-y-4">
+    <h2 class="text-sm font-semibold text-text-primary">
+      Conteo de efectivo <span class="text-red-500">*</span>
+    </h2>
+    <div class="space-y-4">
       <!-- Counter tabs -->
       <div class="border-b border-slate-200">
         <nav class="flex gap-0 -mb-px">
@@ -172,20 +147,13 @@
 
       <!-- Both stay mounted (hidden, not destroyed) so switching tabs keeps the counts -->
       <div [class.hidden]="activeCounter() !== 'general'">
-        <app-denomination-counter (totalChange)="cashCounted.set($event)" />
-        <p class="mt-3 text-xs text-text-secondary">
-          Este total llena automáticamente “Efectivo contado”.
-        </p>
+        <app-denomination-counter [(quantities)]="cashQuantities" />
       </div>
 
       <div [class.hidden]="activeCounter() !== 'efecty'">
-        <app-denomination-counter (totalChange)="efectyPileCounted.set($event)" />
-        <p class="mt-3 text-xs text-text-secondary">
-          Este total llena automáticamente “Efectivo Efecty”.
-        </p>
+        <app-denomination-counter [(quantities)]="efectyQuantities" />
       </div>
     </div>
-    }
   </section>
 
   <!-- New debts: one section per kind; the section defines the kind -->
@@ -235,6 +203,9 @@
       }
       {{ submitting() ? 'Enviando...' : 'Enviar cierre' }}
     </button>
+    @if (bothCountsZero()) {
+    <p class="text-sm font-medium text-amber-700">Ambos conteos están en $0</p>
+    }
   </div>
 
   @if (submitError()) {

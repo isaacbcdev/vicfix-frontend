@@ -33,14 +33,34 @@ export interface NewDebtEntryRequest {
   description: string | null;
 }
 
+export interface DenominationCountRequest {
+  denomination: number;
+  quantity: number;
+}
+
+/** One saved line of a pile; the backend returns all 11 denominations, high to low. */
+export interface DenominationCount {
+  denomination: number;
+  quantity: number;
+  subtotal: number;
+}
+
 export interface CreateDailyCloseRequest {
   closeDate: string;
   efectyReportedBalance: number;
-  efectyPileCounted: number;
-  cashCounted: number;
+  cashCounts: DenominationCountRequest[];
+  efectyCounts: DenominationCountRequest[];
   cashBase: number | null;
   notes: string | null;
   newDebts: NewDebtEntryRequest[];
+}
+
+/** Full replacement (PUT): omitting `notes` clears them, so always send the current value. */
+export interface UpdateDailyCloseRequest {
+  efectyReportedBalance: number;
+  cashCounts: DenominationCountRequest[];
+  efectyCounts: DenominationCountRequest[];
+  notes: string | null;
 }
 
 export interface DailyClose {
@@ -57,7 +77,15 @@ export interface DailyClose {
   notes: string | null;
   createdBy: string;
   createdAt: string;
+  updatedAt: string | null;
+  updatedBy: string | null;
   platformBalances: PlatformBalanceLine[];
+  cashCounts: DenominationCount[];
+  efectyCounts: DenominationCount[];
+  /**
+   * TODAY's outstanding debts, not the ones outstanding on `closeDate` — the backend attaches
+   * the current list to every close. Never present it as historical (history/edit views).
+   */
   outstandingDebts: DebtEntry[];
   debtsCreatedInClose: DebtEntry[];
 }
