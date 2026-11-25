@@ -59,9 +59,3 @@ export interface CreateTransactionRequest {
   phoneNumber?: string;
   notes?: string;
 }
-
-export interface CreateEfectyCloseRequest {
-  closeDate: string;
-  closingBalance: number;
-  notes?: string;
-}

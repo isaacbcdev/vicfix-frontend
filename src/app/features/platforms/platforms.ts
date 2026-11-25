@@ -10,11 +10,6 @@ import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { PlatformsService } from './platforms-api';
 import { EfectyDailyClose, Platform } from './platforms.models';
 
-function today(): string {
-  // Bogota calendar date (YYYY-MM-DD); toISOString() is UTC and rolls over at 7 p.m. local.
-  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Bogota' });
-}
-
 @Component({
   selector: 'app-platforms',
   imports: [ReactiveFormsModule, DatePipe, CurrencyCopPipe, ModalComponent, RouterLink],
@@ -31,23 +26,14 @@ export class PlatformsComponent implements OnInit {
   protected error = signal<string | null>(null);
   protected editingPlatform = signal<Platform | null>(null);
   protected showBalanceModal = signal(false);
-  protected showEfectyModal = signal(false);
   protected latestEfectyClose = signal<EfectyDailyClose | null>(null);
 
   protected submittingBalance = signal(false);
-  protected submittingEfecty = signal(false);
   protected balanceError = signal<string | null>(null);
-  protected efectyError = signal<string | null>(null);
 
   protected balanceForm = this.fb.group({
     currentBalance: [null as number | null, [Validators.required]],
     minimumThreshold: [null as number | null],
-  });
-
-  protected efectyForm = this.fb.group({
-    closeDate: [today(), Validators.required],
-    closingBalance: [null as number | null, [Validators.required, Validators.min(0)]],
-    notes: [''],
   });
 
   ngOnInit(): void {
@@ -98,12 +84,6 @@ export class PlatformsComponent implements OnInit {
     this.editingPlatform.set(null);
   }
 
-  protected openEfectyModal(): void {
-    this.efectyError.set(null);
-    this.efectyForm.reset({ closeDate: today(), closingBalance: null, notes: '' });
-    this.showEfectyModal.set(true);
-  }
-
   protected submitBalance(): void {
     this.balanceForm.markAllAsTouched();
     if (this.balanceForm.invalid || this.submittingBalance()) return;
@@ -129,34 +109,6 @@ export class PlatformsComponent implements OnInit {
         error: (err) => {
           const msg = err?.error?.message as string | undefined;
           this.balanceError.set(msg ?? 'No se pudo actualizar el saldo. Intenta de nuevo.');
-        },
-      });
-  }
-
-  protected submitEfectyClose(): void {
-    this.efectyForm.markAllAsTouched();
-    if (this.efectyForm.invalid || this.submittingEfecty()) return;
-
-    this.submittingEfecty.set(true);
-    this.efectyError.set(null);
-    const raw = this.efectyForm.getRawValue();
-
-    this.svc
-      .createEfectyClose({
-        closeDate: raw.closeDate!,
-        closingBalance: Number(raw.closingBalance),
-        notes: raw.notes || undefined,
-      })
-      .pipe(finalize(() => this.submittingEfecty.set(false)))
-      .subscribe({
-        next: (c) => {
-          this.latestEfectyClose.set(c);
-          this.showEfectyModal.set(false);
-          this.loadPlatforms();
-        },
-        error: (err) => {
-          const msg = err?.error?.message as string | undefined;
-          this.efectyError.set(msg ?? 'No se pudo registrar el cierre. Intenta de nuevo.');
         },
       });
   }

@@ -106,18 +106,17 @@
 
       <!-- Actions -->
       <div class="flex items-center gap-2 pt-1 flex-wrap">
-        @if (auth.hasAnyRole(['ROLE_ADMIN', 'ROLE_ROOT'])) {
-          @if (isEfecty(p)) {
-          <button (click)="openEfectyModal()"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-emerald-300 text-emerald-700 hover:bg-emerald-50 transition-colors">
-            Registrar cierre
-          </button>
-          } @else {
-          <button (click)="openBalanceModal(p)"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-emerald-300 text-emerald-700 hover:bg-emerald-50 transition-colors">
-            Actualizar saldo
-          </button>
-          }
+        @if (isEfecty(p)) {
+        <!-- /close only requires login (parent authGuard), so every user sees this -->
+        <p class="text-xs text-text-secondary">
+          Se registra en el
+          <a routerLink="/close" class="font-medium text-accent hover:underline">Cierre del Día</a>
+        </p>
+        } @else if (auth.hasAnyRole(['ROLE_ADMIN', 'ROLE_ROOT'])) {
+        <button (click)="openBalanceModal(p)"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-emerald-300 text-emerald-700 hover:bg-emerald-50 transition-colors">
+          Actualizar saldo
+        </button>
         }
         @if (p.tracksTransactions) {
         <a [routerLink]="['/platforms', p.id]"
@@ -200,73 +199,6 @@
         </svg>
         }
         Guardar saldo
-      </button>
-    </div>
-
-  </form>
-</app-modal>
-
-<!-- Efecty close modal -->
-<app-modal title="Registrar Cierre — Efecty" [isOpen]="showEfectyModal()" [closeOnBackdropClick]="false" (closed)="showEfectyModal.set(false)">
-  <form [formGroup]="efectyForm" (ngSubmit)="submitEfectyClose()" class="p-5 space-y-4">
-
-    @if (efectyError()) {
-    <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
-      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10" />
-        <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
-      </svg>
-      {{ efectyError() }}
-    </div>
-    }
-
-    <div>
-      <label class="block text-sm font-medium text-text-primary mb-1.5">
-        Fecha de cierre <span class="text-error">*</span>
-      </label>
-      <input type="date" formControlName="closeDate"
-        class="w-full px-3 py-2 rounded-lg border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
-        [class.border-slate-200]="!fe(efectyForm.get('closeDate'))"
-        [class.border-error]="fe(efectyForm.get('closeDate'))" />
-      @if (fe(efectyForm.get('closeDate'))) {
-      <p class="mt-1 text-xs text-error">Campo requerido</p>
-      }
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-text-primary mb-1.5">
-        Saldo de cierre <span class="text-error">*</span>
-      </label>
-      <input type="number" formControlName="closingBalance" min="0"
-        class="w-full px-3 py-2 rounded-lg border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
-        [class.border-slate-200]="!fe(efectyForm.get('closingBalance'))"
-        [class.border-error]="fe(efectyForm.get('closingBalance'))" />
-      @if (fe(efectyForm.get('closingBalance'))) {
-      <p class="mt-1 text-xs text-error">Campo requerido, mínimo 0</p>
-      }
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-text-primary mb-1.5">Notas</label>
-      <textarea formControlName="notes" rows="2" placeholder="Observaciones opcionales..."
-        class="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors resize-none">
-      </textarea>
-    </div>
-
-    <div class="flex justify-end gap-2 pt-2">
-      <button type="button" (click)="showEfectyModal.set(false)"
-        class="px-4 py-2 rounded-lg border border-slate-200 text-sm text-text-secondary hover:bg-slate-50 transition-colors">
-        Cancelar
-      </button>
-      <button type="submit" [disabled]="submittingEfecty()"
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-        @if (submittingEfecty()) {
-        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-        </svg>
-        }
-        Registrar cierre
       </button>
     </div>
 

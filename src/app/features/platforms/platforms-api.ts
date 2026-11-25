@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
 import { Page } from '@shared/models/product.model';
 import {
-  CreateEfectyCloseRequest,
   CreateTransactionRequest,
   EfectyDailyClose,
   Platform,
@@ -78,10 +77,6 @@ export class PlatformsService {
 
   deleteTransaction(id: string): Observable<void> {
     return this.http.delete<void>(`${base}/transactions/${id}`);
-  }
-
-  createEfectyClose(req: CreateEfectyCloseRequest): Observable<EfectyDailyClose> {
-    return this.http.post<EfectyDailyClose>(`${base}/efecty/close`, req);
   }
 
   getLatestEfectyClose(): Observable<EfectyDailyClose> {
