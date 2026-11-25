@@ -40,7 +40,7 @@ export class PlatformsComponent implements OnInit {
   protected efectyError = signal<string | null>(null);
 
   protected balanceForm = this.fb.group({
-    currentBalance: [null as number | null, [Validators.required, Validators.min(0)]],
+    currentBalance: [null as number | null, [Validators.required]],
     minimumThreshold: [null as number | null],
   });
 
@@ -167,7 +167,7 @@ export class PlatformsComponent implements OnInit {
 
   protected progressWidth(platform: Platform): number {
     if (!platform.minimumThreshold) return 100;
-    return Math.min((platform.currentBalance / platform.minimumThreshold) * 100, 100);
+    return Math.max(0, Math.min((platform.currentBalance / platform.minimumThreshold) * 100, 100));
   }
 
   protected progressColorClass(status: Platform['status']): string {

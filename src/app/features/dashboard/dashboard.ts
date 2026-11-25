@@ -101,7 +101,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   protected progressWidth(p: Platform): number {
     if (!p.minimumThreshold) return 100;
-    return Math.min((p.currentBalance / p.minimumThreshold) * 100, 100);
+    return Math.max(0, Math.min((p.currentBalance / p.minimumThreshold) * 100, 100));
   }
 
   protected progressColorClass(status: Platform['status']): string {

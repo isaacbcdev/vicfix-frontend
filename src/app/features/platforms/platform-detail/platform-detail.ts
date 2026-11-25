@@ -97,7 +97,7 @@ export class PlatformDetailComponent implements OnInit {
   });
 
   protected balanceForm = this.fb.group({
-    currentBalance: [null as number | null, [Validators.required, Validators.min(0)]],
+    currentBalance: [null as number | null, [Validators.required]],
     minimumThreshold: [null as number | null],
   });
 
