@@ -14,8 +14,8 @@ export class DebtsService {
     return this.http.get<DebtEntry[]>(`${base}/outstanding`);
   }
 
-  getMonthly(): Observable<DebtEntry[]> {
-    return this.http.get<DebtEntry[]>(`${base}/monthly`);
+  getAdminOverview(): Observable<DebtEntry[]> {
+    return this.http.get<DebtEntry[]>(`${base}/admin-overview`);
   }
 
   resolve(id: number, req: ResolveDebtRequest = {}): Observable<DebtEntry> {

@@ -48,7 +48,7 @@ export class DebtsListComponent implements OnInit {
   protected loadDebts(): void {
     this.loading.set(true);
     this.error.set(null);
-    const source$ = this.isAdminView() ? this.svc.getMonthly() : this.svc.getOutstanding();
+    const source$ = this.isAdminView() ? this.svc.getAdminOverview() : this.svc.getOutstanding();
     source$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (debts) => {
         this.debts.set(debts);
