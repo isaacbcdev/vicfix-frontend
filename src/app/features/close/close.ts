@@ -21,7 +21,7 @@ type CounterId = 'general' | 'efecty';
  * pesos is rounding noise, not a real discrepancy, so "ok" tolerates a small band around
  * zero rather than requiring an exact match.
  */
-function severityForBalance(value: number): StatSeverity {
+export function severityForBalance(value: number): StatSeverity {
   const abs = Math.abs(value);
   if (abs <= 1000) return 'ok';
   if (abs <= 10000) return 'warning';

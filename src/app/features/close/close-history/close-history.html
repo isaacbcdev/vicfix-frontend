@@ -1,0 +1,188 @@
+<div class="p-6 max-w-4xl mx-auto space-y-4">
+
+  <!-- Header -->
+  <div>
+    <h1 class="text-2xl font-semibold text-text-primary">Historial de cierres</h1>
+    <p class="text-sm text-text-secondary mt-0.5">Cierres del día registrados, del más reciente al más antiguo.</p>
+  </div>
+
+  <!-- Error -->
+  @if (error()) {
+  <div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <path stroke-linecap="round" d="M12 8v4m0 4h.01" />
+    </svg>
+    {{ error() }}
+  </div>
+  }
+
+  <!-- Loading skeletons -->
+  @if (loading()) {
+  <div class="space-y-3">
+    @for (_ of [1,2,3]; track $index) {
+    <div class="bg-white rounded-xl border border-slate-200 p-4 animate-pulse">
+      <div class="h-4 bg-slate-100 rounded w-32"></div>
+    </div>
+    }
+  </div>
+  }
+
+  @if (!loading()) {
+  <div class="space-y-3">
+    @for (c of closes(); track c.id) {
+    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+
+      <!-- Row header -->
+      <button type="button" (click)="toggleExpanded(c.id)"
+        class="w-full flex items-center justify-between gap-4 px-4 py-3.5 text-left hover:bg-slate-50 transition-colors">
+        <div class="flex items-center gap-4 min-w-0">
+          <p class="text-sm font-medium text-text-primary shrink-0">{{ c.closeDate | date: 'd MMM y' }}</p>
+        </div>
+
+        <div class="flex items-center gap-4 shrink-0">
+          <div class="text-right">
+            <p class="text-xs text-text-secondary">Diferencia</p>
+            <p class="text-sm font-semibold"
+              [class.text-emerald-700]="severityForBalance(c.diferencia) === 'ok'"
+              [class.text-amber-700]="severityForBalance(c.diferencia) === 'warning'"
+              [class.text-red-700]="severityForBalance(c.diferencia) === 'error'">
+              {{ c.diferencia | currencyCop }}
+            </p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-text-secondary">Gap Efecty</p>
+            <p class="text-sm font-semibold"
+              [class.text-emerald-700]="severityForBalance(c.efectyGap) === 'ok'"
+              [class.text-amber-700]="severityForBalance(c.efectyGap) === 'warning'"
+              [class.text-red-700]="severityForBalance(c.efectyGap) === 'error'">
+              {{ c.efectyGap | currencyCop }}
+            </p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-text-secondary">Sobrante real</p>
+            <p class="text-sm font-semibold"
+              [class.text-emerald-700]="severityForBalance(c.sobranteReal) === 'ok'"
+              [class.text-amber-700]="severityForBalance(c.sobranteReal) === 'warning'"
+              [class.text-red-700]="severityForBalance(c.sobranteReal) === 'error'">
+              {{ c.sobranteReal | currencyCop }}
+            </p>
+          </div>
+          <svg class="w-4 h-4 text-text-secondary transition-transform shrink-0"
+            [class.rotate-180]="expandedId() === c.id" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </button>
+
+      <!-- Expanded detail -->
+      @if (expandedId() === c.id) {
+      <div class="px-4 pb-4 space-y-4 border-t border-slate-100 pt-4">
+
+        <!-- Cash & Efecty figures -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="rounded-lg border border-slate-200 p-3">
+            <p class="text-xs text-text-secondary">Efectivo contado</p>
+            <p class="text-sm font-semibold text-text-primary mt-0.5">{{ c.cashCounted | currencyCop }}</p>
+          </div>
+          <div class="rounded-lg border border-slate-200 p-3">
+            <p class="text-xs text-text-secondary">Base de caja</p>
+            <p class="text-sm font-semibold text-text-primary mt-0.5">{{ c.cashBase | currencyCop }}</p>
+          </div>
+          <div class="rounded-lg border border-slate-200 p-3">
+            <p class="text-xs text-text-secondary">Efectivo Efecty</p>
+            <p class="text-sm font-semibold text-text-primary mt-0.5">{{ c.efectyPileCounted | currencyCop }}</p>
+          </div>
+          <div class="rounded-lg border border-slate-200 p-3">
+            <p class="text-xs text-text-secondary">Saldo reportado Efecty</p>
+            <p class="text-sm font-semibold text-text-primary mt-0.5">{{ c.efectyReportedBalance | currencyCop }}</p>
+          </div>
+        </div>
+
+        <!-- Platform balances -->
+        <div class="space-y-2">
+          <h3 class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Saldos de plataformas</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            @for (line of c.platformBalances; track line.platformId) {
+            <div class="rounded-lg border border-slate-200 border-l-4 border-l-emerald-600 p-3">
+              <p class="text-xs text-text-secondary font-mono">{{ line.platformCode }}</p>
+              <p class="text-sm font-semibold text-text-primary">{{ line.balance | currencyCop }}</p>
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Debts created that day -->
+        @if (c.debtsCreatedInClose.length > 0) {
+        <div class="space-y-2">
+          <h3 class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Deudas creadas este día</h3>
+          <div class="space-y-1.5">
+            @for (d of c.debtsCreatedInClose; track d.id) {
+            <div class="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-3 py-2">
+              <div class="min-w-0">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                  [class.bg-emerald-100]="d.debtKind === 'CUSTOMER_CREDIT'"
+                  [class.text-emerald-700]="d.debtKind === 'CUSTOMER_CREDIT'"
+                  [class.bg-amber-100]="d.debtKind === 'PERSONAL_LOAN'"
+                  [class.text-amber-700]="d.debtKind === 'PERSONAL_LOAN'">
+                  {{ kindLabel(d.debtKind) }}
+                </span>
+                <span class="ml-2 text-sm text-text-primary">{{ d.description ?? '—' }}</span>
+              </div>
+              <span class="text-sm font-medium text-text-primary shrink-0">{{ d.amount | currencyCop }}</span>
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        @if (c.notes) {
+        <div class="rounded-lg bg-slate-50 border border-slate-200 p-3">
+          <p class="text-xs text-text-secondary">Notas</p>
+          <p class="text-sm text-text-primary mt-0.5">{{ c.notes }}</p>
+        </div>
+        }
+
+        @if (canDelete()) {
+        <div class="flex justify-end pt-1 border-t border-slate-100">
+          <button type="button" (click)="deleteClose(c)" [disabled]="deletingId() === c.id"
+            class="inline-flex items-center gap-2 px-3 py-1.5 mt-3 rounded-lg border border-slate-200 text-text-secondary hover:text-red-600 hover:border-red-300 hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs font-medium">
+            @if (deletingId() === c.id) {
+            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+            </svg>
+            } @else {
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+            </svg>
+            }
+            Eliminar cierre
+          </button>
+        </div>
+        }
+
+      </div>
+      }
+    </div>
+    }
+
+    <!-- Empty state -->
+    @empty {
+    <div class="bg-white rounded-xl border border-slate-200 px-4 py-16 text-center">
+      <div class="flex flex-col items-center gap-3">
+        <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+        </svg>
+        <p class="text-text-secondary text-sm">Todavía no se ha registrado ningún cierre.</p>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+</div>

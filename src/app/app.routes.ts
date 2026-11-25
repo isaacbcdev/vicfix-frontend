@@ -60,6 +60,13 @@ export const routes: Routes = [
         loadComponent: () => import('@features/close/close').then((m) => m.CloseComponent),
       },
       {
+        path: 'close/history',
+        loadComponent: () =>
+          import('@features/close/close-history/close-history').then(
+            (m) => m.CloseHistoryComponent,
+          ),
+      },
+      {
         path: 'supplies',
         canActivate: [roleGuard(['ROLE_ADMIN', 'ROLE_ROOT'])],
         loadComponent: () =>

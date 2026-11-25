@@ -21,4 +21,12 @@ export class DailyCloseService {
   getLatest(): Observable<DailyClose> {
     return this.http.get<DailyClose>(`${base}/latest`);
   }
+
+  getAll(): Observable<DailyClose[]> {
+    return this.http.get<DailyClose[]>(base);
+  }
+
+  delete(closeDate: string): Observable<void> {
+    return this.http.delete<void>(`${base}/${closeDate}`);
+  }
 }

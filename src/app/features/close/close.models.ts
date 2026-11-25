@@ -14,6 +14,7 @@ export interface DebtEntry {
   amount: number;
   description: string | null;
   resolved: boolean;
+  resolutionNote: string | null;
   createdInCloseId: number;
   resolvedAt: string | null;
   createdBy: string;
@@ -58,4 +59,5 @@ export interface DailyClose {
   createdAt: string;
   platformBalances: PlatformBalanceLine[];
   outstandingDebts: DebtEntry[];
+  debtsCreatedInClose: DebtEntry[];
 }
