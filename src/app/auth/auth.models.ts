@@ -13,4 +13,4 @@ export interface User {
 
 export type LoginResult =
   | { ok: true }
-  | { ok: false; reason: 'credentials' | 'locked' };
+  | { ok: false; status: number; message: string | null };

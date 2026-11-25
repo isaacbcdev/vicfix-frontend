@@ -44,8 +44,8 @@ export class AuthService {
         map((): LoginResult => ({ ok: true })),
         catchError((err: HttpErrorResponse) => {
           this.clearAuth();
-          const reason = err.status === 423 ? 'locked' : 'credentials';
-          return of<LoginResult>({ ok: false, reason });
+          const message = typeof err.error?.message === 'string' ? err.error.message : null;
+          return of<LoginResult>({ ok: false, status: err.status, message });
         }),
       );
   }

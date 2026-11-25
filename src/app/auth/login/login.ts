@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '@auth/auth-api';
+import { loginErrorMessage } from './login-error';
 
 @Component({
   selector: 'app-login',
@@ -57,11 +58,7 @@ export class LoginComponent {
           this.router.navigate(['/dashboard']);
           return;
         }
-        this.errorMessage.set(
-          result.reason === 'locked'
-            ? 'Cuenta bloqueada temporalmente. Intenta de nuevo en unos minutos.'
-            : 'Usuario o contraseña incorrectos.',
-        );
+        this.errorMessage.set(loginErrorMessage(result.status, result.message));
       });
   }
 }
