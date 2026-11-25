@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '@auth/auth-api';
 import { ConfirmDialogComponent } from '@shared/ui/confirm-dialog/confirm-dialog';
+import { clearDrafts } from '@shared/utils/drafts';
 
 @Component({
   selector: 'app-shell',
@@ -34,7 +35,11 @@ export class ShellComponent {
   protected logout(): void {
     this.loggingOut.set(true);
     this.auth.logout().subscribe({
-      complete: () => this.router.navigate(['/login']),
+      complete: () => {
+        // Explicit logout only; session expiry keeps drafts so the cashier can recover them.
+        clearDrafts();
+        this.router.navigate(['/login']);
+      },
     });
   }
 }

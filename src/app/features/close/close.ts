@@ -5,11 +5,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { CurrencyCopPipe } from '@shared/pipes/currency-cop.pipe';
 import { DEBT_KIND_ORDER, DEBT_KINDS } from '@shared/models/debt-kind';
+import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
 import { DailyCloseService } from './daily-close-api';
+import { CloseDraftStore, DraftDebtRow } from './close-draft';
 import {
   countTotal,
   DenominationCounterComponent,
-  DenominationQuantities,
   toCountRequests,
 } from './denomination-counter/denomination-counter';
 import {
@@ -20,11 +21,6 @@ import {
   DebtKind,
   NewDebtEntryRequest,
 } from './close.models';
-
-function today(): string {
-  // Bogota calendar date (YYYY-MM-DD); toISOString() is UTC and rolls over at 7 p.m. local.
-  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Bogota' });
-}
 
 export type StatSeverity = 'ok' | 'warning' | 'error';
 
@@ -50,38 +46,45 @@ export function severityForBalance(value: number): StatSeverity {
 export class CloseComponent implements OnInit {
   private readonly svc = inject(DailyCloseService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly draft = inject(CloseDraftStore);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   protected loadingPreview = signal(false);
   protected previewError = signal<string | null>(null);
   protected preview = signal<DailyClosePreview | null>(null);
 
-  protected closeDate = signal(today());
-  protected efectyReportedBalance = signal<number | null>(null);
-  protected cashBase = signal<number | null>(null);
-  protected notes = signal('');
+  // Typed form state lives in the draft store (survives navigation and reloads).
+  protected readonly closeDate = this.draft.closeDate;
+  protected readonly efectyReportedBalance = this.draft.efectyReportedBalance;
+  protected readonly cashBase = this.draft.cashBase;
+  protected readonly notes = this.draft.notes;
 
   // Counting is mandatory: the backend derives cashCounted/efectyPileCounted from these.
-  protected cashQuantities = signal<DenominationQuantities>({});
-  protected efectyQuantities = signal<DenominationQuantities>({});
+  protected readonly cashQuantities = this.draft.cashQuantities;
+  protected readonly efectyQuantities = this.draft.efectyQuantities;
   private readonly cashTotal = computed(() => countTotal(this.cashQuantities()));
   private readonly efectyTotal = computed(() => countTotal(this.efectyQuantities()));
   protected readonly bothCountsZero = computed(
     () => this.cashTotal() === 0 && this.efectyTotal() === 0,
   );
 
-  protected newDebts = signal<NewDebtEntryRequest[]>([]);
+  protected readonly newDebts = this.draft.newDebts;
+
+  protected readonly draftRecovered = this.draft.recovered;
+  /** `dd/MM` of the recovered draft's close date. */
+  protected readonly draftDateLabel = computed(() => {
+    const [, month, day] = this.closeDate().split('-');
+    return `${day}/${month}`;
+  });
 
   protected readonly debtKinds = DEBT_KINDS;
   protected readonly debtKindOrder = DEBT_KIND_ORDER;
 
   // Rows live in one array (that's what the API takes) but render in one section per kind;
-  // `index` points back into `newDebts` for update/remove.
+  // each row's stable `id` is used for update/remove.
   protected readonly newDebtsByKind = computed(() => {
-    const groups: Record<DebtKind, { row: NewDebtEntryRequest; index: number }[]> = {
-      CUSTOMER_CREDIT: [],
-      PERSONAL_LOAN: [],
-    };
-    this.newDebts().forEach((row, index) => groups[row.debtKind].push({ row, index }));
+    const groups: Record<DebtKind, DraftDebtRow[]> = { CUSTOMER_CREDIT: [], PERSONAL_LOAN: [] };
+    for (const row of this.newDebts()) groups[row.debtKind].push(row);
     return groups;
   });
 
@@ -125,6 +128,7 @@ export class CloseComponent implements OnInit {
   );
 
   ngOnInit(): void {
+    this.draft.hydrate();
     this.loadPreview();
   }
 
@@ -140,7 +144,8 @@ export class CloseComponent implements OnInit {
       .subscribe({
         next: (p) => {
           this.preview.set(p);
-          this.cashBase.set(p.suggestedCashBase);
+          // Keep a base the cashier already typed (recovered draft); otherwise suggest one.
+          if (this.cashBase() === null) this.cashBase.set(p.suggestedCashBase);
         },
         error: (err) => {
           const msg = err?.error?.message as string | undefined;
@@ -150,17 +155,29 @@ export class CloseComponent implements OnInit {
   }
 
   protected addDebtRow(debtKind: DebtKind): void {
-    this.newDebts.set([...this.newDebts(), { debtKind, amount: 0, description: '' }]);
+    const row: DraftDebtRow = { id: crypto.randomUUID(), debtKind, amount: 0, description: '' };
+    this.newDebts.set([...this.newDebts(), row]);
   }
 
-  protected removeDebtRow(index: number): void {
-    this.newDebts.set(this.newDebts().filter((_, i) => i !== index));
+  protected removeDebtRow(id: string): void {
+    this.newDebts.set(this.newDebts().filter((r) => r.id !== id));
   }
 
-  protected updateDebtRow(index: number, patch: Partial<NewDebtEntryRequest>): void {
-    const rows = [...this.newDebts()];
-    rows[index] = { ...rows[index], ...patch };
-    this.newDebts.set(rows);
+  protected updateDebtRow(id: string, patch: Partial<NewDebtEntryRequest>): void {
+    this.newDebts.set(this.newDebts().map((r) => (r.id === id ? { ...r, ...patch } : r)));
+  }
+
+  protected async discardDraft(): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Descartar borrador',
+      message: 'Se borrarán los conteos, saldos, notas y deudas que escribiste. Esta acción no se puede deshacer.',
+      confirmLabel: 'Descartar',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
+    this.draft.clear();
+    const suggested = this.preview()?.suggestedCashBase;
+    if (suggested !== undefined) this.cashBase.set(suggested);
   }
 
   protected submit(): void {
@@ -176,7 +193,11 @@ export class CloseComponent implements OnInit {
       efectyCounts: toCountRequests(this.efectyQuantities()),
       cashBase: this.cashBase(),
       notes: this.notes() || null,
-      newDebts: this.newDebts(),
+      newDebts: this.newDebts().map(({ debtKind, amount, description }) => ({
+        debtKind,
+        amount,
+        description,
+      })),
     };
 
     this.svc
@@ -188,6 +209,7 @@ export class CloseComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.result.set(res);
+          this.draft.clear();
         },
         error: (err) => {
           const msg = err?.error?.message as string | undefined;
